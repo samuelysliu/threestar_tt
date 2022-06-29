@@ -1,0 +1,160 @@
+{
+	"contractName": "ThreeStar",
+	"abi": [
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "withdrawAmount",
+					"type": "uint256"
+				}
+			],
+			"name": "withdraw",
+			"outputs": [],
+			"payable": true,
+			"stateMutability": "payable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [],
+			"name": "ownerRemain",
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "_winner",
+					"type": "address"
+				},
+				{
+					"name": "_point",
+					"type": "uint256"
+				}
+			],
+			"name": "sendPrize",
+			"outputs": [],
+			"payable": true,
+			"stateMutability": "payable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "",
+					"type": "address"
+				}
+			],
+			"name": "playerInfo",
+			"outputs": [
+				{
+					"name": "amount",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "player",
+					"type": "address"
+				}
+			],
+			"name": "balanceOf",
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [],
+			"name": "game",
+			"outputs": [],
+			"payable": true,
+			"stateMutability": "payable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"payable": true,
+			"stateMutability": "payable",
+			"type": "constructor"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"name": "player",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "betAmount",
+					"type": "uint256"
+				}
+			],
+			"name": "playGame",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"name": "player",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "prize",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"name": "result",
+					"type": "bool"
+				}
+			],
+			"name": "gameResult",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"name": "betAmount",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"name": "success",
+					"type": "bool"
+				}
+			],
+			"name": "withdrawOrder",
+			"type": "event"
+		}
+	]
+}

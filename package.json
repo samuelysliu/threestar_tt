@@ -1,0 +1,9 @@
+{
+    "cacheDirectories": [
+      "templates/node_modules"
+    ],
+    "scripts": {
+      "heroku-postbuild": "cd templates && npm install --legacy-peer-deps && npm run build"
+    }
+  }
+  
