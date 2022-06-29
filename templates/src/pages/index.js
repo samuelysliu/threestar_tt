@@ -10,7 +10,7 @@ import ResultPopout from '../components/resultPopout';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
 
 function Index() {
-    const apiPath = "http://127.0.0.1:5000"
+    const apiPath = "https://three-star.herokuapp.com"
     const [userInfo, setUserInfo] = useState()
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
