@@ -78,6 +78,7 @@ function ResultPopout(gameInfo) {
     }
 
     useEffect(() => {
+        resizeImage();
         window.addEventListener('resize', resizeImage)
     }, [])
 
