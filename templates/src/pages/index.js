@@ -10,8 +10,8 @@ import ResultPopout from '../components/resultPopout';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
 
 function Index() {
-    //const apiPath = "https://three-star.herokuapp.com/"
-    const apiPath = "https://three-star-test.herokuapp.com/"
+    const apiPath = "https://three-star.herokuapp.com/"
+    //const apiPath = "https://three-star-test.herokuapp.com/"
     const [userInfo, setUserInfo] = useState()
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
