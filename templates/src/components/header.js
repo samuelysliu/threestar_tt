@@ -14,8 +14,12 @@ function Header({ sendUserInfo }) {
             console.log('Please install MetaMask!');
         } else {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            setUserInfo({ account: accounts[0], balance: web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether') })
-            setLoading(false)
+            const chainId = await web3.eth.getChainId();
+            if (chainId === 18 || chainId === 108) {
+                setUserInfo({ account: accounts[0], balance: web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether') })
+                setLoading(false)
+            }
+
             window.ethereum.on('accountsChanged', async (accounts) => {
                 setLoading(true)
                 if (typeof accounts[0] !== 'undefined' && accounts[0] !== null) {
@@ -27,8 +31,12 @@ function Header({ sendUserInfo }) {
             window.ethereum.on('chainChanged', async (chainId) => {
                 setLoading(true)
                 let network = parseInt(chainId, 16)
-                setUserInfo(preValue => ({ ...preValue, balance: web3.utils.fromWei(web3.eth.getBalance(userInfo.account), 'ether') }))
-                setLoading(false)
+                console.log(network)
+                if (network === 18 || network === 108) {
+                    let balance = web3.utils.fromWei(await web3.eth.getBalance(userInfo['account']), 'ether')
+                    setUserInfo(preValue => ({ ...preValue, balance:  balance}))
+                    setLoading(false)
+                }
             });
         }
 
