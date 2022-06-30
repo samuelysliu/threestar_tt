@@ -34,7 +34,7 @@ function Header({ sendUserInfo }) {
                 if (network === 18 || network === 108) {
                     let balance = web3.utils.fromWei(await web3.eth.getBalance(userInfo['account']), 'ether')
                     setUserInfo(preValue => ({ ...preValue, balance:  balance}))
-                    setLoading(false)
+                    setLoading(false);
                 }
             });
         }
