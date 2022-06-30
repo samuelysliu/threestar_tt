@@ -31,7 +31,7 @@ function Header({ sendUserInfo }) {
             window.ethereum.on('chainChanged', async (chainId) => {
                 setLoading(true)
                 let network = parseInt(chainId, 16)
-                console.log(network)
+                
                 if (network === 18 || network === 108) {
                     let balance = web3.utils.fromWei(await web3.eth.getBalance(userInfo['account']), 'ether')
                     setUserInfo(preValue => ({ ...preValue, balance:  balance}))
