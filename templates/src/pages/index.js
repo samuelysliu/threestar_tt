@@ -10,8 +10,7 @@ import ResultPopout from '../components/resultPopout';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
 
 function Index() {
-    const apiPath = "https://three-star.herokuapp.com/"
-    //const apiPath = "https://three-star-test.herokuapp.com/"
+    const apiPath = process.env.REACT_APP_APIPATH;
     const [userInfo, setUserInfo] = useState()
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
@@ -55,7 +54,7 @@ function Index() {
 
     const loadWeb3 = () => {
         let contract_abi = ThreeStarABI.abi;
-        let contract_address = '0x1460747b41F545c19237CB8F26BcE45Dd7Fd5F7e' //tt-test
+        let contract_address = process.env.REACT_APP_CONTRACT;
         setContract(new web3.eth.Contract(contract_abi, contract_address));
     }
 
