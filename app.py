@@ -5,8 +5,8 @@ import threeStar
 import os
 
 app = Flask(__name__, static_folder='templates/build')
-#CORS(app, resources={r"/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
-CORS(app)
+CORS(app, resources={r"/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+#CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
