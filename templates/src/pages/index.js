@@ -10,7 +10,7 @@ import ResultPopout from '../components/resultPopout';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
 
 function Index() {
-    const apiPath = 'https://three-star.herokuapp.com/';
+    const apiPath = 'https://three-star-test.herokuapp.com';
     const [userInfo, setUserInfo] = useState()
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
@@ -22,16 +22,17 @@ function Index() {
     const [popoutShow, setPopoutShow] = useState(false)
     const [show, setShow] = useState(true)
     const [toastShow, setToastShow] = useState(false)
+    const [gameInitWaiting, setGameInitWaiting] = useState(true)
     let web3 = new Web3(window.ethereum);
 
     const getUserInfo = (_userInfo) => {
         setUserInfo(_userInfo)
     }
 
-    const getToastShowStatus = (_toastShowStatus) =>{
-        if(_toastShowStatus === undefined){
+    const getToastShowStatus = (_toastShowStatus) => {
+        if (_toastShowStatus === undefined) {
             return toastShow
-        }else if(_toastShowStatus != toastShow){
+        } else if (_toastShowStatus !== toastShow) {
             setToastShow(_toastShowStatus)
         }
     }
@@ -47,6 +48,9 @@ function Index() {
             if (temp.length < 5) {
                 temp.push(luckyNumber)
             }
+            if (temp.length === 5 && userInfo.account !== '' && userBet >= 0.00001) {
+                setGameInitWaiting(false)
+            }
         }
 
         setUserLuckyNumber(temp)
@@ -54,7 +58,7 @@ function Index() {
 
     const loadWeb3 = () => {
         let contract_abi = ThreeStarABI.abi;
-        let contract_address = '0xe8fbF366510907D0B616b387CBc513f7Fc31279B';
+        let contract_address = '0x1460747b41F545c19237CB8F26BcE45Dd7Fd5F7e';
         setContract(new web3.eth.Contract(contract_abi, contract_address));
     }
 
@@ -67,10 +71,10 @@ function Index() {
             setPopoutShow(true);
             let point = 0;
             // assign task to backend to create random number and match
-            axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber }).then(res => {
-                point = res['data']['point'];
-                setStarNumber(res['data']['starNumber'])
-                contract.methods.game().send({ from: userInfo.account, value: userBet * 1000000000000000000 }).then(function (receipt) {
+            contract.methods.game().send({ from: userInfo.account, value: userBet * 1000000000000000000 }).then(function (receipt) {
+                axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber }).then(res => {
+                    point = res['data']['point'];
+                    setStarNumber(res['data']['starNumber'])
                     if (point >= 3) {
                         axios.post(apiPath + "/sendPrize", { "winner": userInfo.account, "point": point }).then(res => {
                             if (res['data']['result'] === 'success') {
@@ -87,10 +91,14 @@ function Index() {
                     } else {
                         setGameStatus("You Lose");
                     }
+                }).catch(error => {
+                    console.log(error);
                 })
             }).catch(error => {
-                console.log(error);
+                setGameStatus("");
+                setPopoutShow(false);
             })
+
         }
     }
 
@@ -100,6 +108,11 @@ function Index() {
 
     useEffect(() => {
         setEstimateEarn(userBet * 100)
+        if(userBet < 0.00001){
+            setGameInitWaiting(true)
+        }else if(userLuckyNumber.length === 5 && userInfo.account !== '' && userBet >= 0.00001){
+            setGameInitWaiting(false)
+        }
     }, [userBet]);
 
     return (
@@ -128,11 +141,11 @@ function Index() {
                         <Form>
                             <Form.Label><img src='https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1' alt="tt token" width="20px"></img>TT</Form.Label>
                             <Form.Control type="number" placeholder="bet amount" value={userBet} onChange={(e) => setUserBet(e.target.value)} />
-                            <Form.Label>Your will Earn<BsFillInfoCircleFill onClick={()=>setToastShow(!toastShow)}/></Form.Label>
+                            <Form.Label>Your will Earn<BsFillInfoCircleFill onClick={() => setToastShow(!toastShow)} /></Form.Label>
                             <br></br>
                             <font style={{ fontSize: "48px", paddingRight: "10px", color: "orange" }}>{estimateEarn}</font><font>TT</font>
                             <br></br>
-                            <Button variant="primary" size="lg" onClick={startGame}>
+                            <Button variant="primary" size="lg" onClick={startGame} disabled={gameInitWaiting}>
                                 Let's Bet
                             </Button>
                         </Form>
