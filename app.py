@@ -37,8 +37,24 @@ class sendPrize(Resource):
         else:
             return {"result": "failed"}
 
+class stake(Resource):
+    def post(self):
+        data = request.get_json()
+        result = threeStar.stake(data['userAddress'], data['stakeAmount'])
+
+        return {"result": result}
+
+class setReward:
+    def post(self):
+        data = request.get_json()
+        result = threeStar.setReward(data['privateKey'], data['todayEarn'])
+
+        return {"result": result}
+
 api.add_resource(startGame, '/startGame')
 api.add_resource(sendPrize, '/sendPrize')
+api.add_resource(stake, '/stake')
+api.add_resource(setReward, '/mastetSetReward')
 
 
 if __name__ == '__main__':
