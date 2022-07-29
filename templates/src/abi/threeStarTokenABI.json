@@ -1,6 +1,6 @@
 {
-	"contractName": "ThreeStarToken",
-	"abi": [
+    "contractName": "ThreeStarToken",
+    "abi": [
         {
             "inputs": [
                 {

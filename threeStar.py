@@ -21,6 +21,11 @@ stakeABI = json.load(stakeABIJson)['abi']
 stakeContractAddress = os.getenv("stakeContractAddress_test")
 stakeContract = web3.eth.contract(address=stakeContractAddress, abi=stakeABI)
 
+TSABIJson = open('./static/abi/threeStarTokenABI.json')
+TSABI = json.load(TSABIJson)['abi']
+TSContractAddress = '0xc5929cBd676C2a8445eA75585C3eA3FfffCD0958'
+TSContract = web3.eth.contract(address = TSContractAddress, abi=TSABI)
+
 owner = {
     'privateKey': os.getenv("walletPrivateKey"),
     'address': os.getenv("walletAddress")
@@ -61,22 +66,6 @@ def sendPrize(winner, point):
 
     result = sendTransaction(contractSendPrize)
     return result
-
-
-def stake(userAddress, stakeAmount):
-    if stakeAmount > 0:
-        userStake = stakeContract.function.stake(userAddress, web3.toWei(stakeAmount, 'ether')).buildTransaction(
-            {
-                'from': owner['address'],
-                'gas': 1041586,
-                'nonce': web3.eth.get_transaction_count(owner['address']),
-            }
-        )
-
-        result = sendTransaction(userStake)
-        return result
-    else:
-        return "stake amount must bigger than 0"
 
 
 def setReward(privateKey, todayEarn):
@@ -123,3 +112,31 @@ def sendTransaction(transaction):
     except Exception:
         print(Exception)
         return "failed"
+
+
+def getOwnerRemain():
+    ownerRemain = web3.fromWei(threeStarContract.functions.ownerRemain().call(), 'ether')
+    return ownerRemain
+
+def getDividend(ownerRemain):
+    return round(ownerRemain * 20 / 100, 5)
+
+def getAPR(dividends):
+    totalSupply = web3.fromWei(stakeContract.functions.totalSupply().call(), 'ether')
+
+    return str(round(dividends*365/totalSupply, 2)) + '%'
+
+
+def test():
+    #userStake = TSContract.functions.allowance('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress).call()
+    userStake = web3.fromWei(threeStarContract.functions.ownerRemain().call(), 'ether')
+    print(userStake)
+    """userStake = TSContract.functions.transferFrom('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress, web3.toWei(10, 'ether')).buildTransaction(
+        {
+            'from': owner['address'],
+            'gas': 1041586,
+            'nonce': web3.eth.get_transaction_count(owner['address']),
+        }
+    )
+
+    result = sendTransaction(userStake)"""

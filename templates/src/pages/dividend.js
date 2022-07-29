@@ -8,26 +8,34 @@ import ThreeStarToken from '../images/threeStarToken.png';
 import Header from '../components/header';
 import ThreeStarTokenABI from '../abi/threeStarTokenABI.json';
 import StakingRewardABI from '../abi/stakingRewardABI.json';
-import TetherABI from '../abi/tetherABI.json';
 
 function Dividend() {
-    const apiPath = 'https://three-star.herokuapp.com';
+    const apiPath = 'http://127.0.0.1:5000';
     let web3 = new Web3(window.ethereum);
 
     const [userInfo, setUserInfo] = useState({ 'account': '', 'balance': '' })
-    
+
     const [TSTokencontract, setTSTokenContract] = useState();
     const [stakeContract, setStakeContract] = useState();
 
     const [stakeMax, setStakeMax] = useState(0);
     const [unstakeMax, setUnstakeMax] = useState(0);
 
+    const [stakeAmount, setStakeAmount] = useState(0);
+    const [unstakeAmount, setUnstakeAmount] = useState(0);
+
+    const [dividends, setDividends] = useState(0);
+    const [APR, setAPR] = useState(0);
+
+    const [disableDividends, setDisableDividends] = useState(true);
+
     let totalAllowance = '100000000000000000000000000000';
-    const [remainAllowance, setRemainAllowance] = useState(0);
+    const [unlockBool, setUnlockBool] = useState(true);
+
     let TSTokenContractABI = ThreeStarTokenABI.abi;
-    let TSTokenContractAddress = '0x9838357AD99D0e83D7d449651094A63A6fd16F83';
+    let TSTokenContractAddress = '0xc5929cBd676C2a8445eA75585C3eA3FfffCD0958';
     let stakeContractABI = StakingRewardABI.abi;
-    let stakeContractAddress = '0x768acfb045b9563A62FC1213b4e91cc8Eee1E91E';
+    let stakeContractAddress = '0xF8c0e37797F96260412699390121D6fB64b380Fb';
 
     const getUserInfo = (_userInfo) => {
         setUserInfo(_userInfo)
@@ -83,40 +91,53 @@ function Dividend() {
 
     const checkContractInfo = () => {
         TSTokencontract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
-            setRemainAllowance(receipt);
-        }).catch(error => {
-            console.log(error);
-        })
+            if (receipt >= 10000000000000000000000000) {
+                setUnlockBool(false);
+                TSTokencontract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+                    setStakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
+                }).catch(error => {
+                    console.log(error);
+                })
 
-        TSTokencontract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
-            setStakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
-        }).catch(error => {
-            console.log(error);
-        })
-
-        stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
-            setUnstakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
+                stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+                    setUnstakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
+                }).catch(error => {
+                    console.log(error);
+                })
+            }
         }).catch(error => {
             console.log(error);
         })
     }
 
     const unlock = () => {
-
         TSTokencontract.methods.approve(stakeContractAddress, totalAllowance).send({ from: userInfo.account }).then(function (receipt) {
-
+            checkContractInfo();
         }).catch(error => {
             console.log(error)
         })
-        /*contract.methods.stake('1000000000000000000').send({ from: userInfo.account, gas: 100000 }).then(function (receipt) {
-            
-        }).catch(error => {
-            console.log(error)
-        })*/
     }
 
     const stake = () => {
+        if (stakeAmount > 0 && stakeAmount <= stakeMax) {
+            stakeContract.methods.stake(web3.utils.toWei(stakeAmount, 'ether')).send({ from: userInfo.account }).then(function (receipt) {
+                setUnstakeMax((Number(unstakeMax) + Number(stakeAmount)).toFixed(5));
+                setStakeMax((Number(stakeMax) - Number(stakeAmount)).toFixed(5));
+            }).catch(error => {
+                console.log(error);
+            })
+        }
+    }
 
+    const unstake = () => {
+        if (unstakeAmount > 0 && unstakeAmount <= unstakeMax) {
+            stakeContract.methods.withdraw(web3.utils.toWei(unstakeAmount, 'ether')).send({ from: userInfo.account, value: web3.utils.toWei('1', 'ether') }).then(function (receipt) {
+                setUnstakeMax((Number(unstakeMax) - Number(unstakeAmount)).toFixed(5));
+                setStakeMax((Number(stakeMax) + Number(unstakeAmount)).toFixed(5));
+            }).catch(error => {
+                console.log(error);
+            })
+        }
     }
 
     const claimDevidends = () => {
@@ -127,9 +148,14 @@ function Dividend() {
         })
     }
 
-
     useEffect(() => {
         loadWeb3();
+        axios.get(apiPath + "/getDividendInfo").then(res => {
+            setDividends(res['data']['dividends'])
+            setAPR(res['data']['APR'])
+        }).catch(error => {
+            console.log(error)
+        });
     }, [])
 
     useEffect(() => {
@@ -137,6 +163,12 @@ function Dividend() {
             checkContractInfo();
         }
     }, [userInfo])
+
+    useEffect(() => {
+        if (Number(dividends) > 0) {
+            setDisableDividends(false)
+        }
+    }, [dividends])
 
     const card = {
         border: "1px",
@@ -211,12 +243,12 @@ function Dividend() {
                         <Col xs={6} sm={6} style={{ textAlign: "right" }}>
                             <font style={{ fontSize: "13px" }}>Coming Dividend</font>
                             <br></br>
-                            <font style={{ fontSize: "22px" }}>2000.88 TT</font>
+                            <font style={{ fontSize: "22px" }}>{dividends} TT</font>
                         </Col>
                     </Row>
                     <Row style={blockTwoStyle}>
                         <Col style={{ fontSize: "15px", textAlign: "left" }}>APR</Col>
-                        <Col style={{ fontSize: "15px", textAlign: "right" }}>36%</Col>
+                        <Col style={{ fontSize: "15px", textAlign: "right" }}>{APR}</Col>
                     </Row>
                     <Row>
                         <Col style={{ fontSize: "15px", textAlign: "left" }}>Next Payout</Col>
@@ -228,7 +260,7 @@ function Dividend() {
                         <Row>
                             <Col><Button style={longButtonStyle} onClick={connectWallet}>Connect Wallet</Button></Col>
                         </Row>
-                        : remainAllowance < 10000000000000000000000000
+                        : unlockBool
                             ?
                             <Row>
                                 <Col><Button style={longButtonStyle} onClick={unlock}>Unlock</Button></Col>
@@ -241,31 +273,41 @@ function Dividend() {
                         <Col xs={5} sm={5} style={{ textAlign: "left" }}>
                             <font style={{ fontSize: "13px", color: "#669BFD" }}>Aviailable TS</font>
                             <br></br>
-                            <font style={{ fontSize: "15px" }}><Form.Control defaultValue={0} style={{ border: "0px" }} type="number" /></font>
+                            <font style={{ fontSize: "15px" }}><Form.Control value={stakeAmount} style={{ border: "0px" }} type="number" onChange={(e) => { setStakeAmount(e.target.value) }} /></font>
                         </Col>
                         <Col style={{ textAlign: "right" }}>
-                            <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }}>Max: {stakeMax}</font>
+                            <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setStakeAmount(stakeMax) }}>Max: {stakeMax}</font>
                             <br></br>
-                            <Button style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
+                            <Button disabled={stakeAmount > stakeMax} style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
+                            <br></br>
+                            <font style={{ fontSize: "12px", color: "#FF0000" }}>
+                                {stakeAmount > stakeMax ? "Insufficient balance"
+                                    : ""}
+                            </font>
                         </Col>
                     </Row>
                     <Row style={blockThreeStyle}>
                         <Col xs={5} sm={5} style={{ textAlign: "left" }}>
                             <font style={{ fontSize: "13px", color: "#669BFD" }}>Staked TS</font>
                             <br></br>
-                            <font style={{ fontSize: "15px" }}><Form.Control defaultValue={0} style={{ border: "0px" }} type="number" /></font>
+                            <font style={{ fontSize: "15px" }}><Form.Control value={unstakeAmount} style={{ border: "0px" }} type="number" onChange={(e) => { setUnstakeAmount(e.target.value) }} /></font>
                         </Col>
                         <Col style={{ textAlign: "right", }}>
-                            <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }}>Max: {unstakeMax}</font>
+                            <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setUnstakeAmount(unstakeMax) }}>Max: {unstakeMax}</font>
                             <br></br>
-                            <Button variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }}>Unstake</Button>
+                            <Button disabled={unstakeAmount > unstakeMax} variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={unstake}>Unstake</Button>
+                            <br></br>
+                            <font style={{ fontSize: "12px", color: "#FF0000" }}>
+                                {unstakeAmount > unstakeMax ? "Insufficient balance"
+                                    : ""}
+                            </font>
                         </Col>
                     </Row>
                     <Row style={blockTwoStyle}>
-                        <Col><Button style={longButtonStyle} onClick={claimDevidends}>Claim Dividends</Button></Col>
+                        <Col><Button disabled={disableDividends} style={longButtonStyle} onClick={claimDevidends}>Claim Dividends</Button></Col>
                     </Row>
                     <Row style={blockFourStyle}>
-                        <Col><p style={{ color: "red", fontSize: "11px" }}>*Dividends must be claimed within 1 days</p></Col>
+                        <Col><p style={{ color: "red", fontSize: "12px" }}>*Dividends must be claimed within 1 days</p></Col>
                     </Row>
                 </Container>
 
@@ -275,9 +317,6 @@ function Dividend() {
                     </Row>
                     <Row style={blockFiveStyle}>
                         <Col><font>You can also get <font style={{ color: "#669BFD" }}>3 Star</font> tokens, by playing the games!</font></Col>
-                    </Row>
-                    <Row style={blockFiveStyle}>
-                        <Col><font>Whether you <font style={{ color: "#669BFD" }}>win/lost</font> a game, you'll receive the token to earn from the dividend!</font></Col>
                     </Row>
                     <Row style={blockFourStyle}>
                         <Col><a href='/'><Button style={longButtonStyle}>Go to play</Button></a></Col>
