@@ -48,7 +48,7 @@ function Index() {
             if (temp.length < 5) {
                 temp.push(luckyNumber)
             }
-            if (temp.length === 5 && userInfo.account !== '' && userBet >= 0.00001) {
+            if (temp.length === 5 && userInfo.account !== '' && userBet >= 1) {
                 setGameInitWaiting(false)
             }
         }
@@ -102,15 +102,32 @@ function Index() {
         }
     }
 
+    const randomCreateuserLuckyNumber = () => {
+        setUserLuckyNumber([])
+        let randomTemp = [Math.floor(Math.random() * 80) + 1]
+        let temp;
+        while (randomTemp.length < 5) {
+            temp = Math.floor(Math.random() * 80) + 1
+            if (!randomTemp.includes(temp)) {
+                randomTemp.push(temp)
+            }
+        }
+        setUserLuckyNumber(randomTemp)
+        if (randomTemp.length === 5 && userInfo.account !== '' && userBet >= 1) {
+            setGameInitWaiting(false)
+        }
+        
+    }
+
     useEffect(() => {
         loadWeb3()
     }, [])
 
     useEffect(() => {
         setEstimateEarn(userBet * 100)
-        if(userBet < 0.00001){
+        if (userBet < 0.00001) {
             setGameInitWaiting(true)
-        }else if(userLuckyNumber.length === 5 && userInfo.account !== '' && userBet >= 0.00001){
+        } else if (userLuckyNumber.length === 5 && userInfo.account !== '' && userBet >= 0.00001) {
             setGameInitWaiting(false)
         }
     }, [userBet]);
@@ -145,6 +162,9 @@ function Index() {
                             <br></br>
                             <font style={{ fontSize: "48px", paddingRight: "10px", color: "orange" }}>{estimateEarn}</font><font>TT</font>
                             <br></br>
+                            <Button variant="success" size="lg" style={{ marginRight: '5px' }} onClick={randomCreateuserLuckyNumber}>
+                                Random
+                            </Button>
                             <Button variant="primary" size="lg" onClick={startGame} disabled={gameInitWaiting}>
                                 Let's Bet
                             </Button>

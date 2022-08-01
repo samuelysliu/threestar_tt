@@ -18,6 +18,36 @@ function Header({ sendUserInfo }) {
             if (chainId === 18 || chainId === 108) {
                 setUserInfo({ account: accounts[0], balance: web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether') })
                 setLoading(false)
+            }else {
+                try {
+                    await web3.currentProvider.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x12" }],
+                    });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await web3.currentProvider.request({
+                                method: "wallet_addEthereumChain",
+                                params: [
+                                    {
+                                        chainId: "0x12",
+                                        chainName: "ThunderCore Testnet",
+                                        rpcUrls: ["https://testnet-rpc.thundercore.com"],
+                                        nativeCurrency: {
+                                            name: "TST token",
+                                            symbol: "TST",
+                                            decimals: 18,
+                                        },
+                                        blockExplorerUrls: ["https://explorer-testnet.thundercore.com/"],
+                                    },
+                                ],
+                            });
+                        } catch (error) {
+                            alert(error.message);
+                        }
+                    }
+                }
             }
 
             window.ethereum.on('accountsChanged', async (accounts) => {
