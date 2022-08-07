@@ -36,6 +36,7 @@ function Dividend() {
     let TSTokenContractAddress = '0xc5929cBd676C2a8445eA75585C3eA3FfffCD0958';
     let stakeContractABI = StakingRewardABI.abi;
     let stakeContractAddress = '0xF8c0e37797F96260412699390121D6fB64b380Fb';
+    //let stakeContractAddress = '0xF19650489A6141585f7e3a48F3D7722017B79ab5' //test
 
     const getUserInfo = (_userInfo) => {
         setUserInfo(_userInfo)
@@ -47,7 +48,7 @@ function Dividend() {
         } else {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const chainId = await web3.eth.getChainId();
-            if (chainId === 18 || chainId === 108) {
+            if (chainId === 18 || chainId === 108 || chainId === 97) {
                 setUserInfo({ account: accounts[0], balance: web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether') })
             } else {
                 try {
