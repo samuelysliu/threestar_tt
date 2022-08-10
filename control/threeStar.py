@@ -13,6 +13,7 @@ threeStarContractAddress, threeStarContract = blockchain.getThreeStarContract(we
 stakeContractAddress, stakeContract = blockchain.getStakeContract(web3)
 TSContractAddress, TSContract = blockchain.getTSToken(web3)
 
+
 def game(userLuckyNum):
     starNumber = [random.randint(1, 80)]
     while len(starNumber) < 20:
@@ -49,58 +50,56 @@ def sendPrize(winner, point):
     return result
 
 
-def setReward(privateKey):
-    if privateKey == os.getenv("privateKey"):
-        try:
-            dividend = getTodayDividend()
-            tx = {
-                'nonce': web3.eth.get_transaction_count(owner['address']),
-                'to': stakeContractAddress,
-                'value': web3.toWei(dividend, 'ether'),
+def setReward():
+    try:
+        dividend = getTodayDividend()
+        tx = {
+            'nonce': web3.eth.get_transaction_count(owner['address']),
+            'to': stakeContractAddress,
+            'value': web3.toWei(dividend, 'ether'),
+            'gas': 1041586,
+            'gasPrice': web3.toWei('50', 'gwei'),
+            'chainId': 18
+        }
+
+        blockchain.sendTransaction(web3, tx)
+
+        setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
+            {
+                'from': owner['address'],
                 'gas': 1041586,
-                'gasPrice': web3.toWei('50', 'gwei'),
-                'chainId': 18
+                'nonce': web3.eth.get_transaction_count(owner['address']),
             }
+        )
+        blockchain.sendTransaction(web3, setTodayReward)
+        return "success"
 
-            blockchain.sendTransaction(web3, tx)
-
-            setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
-                {
-                    'from': owner['address'],
-                    'gas': 1041586,
-                    'nonce': web3.eth.get_transaction_count(owner['address']),
-                }
-            )
-            blockchain.sendTransaction(web3, setTodayReward)
-            return "success"
-
-        except Exception:
-            return "insufficient balance"
-
-    else:
-        return "failed"
+    except Exception:
+        return "insufficient balance"
 
 
 def getOwnerRemain():
     ownerRemain = web3.fromWei(threeStarContract.functions.ownerRemain().call(), 'ether')
     return ownerRemain
 
+
 def getTodayDividend():
     ownerRemain = getOwnerRemain()
     return round(ownerRemain * 20 / 100, 5)
+
 
 def getDividendInfo():
     ownerRemain = blockchain.getOwnerRemain(web3, threeStarContract)
     dividend = getTodayDividend()
     APR = blockchain.getAPR(web3, dividend)
-    payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime("%m/%d") + " 00:00"
+    payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
+        "%m/%d") + " 00:00"
 
     return str(dividend), APR, payout
 
 
-
 def test():
-    #userStake = TSContract.functions.allowance('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress).call()
+    # userStake = TSContract.functions.allowance('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress).call()
     userStake = web3.fromWei(threeStarContract.functions.ownerRemain().call(), 'ether')
     print(userStake)
     """userStake = TSContract.functions.transferFrom('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress, web3.toWei(10, 'ether')).buildTransaction(

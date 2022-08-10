@@ -38,6 +38,7 @@ class sendPrize(Resource):
         else:
             return {"result": "failed"}
 
+"""
 class setReward(Resource):
     def post(self):
         try:
@@ -61,6 +62,7 @@ class setReward(Resource):
                 mimetype="application/json",
                 status=400
             )
+"""
 
 class getDividendInfo(Resource):
     def get(self):
@@ -69,7 +71,7 @@ class getDividendInfo(Resource):
 
 api.add_resource(startGame, '/startGame')
 api.add_resource(sendPrize, '/sendPrize')
-api.add_resource(setReward, '/mastetSetReward')
+#api.add_resource(setReward, '/mastetSetReward')
 api.add_resource(getDividendInfo, '/getDividendInfo')
 
 
