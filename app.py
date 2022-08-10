@@ -1,12 +1,13 @@
-from flask import Flask, request, send_from_directory
+import json
+from flask import Flask, request, send_from_directory, Response
 from flask_restful import Api, Resource
 from flask_cors import CORS
-import threeStar
+from control import threeStar
 import os
 
 app = Flask(__name__, static_folder='templates/build')
-CORS(app, resources={r"/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
-#CORS(app)
+#CORS(app, resources={r"/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -39,18 +40,32 @@ class sendPrize(Resource):
 
 class setReward(Resource):
     def post(self):
-        data = request.get_json()
-        result = threeStar.setReward(data['privateKey'], data['todayEarn'])
+        try:
+            privateKey = request.get_json()['privateKey']
+            result = threeStar.setReward(privateKey)
+            if result == "failed":
+                return Response(
+                    json.dumps(
+                        {"message": "The method is not allowed for the requested URL.", "code": 400, "status": "FAIL"}),
+                    mimetype="application/json",
+                    status=400
+                )
 
-        return {"result": result}
+            else:
+                return {"result": result}
+
+        except:
+            return Response(
+                json.dumps(
+                    {"message": "The method is not allowed for the requested URL.", "code": 400, "status": "FAIL"}),
+                mimetype="application/json",
+                status=400
+            )
 
 class getDividendInfo(Resource):
     def get(self):
-        ownerRemain = threeStar.getOwnerRemain()
-        dividends = threeStar.getDividend(ownerRemain)
-        APR = threeStar.getAPR(dividends)
-
-        return {"dividends": str(dividends), "APR": APR}
+        dividends, APR, payout = threeStar.getDividendInfo()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
 
 api.add_resource(startGame, '/startGame')
 api.add_resource(sendPrize, '/sendPrize')

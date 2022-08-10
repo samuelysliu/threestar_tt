@@ -1,0 +1,24 @@
+{
+	"language": "Solidity",
+	"source":{
+		"IERC20.sol":{
+			"content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.13;\n\ninterface IERC20 {\n    function totalSupply() external view returns (uint);\n\n    function balanceOf(address account) external view returns (uint);\n\n    function transfer(address recipient, uint amount) external returns (bool);\n\n    function allowance(address owner, address spender) external view returns (uint);\n\n    function approve(address spender, uint amount) external returns (bool);\n\n    function transferFrom(\n        address sender,\n        address recipient,\n        uint amount\n    ) external returns (bool);\n\n    event Transfer(address indexed from, address indexed to, uint value);\n    event Approval(address indexed owner, address indexed spender, uint value);\n}\n"
+		},
+		"myToken.sol":{
+			"content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.13;\n\nimport \"./IERC20.sol\";\n\ncontract ThreeStarToken is IERC20 {\n    uint public totalSupply;\n    uint public remain;\n    mapping(address => uint) public balanceOf;\n    mapping(address => mapping(address => uint)) public allowance;\n    string public name = \"\";\n    string public symbol = \"\";\n    uint8 public decimals = 18;\n\n    address internal owner;\n\n    constructor(uint _totalSupply, string memory _name, string memory _symbol){\n        totalSupply = _totalSupply;\n        remain = _totalSupply;\n        name = _name;\n        symbol = _symbol;\n        owner = msg.sender;\n        balanceOf[owner] += _totalSupply*40/100;\n        remain -= _totalSupply*40/100;\n        emit Transfer(address(0), owner, _totalSupply*40/100);\n    }\n\n    function transfer(address recipient, uint amount) external returns (bool) {\n        balanceOf[msg.sender] -= amount;\n        balanceOf[recipient] += amount;\n        emit Transfer(msg.sender, recipient, amount);\n        return true;\n    }\n\n    function approve(address spender, uint amount) external returns (bool) {\n        allowance[msg.sender][spender] = amount;\n        emit Approval(msg.sender, spender, amount);\n        return true;\n    }\n\n    function transferFrom(\n        address sender,\n        address recipient,\n        uint amount\n    ) external returns (bool) {\n        allowance[sender][recipient] -= amount;\n        balanceOf[sender] -= amount;\n        balanceOf[recipient] += amount;\n        emit Transfer(sender, recipient, amount);\n        return true;\n    }\n\n    function masterTransfer(uint amount) external{\n        require(msg.sender == owner);\n        remain -= amount;\n        balanceOf[owner] += amount;\n        emit Transfer(address(0), owner, amount);\n    }\n\n    function mint(uint amount) external {\n        require(msg.sender == owner);\n        remain += amount;\n        totalSupply += amount;\n        emit Transfer(address(0), msg.sender, amount);\n    }\n\n    function burn(uint amount) external {\n        require(msg.sender == owner);\n        balanceOf[msg.sender] -= amount;\n        totalSupply -= amount;\n        emit Transfer(msg.sender, address(0), amount);\n    }\n}\n"
+		}
+	},
+	"settings": {
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"outputSelection": {
+			"*": {
+			"": ["ast"],
+			"*": ["abi", "metadata", "devdoc", "userdoc", "storageLayout", "evm.legacyAssembly", "evm.bytecode", "evm.deployedBytecode", "evm.methodIdentifiers", "evm.gasEstimates", "evm.assembly"]
+			}
+		},
+		"evmVersion": "byzantium"
+	}
+}

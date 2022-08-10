@@ -1,0 +1,21 @@
+{
+	"language": "Solidity",
+	"source":{
+		"threeStar.sol":{
+			"content": "pragma solidity ^0.5.0;\n\ncontract ThreeStar{\n\n    //info about owner\n    address payable internal owner;\n    uint public ownerRemain;\n\n    //info of player wallet address\n    address payable internal playeraddr;\n\n    //info of player bet \n    struct Player{\n        uint amount;\n    }\n\n    mapping(address => Player) public playerInfo;\n    //event for every game round\n    event playGame(address player, uint betAmount);\n    //event for every game round result if win result will be true if lose result will be false\n    event gameResult(address player, uint prize, bool result);\n\n    //event for send user token to contract\n    event withdrawOrder(uint betAmount, bool success);\n\n    //publish contract and setting owner\n    constructor() public payable{\n        owner = msg.sender;\n        ownerRemain = msg.value;\n    }\n\n    //start game\n    function game() public payable{\n        require(msg.value>=10000000000000);\n\n        playerInfo[msg.sender].amount = msg.value;\n\n        ownerRemain += playerInfo[msg.sender].amount;\n        emit playGame(msg.sender, msg.value);\n    }\n\n    function sendPrize(address payable _winner, uint _point) external payable{\n        require(msg.sender == owner);\n        uint _type = _point-2;\n        playeraddr = _winner;\n\n        if(_type == 1){\n            ownerRemain -= playerInfo[playeraddr].amount*99/100*2;\n            emit gameResult(msg.sender, playerInfo[playeraddr].amount*99/100*2, true);\n            playeraddr.transfer(playerInfo[playeraddr].amount*99/100*2);\n        }else if(_type == 2){\n            ownerRemain -= playerInfo[playeraddr].amount*99/100*20;\n            emit gameResult(msg.sender, playerInfo[playeraddr].amount*99/100*20, true);\n            playeraddr.transfer(playerInfo[playeraddr].amount*99/100*20);\n        }else if(_type == 3){\n            ownerRemain -= playerInfo[playeraddr].amount*99/100*100;\n            emit gameResult(msg.sender, playerInfo[playeraddr].amount*99/100*100, true);\n            playeraddr.transfer(playerInfo[playeraddr].amount*99/100*100);\n        }else{\n            revert();\n        }\n\n        resetPlayer();\n    }\n    \n    function resetPlayer() internal{\n        playerInfo[playeraddr].amount = 0;\n    }\n\n    function balanceOf(address player) public view returns (uint){\n        return playerInfo[player].amount;\n    }\n\n    function withdraw(uint withdrawAmount) external payable{\n        require(msg.sender == owner);\n        ownerRemain -= withdrawAmount;\n        owner.transfer(withdrawAmount);\n        emit withdrawOrder(withdrawAmount, true);\n    }\n}\n"
+		}
+	},
+	"settings": {
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"outputSelection": {
+			"*": {
+			"": ["ast"],
+			"*": ["abi", "metadata", "devdoc", "userdoc", "storageLayout", "evm.legacyAssembly", "evm.bytecode", "evm.deployedBytecode", "evm.methodIdentifiers", "evm.gasEstimates", "evm.assembly"]
+			}
+		},
+		"evmVersion": "byzantium"
+	}
+}
