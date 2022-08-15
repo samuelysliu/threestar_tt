@@ -107,7 +107,7 @@ def setReward():
             'value': web3.toWei(dividend, 'ether'),
             'gas': 1041586,
             'gasPrice': web3.toWei('50', 'gwei'),
-            'chainId': 18
+            'chainId': chainID
         }
 
         blockchain.sendTransaction(web3, tx)

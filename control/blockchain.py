@@ -16,7 +16,7 @@ def getOwner():
 owner = getOwner()
 
 def thunderCore():
-    web3 = Web3(Web3.HTTPProvider(os.getenv("httpProvider_test"), request_kwargs={'timeout': 60}))
+    web3 = Web3(Web3.HTTPProvider(os.getenv("httpProvider"), request_kwargs={'timeout': 60}))
     web3.middleware_onion.inject(geth_poa_middleware, layer=0)
     chainID = os.getenv("chainId")
     return web3, chainID
