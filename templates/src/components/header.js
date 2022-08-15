@@ -12,7 +12,7 @@ function Header({ sendUserInfo }) {
 
     const [loading, setLoading] = useState(true)
 
-    const init = () => {
+    /*const init = () => {
         metaConnect.thunderCoreTest().then(value => {
             try {
                 if (value.account) {
@@ -80,7 +80,7 @@ function Header({ sendUserInfo }) {
 
     useEffect(() => {
         sendUserInfo(userInfo)
-    }, [userInfo])
+    }, [userInfo])*/
 
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">

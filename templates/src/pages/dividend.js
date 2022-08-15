@@ -39,6 +39,8 @@ function Dividend({ userInfo, connectWallet }) {
 
     const [isStaking, setIsStaking] = useState(false)
 
+    const [userDividend, setUserDividend] = useState(0)
+
     const loadWeb3 = () => {
         setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
         setStakeContract(new web3.eth.Contract(stakeContractABI, stakeContractAddress));
@@ -56,6 +58,14 @@ function Dividend({ userInfo, connectWallet }) {
 
                 stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
                     setUnstakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
+                }).catch(error => {
+                    console.log(error);
+                })
+
+                stakeContract.methods.rewards(userInfo.account).call().then(function (receipt){
+                    if(Number(receipt) > 0){
+                        setDividends(Number(receipt))
+                    }
                 }).catch(error => {
                     console.log(error);
                 })
@@ -135,10 +145,10 @@ function Dividend({ userInfo, connectWallet }) {
     }, [userInfo])
 
     useEffect(() => {
-        if (Number(dividends) > 0) {
+        if (Number(userDividend) > 0) {
             setDisableDividends(false)
         }
-    }, [dividends])
+    }, [userDividend])
 
     const card = {
         border: "1px",
