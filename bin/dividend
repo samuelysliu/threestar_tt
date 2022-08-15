@@ -1,3 +1,0 @@
-from control import threeStar
-
-threeStar.setReward()
