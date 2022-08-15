@@ -48,7 +48,7 @@ export class ConnectWallet {
         }
     }
 
-    async thunderCoreTest() {
+    async thunderCore() {
         if (typeof window.ethereum === 'undefined') {
             console.log('Please install MetaMask!');
         } else {
