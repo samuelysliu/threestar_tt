@@ -6,7 +6,7 @@ from control import threeStar
 import os
 
 app = Flask(__name__, static_folder='templates/build')
-#CORS(app, resources={r"/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+#CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
 CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -25,9 +25,14 @@ def serve(path):
 class startGame(Resource):
     def post(self):
         data = request.get_json()
-        result = threeStar.game(data['userLuckyNum'])
+        result = threeStar.game(data)
         return result
 
+class test(Resource):
+    def get(self):
+        result = threeStar.test()
+        return result
+"""
 class sendPrize(Resource):
     def post(self):
         data = request.get_json()
@@ -38,7 +43,7 @@ class sendPrize(Resource):
         else:
             return {"result": "failed"}
 
-"""
+
 class setReward(Resource):
     def post(self):
         try:
@@ -69,10 +74,11 @@ class getDividendInfo(Resource):
         dividends, APR, payout = threeStar.getDividendInfo()
         return {"dividends": dividends, "APR": APR, "payout": str(payout)}
 
-api.add_resource(startGame, '/startGame')
-api.add_resource(sendPrize, '/sendPrize')
+api.add_resource(startGame, '/api/startGame')
+#api.add_resource(sendPrize, '/api/sendPrize')
 #api.add_resource(setReward, '/mastetSetReward')
-api.add_resource(getDividendInfo, '/getDividendInfo')
+api.add_resource(getDividendInfo, '/api/getDividendInfo')
+api.add_resource(test, '/api/test')
 
 
 if __name__ == '__main__':

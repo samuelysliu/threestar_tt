@@ -22,7 +22,6 @@ export class ConnectWallet {
                 } catch (error) {
                     if (error.code === 4902) {
                         try {
-                            console.log("66")
                             await this.web3.currentProvider.request({
                                 method: "wallet_addEthereumChain",
                                 params: [

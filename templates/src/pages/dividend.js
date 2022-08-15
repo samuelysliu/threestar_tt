@@ -268,7 +268,7 @@ function Dividend() {
     return (
         <div style={{ backgroundColor: "#FAF9FA" }}>
             <Header sendUserInfo={getUserInfo} />
-            <Container style={{ textAlign: "center", marginTop: "20px" }}>
+            <Container style={{ textAlign: "center", marginTop: "20px", maxWidth:"720px" }}>
                 <font style={{ fontSize: "26px" }}><font style={{ color: "#669BFD" }}>3Star </font><font>Dividend</font></font>
                 <br></br>
                 <font style={{ fontSize: "15px" }}>Stake 3Star to earn TT</font>

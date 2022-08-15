@@ -63,11 +63,13 @@ def sendTransaction(web3, transaction):
         print(Exception)
         return "failed"
 
-
 def getOwnerRemain(web3, contract):
     ownerRemain = web3.fromWei(contract.functions.ownerRemain().call(), 'ether')
     return ownerRemain
 
+def getPlayerAmount(web3, contract, playerAddress):
+    playerAmount = web3.fromWei(contract.functions.playerInfo(playerAddress).call, 'ether')
+    return playerAmount
 
 def getAPR(web3, dividends):
     stakeContractAddress, stakeContract = getStakeContract(web3)
