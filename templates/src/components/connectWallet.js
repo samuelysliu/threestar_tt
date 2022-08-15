@@ -46,6 +46,52 @@ export class ConnectWallet {
                 }
             }
         }
+
+        window.ethereum.on('accountsChanged', async (accounts) => {
+            if (typeof accounts[0] !== 'undefined' && accounts[0] !== null) {
+                return ({ account: accounts[0], balance: this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether') })
+            }
+        });
+
+        //Update data when user switch the network
+        window.ethereum.on('chainChanged', async (chainId) => {
+            let network = parseInt(chainId, 16)
+            if (network === 18) {
+                let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                let balance = this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether')
+                return ({ account: accounts[0], balance: balance })
+            } else {
+                try {
+                    await this.web3.currentProvider.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x12" }],
+                    });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await this.web3.currentProvider.request({
+                                method: "wallet_addEthereumChain",
+                                params: [
+                                    {
+                                        chainId: "0x12",
+                                        chainName: "ThunderCore Testnet",
+                                        rpcUrls: ["https://testnet-rpc.thundercore.com"],
+                                        nativeCurrency: {
+                                            name: "TST token",
+                                            symbol: "TST",
+                                            decimals: 18,
+                                        },
+                                        blockExplorerUrls: ["https://explorer-testnet.thundercore.com/"],
+                                    },
+                                ],
+                            });
+                        } catch (error) {
+                            alert(error.message);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     async thunderCore() {
@@ -86,7 +132,6 @@ export class ConnectWallet {
                         }
                     }
                 }
-
             }
 
             window.ethereum.on('accountsChanged', async (accounts) => {

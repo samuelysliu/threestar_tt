@@ -34,7 +34,7 @@ function App() {
     //Update data when user switch the network
     window.ethereum.on('chainChanged', async (chainId) => {
       let network = parseInt(chainId, 16)
-      if (network === 18) {
+      if (network === 108) {
         let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         let balance = web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether')
         setUserInfo({ account: accounts[0], balance: balance })
@@ -42,7 +42,7 @@ function App() {
         try {
           await web3.currentProvider.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x12" }],
+            params: [{ chainId: "0x6c" }],
           });
         } catch (error) {
           if (error.code === 4902) {
@@ -51,15 +51,15 @@ function App() {
                 method: "wallet_addEthereumChain",
                 params: [
                   {
-                    chainId: "0x12",
-                    chainName: "ThunderCore Testnet",
-                    rpcUrls: ["https://testnet-rpc.thundercore.com"],
+                    chainId: "0x6c",
+                    chainName: "ThunderCore",
+                    rpcUrls: ["https://mainnet-rpc.thundercore.com"],
                     nativeCurrency: {
-                      name: "TST token",
-                      symbol: "TST",
+                      name: "TT token",
+                      symbol: "TT",
                       decimals: 18,
                     },
-                    blockExplorerUrls: ["https://explorer-testnet.thundercore.com/"],
+                    blockExplorerUrls: ["https://viewblock.io/thundercore"],
                   },
                 ],
               });
@@ -69,6 +69,7 @@ function App() {
           }
         }
       }
+
     });
   }
   return (
