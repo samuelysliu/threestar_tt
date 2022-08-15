@@ -42,6 +42,7 @@ function Index({ userInfo, connectWallet }) {
     const [userNumberColor, setUserNumberColor] = useState({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
 
     const [walletConnecting, setWalletConnecting] = useState(false)
+    const [errorMessage, SetErrorMessage] = useState("")
 
     const threeStarcontract_abi = ThreeStarABI.abi;
     const threeStarcontract_address = pathController.getThreeStarContractAddress();
@@ -59,12 +60,20 @@ function Index({ userInfo, connectWallet }) {
 
     //user click let's bet 
     const startGame = () => {
+        if (userInfo.account.length === 0) {
+            connectWallet()
+            SetErrorMessage("Invalid Wallet")
+            setTimeout(() => {
+                SetErrorMessage("")
+            }, 6000)
+        }
+
         // user must choose five lucky number
-        if (userLuckyNumber.length === 5) {
+        else if (userLuckyNumber.length === 5) {
             setBetting(true)
             let point = 0;
             // assign task to backend to create random number and match
-            threeStarcontract.methods.game().send({ from: userInfo.account, value: userBet * 1000000000000000000 }).then(function (receipt) {
+            threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
                 axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
                     point = res['data']['point'];
                     setStarNumber(res['data']['starNumber'])
@@ -93,8 +102,11 @@ function Index({ userInfo, connectWallet }) {
                 setTToken((Number(TTToken) - Number(userBet)).toFixed(2))
             }).catch(error => {
                 setBetting(false)
+                SetErrorMessage("Insufficient Balance")
+                setTimeout(() => {
+                    SetErrorMessage("")
+                }, 6000)
             })
-
         }
     }
 
@@ -356,14 +368,14 @@ function Index({ userInfo, connectWallet }) {
                     </div>
 
                     <Row style={{ paddingTop: "20px" }}>
+                        <font style={{ color: "#E47600", fontSize: "12px" }}>{errorMessage}</font>
                         {userInfo.account.length === 0
                             ? <>
                                 <Col>
-
-                                    <button style={connectBtStyle} onClick={()=>{connectWallet(); setWalletConnecting(true)}}>
+                                    <button style={connectBtStyle} onClick={() => { connectWallet(); setWalletConnecting(true) }}>
                                         <strong>CONNECT WALLET</strong>
                                         {walletConnecting ? <Spinner animation="border" style={{ color: "#FFF", width: "1rem", height: "1rem", marginLeft: "5px" }} /> : ""}
-                                        </button>
+                                    </button>
                                 </Col>
                             </>
                             : <>
