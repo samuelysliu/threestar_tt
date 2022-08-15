@@ -7,6 +7,7 @@ import os
 
 app = Flask(__name__, static_folder='templates/build')
 #CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.19"]}})
 CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -32,18 +33,13 @@ class test(Resource):
     def get(self):
         result = threeStar.test()
         return result
-"""
-class sendPrize(Resource):
+
+class withdrawThreeStar(Resource):
     def post(self):
-        data = request.get_json()
-        result = threeStar.sendPrize(data['winner'], data['point'])
+        result = threeStar.withdrawThreeStar(request.get_json())
+        return result
 
-        if result == "success":
-            return {"result": "success"}
-        else:
-            return {"result": "failed"}
-
-
+"""
 class setReward(Resource):
     def post(self):
         try:
@@ -79,6 +75,7 @@ api.add_resource(startGame, '/api/startGame')
 #api.add_resource(setReward, '/mastetSetReward')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
 api.add_resource(test, '/api/test')
+api.add_resource(withdrawThreeStar, '/master/withdraw')
 
 
 if __name__ == '__main__':

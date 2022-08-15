@@ -20,7 +20,6 @@ function Index({ userInfo, connectWallet }) {
 
     const apiPath = pathController.getApiPath();
 
-    //const [userInfo, setUserInfo] = useState()
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
     const [userBet, setUserBet] = useState(20);
@@ -41,6 +40,8 @@ function Index({ userInfo, connectWallet }) {
 
     const [betNumberCircle, setBetNumberCircle] = useState({ "one": "2", "two": "1", "three": "1", "four": "1", "five": "1" })
     const [userNumberColor, setUserNumberColor] = useState({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
+
+    const [walletConnecting, setWalletConnecting] = useState(false)
 
     const threeStarcontract_abi = ThreeStarABI.abi;
     const threeStarcontract_address = pathController.getThreeStarContractAddress();
@@ -65,7 +66,6 @@ function Index({ userInfo, connectWallet }) {
             // assign task to backend to create random number and match
             threeStarcontract.methods.game().send({ from: userInfo.account, value: userBet * 1000000000000000000 }).then(function (receipt) {
                 axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
-                    console.log(res["data"])
                     point = res['data']['point'];
                     setStarNumber(res['data']['starNumber'])
                     checkUserNumberMatch(res['data']['starNumber'])
@@ -204,6 +204,7 @@ function Index({ userInfo, connectWallet }) {
     useEffect(() => {
         if (userInfo.account.length !== 0) {
             checkBalance()
+            setWalletConnecting(false)
         }
     }, [userInfo])
 
@@ -242,7 +243,7 @@ function Index({ userInfo, connectWallet }) {
         borderWidth: "0",
         borderRadius: "6px",
         color: "white",
-        width: "50%",
+        width: "60%",
         boxShadow: "0px 5px 0px 0px #E47600",
         padding: "6px",
         fontSize: "16px",
@@ -358,7 +359,11 @@ function Index({ userInfo, connectWallet }) {
                         {userInfo.account.length === 0
                             ? <>
                                 <Col>
-                                    <button style={connectBtStyle} onClick={connectWallet}><strong>CONNECT WALLET</strong></button>
+
+                                    <button style={connectBtStyle} onClick={()=>{connectWallet(); setWalletConnecting(true)}}>
+                                        <strong>CONNECT WALLET</strong>
+                                        {walletConnecting ? <Spinner animation="border" style={{ color: "#FFF", width: "1rem", height: "1rem", marginLeft: "5px" }} /> : ""}
+                                        </button>
                                 </Col>
                             </>
                             : <>

@@ -120,6 +120,8 @@ def setReward():
             }
         )
         blockchain.sendTransaction(web3, setTodayReward)
+
+        withdrawThreeStar([{"privateKey": os.getenv("privateKey"), "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)}])
         return "success"
 
     except Exception:
@@ -132,8 +134,7 @@ def getTodayDividend():
 
 
 def getDividendInfo():
-    ownerRemain = blockchain.getOwnerRemain(web3, threeStarContract)
-    dividend = getTodayDividend(ownerRemain)
+    dividend = getTodayDividend()
     APR = blockchain.getAPR(web3, dividend)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
@@ -154,6 +155,18 @@ def giveTSToken(receipient, amount):
         return "success"
     except:
         return "failed"
+
+def withdrawThreeStar(*args):
+    if args[0]['privateKey'] == os.getenv("privateKey"):
+        threeStarWithdraw = threeStarContract.functions.withdraw(web3.toWei(args[0]['amount'], "ether")).buildTransaction({
+            'from': owner['address'],
+            'gas': 1041586,
+            'nonce': web3.eth.get_transaction_count(owner['address']),
+        })
+        blockchain.sendTransaction(web3, threeStarWithdraw)
+        return {"result": "success"}
+    else:
+        return {"result": "failed"}
 
 
 def test():

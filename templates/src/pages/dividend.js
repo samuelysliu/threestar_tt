@@ -4,15 +4,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Web3 from 'web3'
 import axios from 'axios';
 import ThreeStarToken from '../images/threeStarToken.png';
-import Header from '../components/header';
+import Sidebar from '../components/sidebar';
 import ThreeStarTokenABI from '../abi/threeStarTokenABI.json';
 import StakingRewardABI from '../abi/stakingRewardABI.json';
 import { PathController } from '../components/pathController';
-import { ConnectWallet } from '../components/connectWallet';
 
-function Dividend() {
+function Dividend({ userInfo, connectWallet }) {
     const pathController = new PathController()
-    const metaConnect = new ConnectWallet()
     const web3 = new Web3(window.ethereum);
 
     const apiPath = pathController.getApiPath();
@@ -20,8 +18,6 @@ function Dividend() {
     const stakeContractABI = StakingRewardABI.abi;
     const TSTokenContractAddress = pathController.getTSTokenContractAddress();
     const stakeContractAddress = pathController.getStakeContractAddress();
-
-    const [userInfo, setUserInfo] = useState({ 'account': '', 'balance': '' })
 
     const [TSTokencontract, setTSTokenContract] = useState();
     const [stakeContract, setStakeContract] = useState();
@@ -42,72 +38,6 @@ function Dividend() {
     const [unlockBool, setUnlockBool] = useState(true);
 
     const [isStaking, setIsStaking] = useState(false)
-
-
-    const getUserInfo = (_userInfo) => {
-        setUserInfo(_userInfo)
-    }
-
-    const connectWallet = () => {
-        metaConnect.thunderCoreTest().then(value => {
-            try {
-                if (value.account) {
-                    setUserInfo(value);
-                }
-            } catch (e) {
-                console.log(e)
-            }
-
-        }).catch(error => {
-            console.log(error)
-        })
-
-        window.ethereum.on('accountsChanged', async (accounts) => {
-            if (typeof accounts[0] !== 'undefined' && accounts[0] !== null) {
-                setUserInfo({ account: accounts[0], balance: this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether') })
-            }
-        });
-
-        //Update data when user switch the network
-        window.ethereum.on('chainChanged', async (chainId) => {
-            let network = parseInt(chainId, 16)
-            if (network === 18) {
-                let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                let balance = this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether')
-                setUserInfo({ account: accounts[0], balance: balance })
-            } else {
-                try {
-                    await this.web3.currentProvider.request({
-                        method: "wallet_switchEthereumChain",
-                        params: [{ chainId: "0x12" }],
-                    });
-                } catch (error) {
-                    if (error.code === 4902) {
-                        try {
-                            await this.web3.currentProvider.request({
-                                method: "wallet_addEthereumChain",
-                                params: [
-                                    {
-                                        chainId: "0x12",
-                                        chainName: "ThunderCore Testnet",
-                                        rpcUrls: ["https://testnet-rpc.thundercore.com"],
-                                        nativeCurrency: {
-                                            name: "TST token",
-                                            symbol: "TST",
-                                            decimals: 18,
-                                        },
-                                        blockExplorerUrls: ["https://explorer-testnet.thundercore.com/"],
-                                    },
-                                ],
-                            });
-                        } catch (error) {
-                            alert(error.message);
-                        }
-                    }
-                }
-            }
-        });
-    }
 
     const loadWeb3 = () => {
         setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
@@ -266,8 +196,8 @@ function Dividend() {
     }
 
     return (
-        <div style={{ backgroundColor: "#FAF9FA" }}>
-            <Header sendUserInfo={getUserInfo} />
+        <div style={{ backgroundColor: "#FAF9FA", minHeight: "100vh" }}>
+            <Sidebar />
             <Container style={{ textAlign: "center", marginTop: "20px", maxWidth:"720px" }}>
                 <font style={{ fontSize: "26px" }}><font style={{ color: "#669BFD" }}>3Star </font><font>Dividend</font></font>
                 <br></br>
