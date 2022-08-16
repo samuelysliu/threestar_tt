@@ -74,7 +74,6 @@ function Index({ userInfo, connectWallet }) {
             let point = 0;
             // assign task to backend to create random number and match
             threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
-                setTToken(Number(TTToken) - Number(userBet))
                 axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
                     point = res['data']['point'];
                     setStarNumber(res['data']['starNumber'])
@@ -85,7 +84,7 @@ function Index({ userInfo, connectWallet }) {
                     if (point > 2) {
                         setTitle("YOU WON!!")
                         setWinTT(res['data']['winTT'])
-                        setTToken((Number(TTToken) + Number(res['data']['winTT'])).toFixed(2))
+                        setTToken((Number(TTToken) - Number(userBet) + Number(res['data']['winTT'])).toFixed(2))
                     } else {
                         setTitle("YOU GOT 3Star!")
                         setWinTS(res['data']['winTS'])
@@ -100,7 +99,6 @@ function Index({ userInfo, connectWallet }) {
                 }).catch(error => {
                     setBetting(false)
                 })
-                setTToken((Number(TTToken) - Number(userBet)).toFixed(2))
             }).catch(error => {
                 setBetting(false)
                 SetErrorMessage("Insufficient Balance")
