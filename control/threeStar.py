@@ -179,8 +179,7 @@ def withdrawThreeStar(*args):
 
 
 def test():
-    withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                       "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)})
+
 
 
     """userStake = TSContract.functions.transferFrom('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress, web3.toWei(10, 'ether')).buildTransaction(
