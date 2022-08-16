@@ -102,31 +102,30 @@ def sendPrize(winner, point):
 def setReward():
     try:
         dividend = getTodayDividend()
-        setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
-            {
-                'from': owner['address'],
-                'gas': 6721975,
-                'nonce': web3.eth.get_transaction_count(owner['address']),
-            }
-        )
-        blockchain.sendTransaction(web3, setTodayReward)
-
-
         withdrawThreeStar({"privateKey": os.getenv("privateKey"),
                            "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)})
 
         try:
-            time.sleep(180)
+            time.sleep(60)
 
             tx = {
                 'nonce': web3.eth.get_transaction_count(owner['address']),
                 'to': stakeContractAddress,
                 'value': web3.toWei(dividend, 'ether'),
-                'gas': 1041586,
+                'gas': 6721975,
                 'gasPrice': web3.toWei('50', 'gwei'),
-                'chainId': chainID
+                'chainId': int(chainID)
             }
             blockchain.sendTransaction(web3, tx)
+
+            setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
+                {
+                    'from': owner['address'],
+                    'gas': 6721975,
+                    'nonce': web3.eth.get_transaction_count(owner['address']),
+                }
+            )
+            blockchain.sendTransaction(web3, setTodayReward)
         except:
             "owner insufficient balance"
 
@@ -180,12 +179,22 @@ def withdrawThreeStar(*args):
 
 
 def test():
-    # userStake = TSContract.functions.allowance('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress).call()
-    test = web3.fromWei(threeStarContract.functions.sendPrize('0xf58392840Be5939AB1DA03569D1B3C70247D5400', 5).call({
-        'from': '0xf58392840Be5939AB1DA03569D1B3C70247D5400'
-    }), 'ether')
-    print(test)
-    return test
+    tx = {
+        'nonce': web3.eth.get_transaction_count(owner['address']),
+        'to': stakeContractAddress,
+        'value': web3.toWei(32, 'ether'),
+        'gas': 6721975,
+        'gasPrice': web3.toWei('50', 'gwei'),
+        'chainId': int(chainID)
+    }
+
+    txCreate = web3.eth.account.sign_transaction(tx, owner['privateKey'])
+
+    txHash = web3.eth.send_raw_transaction(txCreate.rawTransaction)
+    txReceipt = web3.eth.wait_for_transaction_receipt(txHash)
+    print(txReceipt)
+
+
     """userStake = TSContract.functions.transferFrom('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress, web3.toWei(10, 'ether')).buildTransaction(
         {
             'from': owner['address'],

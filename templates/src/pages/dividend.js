@@ -63,22 +63,12 @@ function Dividend({ userInfo, connectWallet }) {
                 })
 
                 stakeContract.methods.rewards(userInfo.account).call().then(function (receipt){
-                    if(Number(receipt) > 0){
-                        setDividends(Number(receipt))
+                    if(receipt > 0){
+                        setDisableDividends(false)
                     }
                 }).catch(error => {
                     console.log(error);
                 })
-            }
-        }).catch(error => {
-            console.log(error);
-        })
-    }
-
-    const checkClaimBool = () =>{
-        stakeContract.methods.rewards(userInfo.account).call().then(function(receipt) {
-            if(receipt > 0){
-                setDisableDividends(false)
             }
         }).catch(error => {
             console.log(error);
@@ -120,7 +110,7 @@ function Dividend({ userInfo, connectWallet }) {
 
     const claimDevidends = () => {
         stakeContract.methods.getReward().send({ from: userInfo.account }).then(function (receipt) {
-            console.log(receipt)
+            setDisableDividends(true)
         }).catch(error => {
             console.log(error)
         })
@@ -140,7 +130,6 @@ function Dividend({ userInfo, connectWallet }) {
     useEffect(() => {
         if (userInfo.account.length !== 0) {
             checkContractInfo();
-            checkClaimBool();
         }
     }, [userInfo])
 
