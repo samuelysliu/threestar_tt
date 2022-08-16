@@ -179,20 +179,8 @@ def withdrawThreeStar(*args):
 
 
 def test():
-    tx = {
-        'nonce': web3.eth.get_transaction_count(owner['address']),
-        'to': stakeContractAddress,
-        'value': web3.toWei(32, 'ether'),
-        'gas': 6721975,
-        'gasPrice': web3.toWei('50', 'gwei'),
-        'chainId': int(chainID)
-    }
-
-    txCreate = web3.eth.account.sign_transaction(tx, owner['privateKey'])
-
-    txHash = web3.eth.send_raw_transaction(txCreate.rawTransaction)
-    txReceipt = web3.eth.wait_for_transaction_receipt(txHash)
-    print(txReceipt)
+    withdrawThreeStar({"privateKey": os.getenv("privateKey"),
+                       "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)})
 
 
     """userStake = TSContract.functions.transferFrom('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress, web3.toWei(10, 'ether')).buildTransaction(

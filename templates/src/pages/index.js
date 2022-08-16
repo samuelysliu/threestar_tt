@@ -74,6 +74,7 @@ function Index({ userInfo, connectWallet }) {
             let point = 0;
             // assign task to backend to create random number and match
             threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
+                setTToken(Number(TTToken) - Number(userBet))
                 axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
                     point = res['data']['point'];
                     setStarNumber(res['data']['starNumber'])

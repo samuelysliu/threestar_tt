@@ -57,6 +57,7 @@ function Dividend({ userInfo, connectWallet }) {
                 })
 
                 stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+                    console.log(web3.utils.fromWei(receipt, "ether"))
                     setUnstakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
                 }).catch(error => {
                     console.log(error);

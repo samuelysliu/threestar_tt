@@ -2,39 +2,6 @@
   "contractName": "ThreeStar",
   "abi": [
     {
-      "inputs": [],
-      "name": "getReward",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "withdrawAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "masterWithdraw",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "todayEarn",
-          "type": "uint256"
-        }
-      ],
-      "name": "setReward",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "address",
@@ -65,19 +32,6 @@
       "type": "event"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "stake",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "anonymous": false,
       "inputs": [
         {
@@ -101,19 +55,6 @@
       ],
       "name": "stakingEvent",
       "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
     },
     {
       "anonymous": false,
@@ -160,10 +101,6 @@
       "type": "event"
     },
     {
-      "stateMutability": "payable",
-      "type": "receive"
-    },
-    {
       "inputs": [
         {
           "internalType": "address",
@@ -184,15 +121,22 @@
     },
     {
       "inputs": [],
-      "name": "ownerGasFee",
-      "outputs": [
+      "name": "getReward",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "withdrawAmount",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
+      "name": "masterWithdraw",
+      "outputs": [],
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -212,6 +156,32 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "todayEarn",
+          "type": "uint256"
+        }
+      ],
+      "name": "setReward",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "stake",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -286,6 +256,19 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "withdrawTimestamp",
       "outputs": [
@@ -297,6 +280,10 @@
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ]
 }
