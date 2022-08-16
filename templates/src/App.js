@@ -12,7 +12,7 @@ function App() {
 
   const connectWallet = () => {
     const web3 = new Web3(window.ethereum)
-    metaConnect.thunderCoreTest().then(value => {
+    metaConnect.thunderCore().then(value => {
       try {
         if (value.account) {
           setUserInfo(value);
