@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from control import blockchain
 import datetime, pytz
+import time
 
 load_dotenv()
 
@@ -71,11 +72,11 @@ def game(*args):
     if point > 2:
         sendPrize(args[0]["playerAddress"], point)
         if point == 3:
-            winTT = playerAmount*99/100*2
+            winTT = playerAmount * 99 / 100 * 2
         elif point == 4:
             winTT = playerAmount * 99 / 100 * 20
         elif point == 5:
-            winTT = playerAmount *99/100*100
+            winTT = playerAmount * 99 / 100 * 100
     else:
         giveTSToken(args[0]["playerAddress"], playerAmount * 0.004)
         winTS = playerAmount * 0.004
@@ -101,31 +102,38 @@ def sendPrize(winner, point):
 def setReward():
     try:
         dividend = getTodayDividend()
-        tx = {
-            'nonce': web3.eth.get_transaction_count(owner['address']),
-            'to': stakeContractAddress,
-            'value': web3.toWei(dividend, 'ether'),
-            'gas': 1041586,
-            'gasPrice': web3.toWei('50', 'gwei'),
-            'chainId': chainID
-        }
-
-        blockchain.sendTransaction(web3, tx)
-
         setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
             {
                 'from': owner['address'],
-                'gas': 1041586,
+                'gas': 6721975,
                 'nonce': web3.eth.get_transaction_count(owner['address']),
             }
         )
         blockchain.sendTransaction(web3, setTodayReward)
 
-        withdrawThreeStar([{"privateKey": os.getenv("privateKey"), "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)}])
+
+        withdrawThreeStar({"privateKey": os.getenv("privateKey"),
+                           "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)})
+
+        try:
+            time.sleep(180)
+
+            tx = {
+                'nonce': web3.eth.get_transaction_count(owner['address']),
+                'to': stakeContractAddress,
+                'value': web3.toWei(dividend, 'ether'),
+                'gas': 1041586,
+                'gasPrice': web3.toWei('50', 'gwei'),
+                'chainId': chainID
+            }
+            blockchain.sendTransaction(web3, tx)
+        except:
+            "owner insufficient balance"
+
         return "success"
 
-    except Exception:
-        return "insufficient balance"
+    except :
+        return "contract insufficient balance"
 
 
 def getTodayDividend():
@@ -156,9 +164,11 @@ def giveTSToken(receipient, amount):
     except:
         return "failed"
 
+
 def withdrawThreeStar(*args):
     if args[0]['privateKey'] == os.getenv("privateKey"):
-        threeStarWithdraw = threeStarContract.functions.withdraw(web3.toWei(args[0]['amount'], "ether")).buildTransaction({
+        threeStarWithdraw = threeStarContract.functions.withdraw(
+            web3.toWei(args[0]['amount'], "ether")).buildTransaction({
             'from': owner['address'],
             'gas': 1041586,
             'nonce': web3.eth.get_transaction_count(owner['address']),

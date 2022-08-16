@@ -1,4 +1,9 @@
 from control import threeStar
+import os
+from dotenv import load_dotenv
 
-dividend = threeStar.setReward()
-print(dividend)
+load_dotenv()
+
+result = threeStar.setReward()
+print(result)
+
