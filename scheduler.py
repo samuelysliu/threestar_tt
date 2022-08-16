@@ -1,5 +1,5 @@
 from control import threeStar
 
-#result = threeStar.setReward()
-threeStar.test()
+result = threeStar.setReward()
+#threeStar.test()
 
