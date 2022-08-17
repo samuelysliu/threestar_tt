@@ -238,7 +238,7 @@ def getDividendInfo():
 
 def getDividendInfo_bsc():
     dividend = getTodayDividend(web3_bsc, threeStarContract_bsc)
-    APR = blockchain.getAPR(web3_bsc, dividend)
+    APR = blockchain.getAPR_bsc(web3_bsc, dividend)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
 

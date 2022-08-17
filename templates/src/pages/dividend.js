@@ -8,19 +8,35 @@ import Sidebar from '../components/sidebar';
 import ThreeStarTokenABI from '../abi/threeStarTokenABI.json';
 import StakingRewardABI from '../abi/stakingRewardABI.json';
 import { PathController } from '../components/pathController';
+import { ConnectWallet } from '../components/connectWallet'
 
-function Dividend({ userInfo, connectWallet }) {
-    const pathController = new PathController()
+function Dividend({ userInfo, connectWallet, token }) {
+    const metaConnect = new ConnectWallet()
     const web3 = new Web3(window.ethereum);
 
-    const apiPath = pathController.getApiPath();
-    const TSTokenContractABI = ThreeStarTokenABI.abi;
-    const stakeContractABI = StakingRewardABI.abi;
-    const TSTokenContractAddress = pathController.getTSTokenContractAddress();
-    const stakeContractAddress = pathController.getStakeContractAddress();
-
-    const [TSTokencontract, setTSTokenContract] = useState();
+    const [apiPath, setApiPath] = useState("")
+    const [TSTokenContract, setTSTokenContract] = useState();
+    const [TSTokenContractAddress, setTSTokenContractAddress] = useState();
     const [stakeContract, setStakeContract] = useState();
+    const [stakeContractAddress, setStakeContractAddress] = useState();
+
+    const loadWeb3 = () => {
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value)
+            setApiPath(pathController.getApiPath())
+
+            const stakeContractABI = StakingRewardABI.abi;
+            setStakeContractAddress(pathController.getStakeContractAddress());
+
+            const TSTokenContractABI = ThreeStarTokenABI.abi;
+            setTSTokenContractAddress(pathController.getTSTokenContractAddress());
+
+            setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, pathController.getTSTokenContractAddress()));
+            setStakeContract(new web3.eth.Contract(stakeContractABI, pathController.getStakeContractAddress()));
+        }).catch(error => {
+            console.log(error)
+        })
+    }
 
     const [stakeMax, setStakeMax] = useState(0);
     const [unstakeMax, setUnstakeMax] = useState(0);
@@ -39,18 +55,12 @@ function Dividend({ userInfo, connectWallet }) {
 
     const [isStaking, setIsStaking] = useState(false)
 
-    const [userDividend, setUserDividend] = useState(0)
-
-    const loadWeb3 = () => {
-        setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
-        setStakeContract(new web3.eth.Contract(stakeContractABI, stakeContractAddress));
-    }
 
     const checkContractInfo = () => {
-        TSTokencontract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
+        TSTokenContract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
             if (receipt >= 10000000000000000000000000) {
                 setUnlockBool(false);
-                TSTokencontract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+                TSTokenContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
                     setStakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
                 }).catch(error => {
                     console.log(error);
@@ -58,17 +68,13 @@ function Dividend({ userInfo, connectWallet }) {
 
                 stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
                     setUnstakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
-                }).catch(error => {
-                    console.log(error);
-                })
+                }).catch(error => { })
 
-                stakeContract.methods.rewards(userInfo.account).call().then(function (receipt){
-                    if(receipt > 0){
+                stakeContract.methods.rewards(userInfo.account).call().then(function (receipt) {
+                    if (receipt > 0) {
                         setDisableDividends(false)
                     }
-                }).catch(error => {
-                    console.log(error);
-                })
+                }).catch(error => { })
             }
         }).catch(error => {
             console.log(error);
@@ -76,7 +82,7 @@ function Dividend({ userInfo, connectWallet }) {
     }
 
     const unlock = () => {
-        TSTokencontract.methods.approve(stakeContractAddress, totalAllowance).send({ from: userInfo.account }).then(function (receipt) {
+        TSTokenContract.methods.approve(stakeContractAddress, totalAllowance).send({ from: userInfo.account }).then(function (receipt) {
             checkContractInfo();
         }).catch(error => {
             console.log(error)
@@ -119,26 +125,33 @@ function Dividend({ userInfo, connectWallet }) {
     useEffect(() => {
         loadWeb3();
         connectWallet()
-        axios.get(apiPath + "/getDividendInfo").then(res => {
-            setDividends(res['data']['dividends'])
-            setAPR(res['data']['APR'])
-            setPayout(res['data']['payout'])
-        }).catch(error => {
-            console.log(error)
-        });
     }, [])
+
+    useEffect(() => {
+        loadWeb3();
+    }, [token])
+
+    useEffect(() => {
+        if (apiPath !== "") {
+            axios.get(apiPath + "/getDividendInfo").then(res => {
+                setDividends(res['data']['dividends'])
+                setAPR(res['data']['APR'])
+                setPayout(res['data']['payout'])
+            }).catch(error => {
+                console.log(error)
+            });
+
+            if (userInfo.account.length !== 0) {
+                checkContractInfo();
+            }
+        }
+    }, [apiPath])
 
     useEffect(() => {
         if (userInfo.account.length !== 0) {
             checkContractInfo();
         }
     }, [userInfo])
-
-    useEffect(() => {
-        if (Number(userDividend) > 0) {
-            setDisableDividends(false)
-        }
-    }, [userDividend])
 
     const card = {
         border: "1px",
@@ -198,10 +211,10 @@ function Dividend({ userInfo, connectWallet }) {
     return (
         <div style={{ backgroundColor: "#FAF9FA", minHeight: "100vh" }}>
             <Sidebar />
-            <Container style={{ textAlign: "center", marginTop: "20px", maxWidth:"720px" }}>
+            <Container style={{ textAlign: "center", marginTop: "20px", maxWidth: "720px" }}>
                 <font style={{ fontSize: "26px" }}><font style={{ color: "#669BFD" }}>3Star </font><font>Dividend</font></font>
                 <br></br>
-                <font style={{ fontSize: "15px" }}>Stake 3Star to earn TT</font>
+                <font style={{ fontSize: "15px" }}>Stake 3Star to earn {token}</font>
                 <Container style={card}>
                     <Row style={blockOneStyle}>
                         <Col xs={2} sm={2}><img src={ThreeStarToken} width="50px"></img></Col>
@@ -213,7 +226,7 @@ function Dividend({ userInfo, connectWallet }) {
                         <Col xs={6} sm={6} style={{ textAlign: "right" }}>
                             <font style={{ fontSize: "13px" }}>Coming Dividend</font>
                             <br></br>
-                            <font style={{ fontSize: "22px" }}>{dividends} TT</font>
+                            <font style={{ fontSize: "22px" }}>{dividends} {token}</font>
                         </Col>
                     </Row>
                     <Row style={blockTwoStyle}>

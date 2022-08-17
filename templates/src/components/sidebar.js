@@ -1,39 +1,18 @@
 import '../styles/sidebar.css';
 import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa'
-import { ConnectWallet } from '../components/connectWallet'
-import { PathController } from '../components/pathController';
-
 
 function Sidebar() {
-    const metaConnect = new ConnectWallet()
-    const [title, setTitle] = useState("")
-    const loadWeb3 = () => {
-        metaConnect.getChainId().then((value) => {
-            const pathController = new PathController(value)
-            setTitle(pathController.getTitle())
-        }).catch(error => {
-            console.log(error)
-        })
-    }
-
-
     const [isOpen, setIsopen] = useState(false);
 
     const ToggleSidebar = () => {
         isOpen === true ? setIsopen(false) : setIsopen(true);
     }
 
-    const [userInfo, setUserInfo] = useState({ account: '', balance: '' });
-
-    useEffect(() => {
-        loadWeb3()
-    }, [])
-
     return (
         <div className="container-fluid" style={{ backgroundColor: "#01AFFB" }}>
             <nav className="navbar navbar-expand-lg navbar-light shadow-md">
-                <font style={{ fontSize: "28px", color: "white", position: "absolute", left: "50%", marginLeft: "-60px" }}><strong>{title}</strong></font>
+                <font style={{ fontSize: "28px", color: "white", position: "absolute", left: "50%", marginLeft: "-60px" }}><strong>TT 3Star</strong></font>
                 <div className="form-inline ml-auto">
                     <div className="btn btn-primary" onClick={ToggleSidebar} >
                         <FaBars />
