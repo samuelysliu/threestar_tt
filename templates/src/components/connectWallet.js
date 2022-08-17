@@ -14,7 +14,7 @@ export class ConnectWallet {
                 const chainId = await this.web3.eth.getChainId();
                 if (chainId === 108 || chainId === 56) {
                     return { account: accounts[0], balance: this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether') }
-                } else {
+                } /*else {
                     try {
                         await this.web3.currentProvider.request({
                             method: "wallet_switchEthereumChain",
@@ -44,7 +44,7 @@ export class ConnectWallet {
                             }
                         }
                     }
-                }
+                }*/
             }
         } else if (process.env.REACT_APP_NETWORK === "Test") {
             if (typeof window.ethereum === 'undefined') {
@@ -87,52 +87,6 @@ export class ConnectWallet {
                     }
                 }
             }
-
-            window.ethereum.on('accountsChanged', async (accounts) => {
-                if (typeof accounts[0] !== 'undefined' && accounts[0] !== null) {
-                    return ({ account: accounts[0], balance: this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether') })
-                }
-            });
-
-            //Update data when user switch the network
-            window.ethereum.on('chainChanged', async (chainId) => {
-                let network = parseInt(chainId, 16)
-                if (network === 18) {
-                    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    let balance = this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether')
-                    return ({ account: accounts[0], balance: balance })
-                } else {
-                    try {
-                        await this.web3.currentProvider.request({
-                            method: "wallet_switchEthereumChain",
-                            params: [{ chainId: "0x12" }],
-                        });
-                    } catch (error) {
-                        if (error.code === 4902) {
-                            try {
-                                await this.web3.currentProvider.request({
-                                    method: "wallet_addEthereumChain",
-                                    params: [
-                                        {
-                                            chainId: "0x12",
-                                            chainName: "ThunderCore Testnet",
-                                            rpcUrls: ["https://testnet-rpc.thundercore.com"],
-                                            nativeCurrency: {
-                                                name: "TST token",
-                                                symbol: "TST",
-                                                decimals: 18,
-                                            },
-                                            blockExplorerUrls: ["https://explorer-testnet.thundercore.com/"],
-                                        },
-                                    ],
-                                });
-                            } catch (error) {
-                                alert(error.message);
-                            }
-                        }
-                    }
-                }
-            });
         }
     }
 
@@ -182,7 +136,7 @@ export class ConnectWallet {
             try {
                 await this.web3.currentProvider.request({
                     method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0x61"}],
+                    params: [{ chainId: "0x38"}],
                 });
             } catch (error) {
                 if (error.code === 4902) {
@@ -191,15 +145,15 @@ export class ConnectWallet {
                             method: "wallet_addEthereumChain",
                             params: [
                                 {
-                                    chainId: "0x61",
-                                    chainName: "Smart Chain-Testnet",
-                                    rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                                    chainId: "0x38",
+                                    chainName: "Smart Chain",
+                                    rpcUrls: ["https://bsc-dataseed.binance.org/"],
                                     nativeCurrency: {
                                         name: "BNB token",
                                         symbol: "BNB",
                                         decimals: 18,
                                     },
-                                    blockExplorerUrls: ["https://testnet.bscscan.com"],
+                                    blockExplorerUrls: ["https://bscscan.com"],
                                 },
                             ],
                         });
