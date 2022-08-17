@@ -20,6 +20,8 @@ import { ConnectWallet } from '../components/connectWallet'
 function Index({ userInfo, connectWallet }) {
     const metaConnect = new ConnectWallet()
     const [apiPath, setApiPath] = useState("")
+    const [title, setTitle] = useState("")
+    const [token, setToken] = useState("")
 
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
@@ -35,7 +37,7 @@ function Index({ userInfo, connectWallet }) {
 
     const [betting, setBetting] = useState(false)
 
-    const [title, setTitle] = useState("YOU WILL WIN TT")
+    const [statusMessage, setStatusMessage] = useState("YOU WILL WIN TT")
     const [winTS, setWinTS] = useState(0)
     const [winTT, setWinTT] = useState(0)
 
@@ -65,6 +67,12 @@ function Index({ userInfo, connectWallet }) {
             setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
             setThreeStarContract(new web3.eth.Contract(threeStarcontract_abi, threeStarcontract_address));
 
+            if(value === 97 || value === 56){
+                setToken("BNB")
+            }else{
+                setToken("TT")
+            }
+
         }).catch(error => {
             console.log(error)
         })
@@ -85,8 +93,8 @@ function Index({ userInfo, connectWallet }) {
             setBetting(true)
             let point = 0;
             // assign task to backend to create random number and match
-            threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(0.0001), "ether") }).then(function (receipt) {
-                axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": 0.0001 }).then(res => {
+            threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
+                axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
                     point = res['data']['point'];
                     setStarNumber(res['data']['starNumber'])
                     checkUserNumberMatch(res['data']['starNumber'])
@@ -94,18 +102,18 @@ function Index({ userInfo, connectWallet }) {
                     setBetting(false)
 
                     if (point > 2) {
-                        setTitle("YOU WON!!")
+                        setStatusMessage("YOU WON!!")
                         setWinTT(res['data']['winTT'])
                         setTToken((Number(TTToken) - Number(userBet) + Number(res['data']['winTT'])).toFixed(2))
                     } else {
-                        setTitle("YOU GOT 3Star!")
+                        setStatusMessage("YOU GOT 3Star!")
                         setWinTS(res['data']['winTS'])
                         setTToken((Number(TTToken) - Number(userBet)).toFixed(2))
                         setTSToken((Number(TSToken) + Number(res['data']['winTS'])).toFixed(2))
                     }
 
                     setTimeout(() => {
-                        setTitle("YOU WILL WIN TT")
+                        setStatusMessage("YOU WILL WIN TT")
                         setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
                     }, "6000")
 
@@ -355,16 +363,16 @@ function Index({ userInfo, connectWallet }) {
                         </Col>
                     </Row>
                     <Row style={{ paddingTop: "10px" }}>
-                        <Col><font>{title}</font></Col>
+                        <Col><font>{statusMessage}</font></Col>
                     </Row>
 
-                    {title === "YOU WILL WIN TT"
+                    {statusMessage === "YOU WILL WIN TT"
                         ?
                         <Row>
                             <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn}</font></Col>
                         </Row>
 
-                        : title === "YOU GOT 3Star!"
+                        : statusMessage === "YOU GOT 3Star!"
                             ?
                             <Row>
                                 <Col><img src={ThreeStarToken} style={{ width: "35px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTS}</font></Col>

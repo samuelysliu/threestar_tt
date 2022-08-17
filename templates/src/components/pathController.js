@@ -6,7 +6,7 @@ export class PathController {
             this.TSTokenContractAddress = process.env.REACT_APP_BSC_TSTOKENCONTRACTADDRESS
             this.stakeContractAddress = process.env.REACT_APP_BSC_STAKECONTRACTADDRESS
             this.title = "BSC 3Star"
-        } else if (chainId === 108) {
+        } else if (chainId === 56) {
             this.apiPath = process.env.REACT_APP_APIPATH + "bsc"
             this.threeStarContractAddress = process.env.REACT_APP_BSC_THREESTARCONTRACTADDRESS
             this.TSTokenContractAddress = process.env.REACT_APP_BSC_TSTOKENCONTRACTADDRESS
