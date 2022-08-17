@@ -27,7 +27,7 @@ function App() {
         //Update data when user switch the network
         window.ethereum.on('chainChanged', async (chainId) => {
           let network = parseInt(chainId, 16)
-          if (network === 108) {
+          if (network === 108 || network === 56 || network === 97) {
             let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             let balance = web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether')
             setUserInfo({ account: accounts[0], balance: balance })

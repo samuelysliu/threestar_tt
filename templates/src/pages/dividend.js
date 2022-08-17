@@ -34,7 +34,7 @@ function Dividend({ userInfo, connectWallet }) {
 
     const [disableDividends, setDisableDividends] = useState(true);
 
-    let totalAllowance = '100000000000000000000000000';
+    let totalAllowance = '10000000000000000000000000000';
     const [unlockBool, setUnlockBool] = useState(true);
 
     const [isStaking, setIsStaking] = useState(false)
@@ -48,7 +48,7 @@ function Dividend({ userInfo, connectWallet }) {
 
     const checkContractInfo = () => {
         TSTokencontract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
-            if (receipt >= Number(totalAllowance)) {
+            if (receipt >= 10000000000000000000000000) {
                 setUnlockBool(false);
                 TSTokencontract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
                     setStakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
@@ -57,7 +57,6 @@ function Dividend({ userInfo, connectWallet }) {
                 })
 
                 stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
-                    console.log(web3.utils.fromWei(receipt, "ether"))
                     setUnstakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
                 }).catch(error => {
                     console.log(error);
@@ -119,6 +118,7 @@ function Dividend({ userInfo, connectWallet }) {
 
     useEffect(() => {
         loadWeb3();
+        connectWallet()
         axios.get(apiPath + "/getDividendInfo").then(res => {
             setDividends(res['data']['dividends'])
             setAPR(res['data']['APR'])

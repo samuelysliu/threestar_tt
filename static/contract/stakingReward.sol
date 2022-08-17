@@ -26,7 +26,6 @@ contract StakingRewards {
     IERC20 public immutable stakingToken;
 
     address internal owner;
-    uint public ownerGasFee;
 
     uint TT = 0;
 
@@ -54,6 +53,8 @@ contract StakingRewards {
     event Received(address angle, uint amount);
 
     event withdrawOrder(uint, bool);
+
+    uint public test;
 
     receive() external payable{
         emit Received(msg.sender, msg.value);
@@ -95,7 +96,6 @@ contract StakingRewards {
         require(balanceOf[msg.sender] >= _amount, "insufficient balance");
         require(msg.value >= 1000000000000000000);
 
-        ownerGasFee += msg.value;
         balanceOf[msg.sender] -= _amount;
         totalSupply -= _amount;
         stakingToken.transfer(msg.sender, _amount);
@@ -124,12 +124,11 @@ contract StakingRewards {
 
     function setReward(uint todayEarn) external onlyOwner {
         for(uint i = 0; i < stakerAddress.length; i++){
-            rewards[stakerAddress[i]] = balanceOf[stakerAddress[i]] / totalSupply * todayEarn;
+            rewards[stakerAddress[i]] = balanceOf[stakerAddress[i]] * todayEarn / totalSupply ;
         }
     }
 
     function masterWithdraw(uint withdrawAmount) external payable onlyOwner{
-        ownerGasFee -= withdrawAmount;
         payable(owner).transfer(withdrawAmount);
         emit withdrawOrder(withdrawAmount, true);
     }

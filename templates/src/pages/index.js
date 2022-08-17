@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Container, Row, Col, Spinner, Tooltip, Overlay, Button, OverlayTrigger, Popover } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Web3 from 'web3'
 import Sidebar from '../components/sidebar';
 import ThreeStarABI from '../abi/threeStarABI.json';
 import axios from 'axios';
 import { TiStarFullOutline } from 'react-icons/ti';
+import { BsInfoCircleFill } from 'react-icons/bs';
 import BetCircle from '../components/betCircle';
 import { PathController } from '../components/pathController';
 import '../styles/home.css'
@@ -14,11 +15,11 @@ import ThreeStarTokenABI from '../abi/threeStarTokenABI.json';
 import UserNumber from '../components/userNumber';
 import Confetti from 'react-confetti'
 import UseWindowSize from '../components/useWindowSize'
+import { ConnectWallet } from '../components/connectWallet'
 
 function Index({ userInfo, connectWallet }) {
-    const pathController = new PathController()
-
-    const apiPath = pathController.getApiPath();
+    const metaConnect = new ConnectWallet()
+    const [apiPath, setApiPath] = useState("")
 
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
@@ -44,18 +45,29 @@ function Index({ userInfo, connectWallet }) {
     const [walletConnecting, setWalletConnecting] = useState(false)
     const [errorMessage, SetErrorMessage] = useState("")
 
-    const threeStarcontract_abi = ThreeStarABI.abi;
-    const threeStarcontract_address = pathController.getThreeStarContractAddress();
-    const TSTokenContractABI = ThreeStarTokenABI.abi;
-    const TSTokenContractAddress = pathController.getTSTokenContractAddress();
-
     const { width, height } = UseWindowSize();
+
+    const [infoShow, setInfoShow] = useState(false)
+    const [infoTarget, setInfoTarget] = useState(null)
+    const infoRef = useRef(null);
 
     let web3 = new Web3(window.ethereum);
 
     const loadWeb3 = () => {
-        setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
-        setThreeStarContract(new web3.eth.Contract(threeStarcontract_abi, threeStarcontract_address));
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value)
+            setApiPath(pathController.getApiPath())
+            const threeStarcontract_abi = ThreeStarABI.abi;
+            const threeStarcontract_address = pathController.getThreeStarContractAddress();
+            const TSTokenContractABI = ThreeStarTokenABI.abi;
+            const TSTokenContractAddress = pathController.getTSTokenContractAddress();
+
+            setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
+            setThreeStarContract(new web3.eth.Contract(threeStarcontract_abi, threeStarcontract_address));
+
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
     //user click let's bet 
@@ -73,8 +85,8 @@ function Index({ userInfo, connectWallet }) {
             setBetting(true)
             let point = 0;
             // assign task to backend to create random number and match
-            threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
-                axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
+            threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(0.0001), "ether") }).then(function (receipt) {
+                axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": 0.0001 }).then(res => {
                     point = res['data']['point'];
                     setStarNumber(res['data']['starNumber'])
                     checkUserNumberMatch(res['data']['starNumber'])
@@ -88,6 +100,7 @@ function Index({ userInfo, connectWallet }) {
                     } else {
                         setTitle("YOU GOT 3Star!")
                         setWinTS(res['data']['winTS'])
+                        setTToken((Number(TTToken) - Number(userBet)).toFixed(2))
                         setTSToken((Number(TSToken) + Number(res['data']['winTS'])).toFixed(2))
                     }
 
@@ -279,6 +292,17 @@ function Index({ userInfo, connectWallet }) {
         }
     }
 
+    const infoStyle = {
+        backgroundColor: "white",
+        color: "black",
+        width: "210px",
+        fontSize: "12px",
+        borderRadius: "5px",
+        height: "30px",
+        display: "flex",
+        alignItems: "center"
+    }
+
 
     return (
         <>
@@ -286,7 +310,24 @@ function Index({ userInfo, connectWallet }) {
             <div style={{ backgroundColor: "#1AB3FF", margin: "20px", borderRadius: "6px" }}>
                 <Container style={mainContainer}>
                     <Row style={{ paddingTop: "10px" }}>
-                        <Col><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
+                        <Col xs={{ span: 6, offset: 3 }}><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
+                        <Col xs={{ span: 2, offset: 1 }} style={{ textAlign: "right" }}>
+                            <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
+                        </Col>
+                    </Row>
+                    <Row ref={infoRef}>
+                        <Overlay
+                            show={infoShow}
+                            target={infoTarget}
+                            placement="bottom"
+                            container={infoRef}
+                            rootClose
+                            onHide={() => setInfoShow(false)}
+                        >
+                            <div style={infoStyle}>
+                                <font>winning TT will be charged 1% fee </font>
+                            </div>
+                        </Overlay>
                     </Row>
                     <div style={randomNumberStyle}>
                         <Row style={{ justifyContent: "center" }}>
