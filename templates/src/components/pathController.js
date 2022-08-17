@@ -1,12 +1,6 @@
 export class PathController {
     constructor(chainId) {
-        if (chainId === 97) {
-            this.apiPath = process.env.REACT_APP_APIPATH + "bsc"
-            this.threeStarContractAddress = process.env.REACT_APP_BSC_THREESTARCONTRACTADDRESS
-            this.TSTokenContractAddress = process.env.REACT_APP_BSC_TSTOKENCONTRACTADDRESS
-            this.stakeContractAddress = process.env.REACT_APP_BSC_STAKECONTRACTADDRESS
-            this.title = "BSC 3Star"
-        } else if (chainId === 56) {
+        if (String(chainId) === process.env.REACT_APP_BSC) {
             this.apiPath = process.env.REACT_APP_APIPATH + "bsc"
             this.threeStarContractAddress = process.env.REACT_APP_BSC_THREESTARCONTRACTADDRESS
             this.TSTokenContractAddress = process.env.REACT_APP_BSC_TSTOKENCONTRACTADDRESS

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Row, Col, Spinner, Tooltip, Overlay, Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Container, Row, Col, Spinner, Overlay, Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Web3 from 'web3'
 import Sidebar from '../components/sidebar';
@@ -16,12 +16,11 @@ import UserNumber from '../components/userNumber';
 import Confetti from 'react-confetti'
 import UseWindowSize from '../components/useWindowSize'
 import { ConnectWallet } from '../components/connectWallet'
+import BNBTokenImage from '../images/BNB.png'
 
-function Index({ userInfo, connectWallet }) {
+function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const metaConnect = new ConnectWallet()
     const [apiPath, setApiPath] = useState("")
-    const [title, setTitle] = useState("")
-    const [token, setToken] = useState("")
 
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
@@ -33,11 +32,9 @@ function Index({ userInfo, connectWallet }) {
     const [TSToken, setTSToken] = useState(0)
     const [TTToken, setTToken] = useState(0)
 
-    const TTTokenUrl = "https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1.25,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1"
-
     const [betting, setBetting] = useState(false)
 
-    const [statusMessage, setStatusMessage] = useState("YOU WILL WIN TT")
+    const [statusMessage, setStatusMessage] = useState("")
     const [winTS, setWinTS] = useState(0)
     const [winTT, setWinTT] = useState(0)
 
@@ -53,6 +50,8 @@ function Index({ userInfo, connectWallet }) {
     const [infoTarget, setInfoTarget] = useState(null)
     const infoRef = useRef(null);
 
+    const TTTokenImage = "https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1.25,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1"
+
     let web3 = new Web3(window.ethereum);
 
     const loadWeb3 = () => {
@@ -67,12 +66,7 @@ function Index({ userInfo, connectWallet }) {
             setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
             setThreeStarContract(new web3.eth.Contract(threeStarcontract_abi, threeStarcontract_address));
 
-            if(value === 97 || value === 56){
-                setToken("BNB")
-            }else{
-                setToken("TT")
-            }
-
+            setStatusMessage("YOU WILL WIN " + token)
         }).catch(error => {
             console.log(error)
         })
@@ -113,7 +107,7 @@ function Index({ userInfo, connectWallet }) {
                     }
 
                     setTimeout(() => {
-                        setStatusMessage("YOU WILL WIN TT")
+                        setStatusMessage("YOU WILL WIN " + token)
                         setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
                     }, "6000")
 
@@ -240,6 +234,10 @@ function Index({ userInfo, connectWallet }) {
         }
     }, [userInfo])
 
+    useEffect(() => {
+        loadWeb3()
+    }, [token])
+
     const mainContainer = {
         textAlign: "center",
         color: "white",
@@ -333,7 +331,7 @@ function Index({ userInfo, connectWallet }) {
                             onHide={() => setInfoShow(false)}
                         >
                             <div style={infoStyle}>
-                                <font>winning TT will be charged 1% fee </font>
+                                <font>winning {token} will be charged 1% fee </font>
                             </div>
                         </Overlay>
                     </Row>
@@ -366,7 +364,7 @@ function Index({ userInfo, connectWallet }) {
                         <Col><font>{statusMessage}</font></Col>
                     </Row>
 
-                    {statusMessage === "YOU WILL WIN TT"
+                    {statusMessage === "YOU WILL WIN " + token
                         ?
                         <Row>
                             <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn}</font></Col>
@@ -380,7 +378,7 @@ function Index({ userInfo, connectWallet }) {
                             :
                             <Row>
                                 <Confetti width={width} height={height} />
-                                <Col><img src={TTTokenUrl} style={{ width: "35px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTT}</font></Col>
+                                <Col><img src={originTokenUrl} style={{ width: "35px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTT}</font></Col>
                             </Row>
                     }
 
@@ -428,8 +426,22 @@ function Index({ userInfo, connectWallet }) {
                             </>
                             : <>
                                 <Col className='tokenNumBc' style={{ marginLeft: "20px" }}>
-                                    <img className='tokenStyle' src={TTTokenUrl}></img>
-                                    <font>{TTToken} TT</font>
+                                    <img className='tokenStyle' src={originTokenUrl}></img>
+                                    <Dropdown>
+                                        <Dropdown.Toggle>
+                                            <font>{TTToken} {token}</font>
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item onClick={() => metaConnect.changeChain("BSC")}>
+                                                <img src={BNBTokenImage} width="20px"></img>
+                                                <font style={{ paddingLeft: "10px" }}>BNB</font>
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => metaConnect.changeChain("ThunderCore")}>
+                                                <img src={TTTokenImage} width="20px"></img>
+                                                <font style={{ paddingLeft: "10px" }}>TT</font>
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
                                 </Col>
                                 <Col className='tokenNumBc' style={{ marginRight: "20px" }}>
                                     <img className='tokenStyle' src={ThreeStarToken}></img>
