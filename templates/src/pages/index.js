@@ -76,7 +76,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                 setBetNumberDefault(["0.01", "0.1", "1", "10", "100"])
                 setUserBet(1)
             }
-            
+            setBetNumberCircle({ "one": "1", "two": "1", "three": "2", "four": "1", "five": "1" })
         }).catch(error => {
             console.log(error)
         })
