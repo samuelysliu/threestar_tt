@@ -12,39 +12,11 @@ export class ConnectWallet {
             } else {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 const chainId = await this.web3.eth.getChainId();
-                if (chainId === 108 || chainId === 56) {
+                if (String(chainId) === process.env.REACT_APP_ThunderCore || String(chainId) === process.env.REACT_APP_BSC) {
                     return { account: accounts[0], balance: this.web3.utils.fromWei(await this.web3.eth.getBalance(accounts[0]), 'ether') }
-                } /*else {
-                    try {
-                        await this.web3.currentProvider.request({
-                            method: "wallet_switchEthereumChain",
-                            params: [{ chainId: "0x6c" }],
-                        });
-                    } catch (error) {
-                        if (error.code === 4902) {
-                            try {
-                                await this.web3.currentProvider.request({
-                                    method: "wallet_addEthereumChain",
-                                    params: [
-                                        {
-                                            chainId: "0x6c",
-                                            chainName: "ThunderCore",
-                                            rpcUrls: ["https://mainnet-rpc.thundercore.com"],
-                                            nativeCurrency: {
-                                                name: "TT token",
-                                                symbol: "TT",
-                                                decimals: 18,
-                                            },
-                                            blockExplorerUrls: ["https://viewblock.io/thundercore"],
-                                        },
-                                    ],
-                                });
-                            } catch (error) {
-                                alert(error.message);
-                            }
-                        }
-                    }
-                }*/
+                } else {
+                    this.changeChain("ThunderCore")
+                }
             }
         } else if (process.env.REACT_APP_NETWORK === "Test") {
             if (typeof window.ethereum === 'undefined') {
@@ -228,4 +200,5 @@ export class ConnectWallet {
             }
         }
     }
+
 }
