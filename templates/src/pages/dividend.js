@@ -54,6 +54,7 @@ function Dividend({ userInfo, connectWallet, token }) {
     const [unlockBool, setUnlockBool] = useState(true);
 
     const [isStaking, setIsStaking] = useState(false)
+    const [isClaiming, setIsClaiming] = useState(false)
 
 
     const checkContractInfo = () => {
@@ -115,10 +116,12 @@ function Dividend({ userInfo, connectWallet, token }) {
     }
 
     const claimDevidends = () => {
+        setIsClaiming(true)
         stakeContract.methods.getReward().send({ from: userInfo.account }).then(function (receipt) {
             setDisableDividends(true)
+            setIsClaiming(false)
         }).catch(error => {
-            console.log(error)
+            setIsClaiming(false)
         })
     }
 
@@ -140,7 +143,7 @@ function Dividend({ userInfo, connectWallet, token }) {
             }).catch(error => {
                 console.log(error)
             });
-            
+
             if (userInfo.account.length !== 0) {
                 checkContractInfo();
             }
@@ -300,7 +303,15 @@ function Dividend({ userInfo, connectWallet, token }) {
                         </Col>
                     </Row>
                     <Row style={blockTwoStyle}>
-                        <Col><Button disabled={disableDividends} style={longButtonStyle} onClick={claimDevidends}>Claim Dividends</Button></Col>
+                        <Col>
+                            {isClaiming ?
+                                <Button disabled={true} style={longButtonStyle}>
+                                    <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+                                    Loading...
+                                </Button>
+                                : <Button disabled={disableDividends} style={longButtonStyle} onClick={claimDevidends}>Claim Dividends</Button>
+                            }
+                        </Col>
                     </Row>
                     <Row style={blockFourStyle}>
                         <Col><p style={{ color: "red", fontSize: "12px" }}>*Dividends must be claimed within 1 days</p></Col>

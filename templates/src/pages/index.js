@@ -17,6 +17,7 @@ import Confetti from 'react-confetti'
 import UseWindowSize from '../components/useWindowSize'
 import { ConnectWallet } from '../components/connectWallet'
 import BNBTokenImage from '../images/BNB.png'
+import WinRule from '../components/winRule';
 
 function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const metaConnect = new ConnectWallet()
@@ -69,10 +70,10 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             setThreeStarContract(new web3.eth.Contract(threeStarcontractABI, threeStarcontractAddress));
 
             setStatusMessage("YOU WILL WIN " + token)
-            if(token === "TT"){
+            if (token === "TT") {
                 setBetNumberDefault(["20", "80", "100", "1K", "10K"])
                 setUserBet(100)
-            }else{
+            } else {
                 setBetNumberDefault(["0.01", "0.1", "1", "10", "100"])
                 setUserBet(1)
             }
@@ -94,43 +95,46 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
         // user must choose five lucky number
         else if (userLuckyNumber.length === 5) {
-            setBetting(true)
-            let point = 0;
-            // assign task to backend to create random number and match
-            threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
-                axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
-                    point = res['data']['point'];
-                    setStarNumber(res['data']['starNumber'])
-                    checkUserNumberMatch(res['data']['starNumber'])
-
-                    setBetting(false)
-
-                    if (point > 2) {
-                        setStatusMessage("YOU WON!!")
-                        setWinTT(res['data']['winTT'])
-                        setTToken((Number(TTToken) - Number(userBet) + Number(res['data']['winTT'])).toFixed(2))
-                    } else {
-                        setStatusMessage("YOU GOT 3Star!")
-                        setWinTS(res['data']['winTS'])
-                        setTToken((Number(TTToken) - Number(userBet)).toFixed(2))
-                        setTSToken((Number(TSToken) + Number(res['data']['winTS'])).toFixed(2))
-                    }
-
-                    setTimeout(() => {
-                        setStatusMessage("YOU WILL WIN " + token)
-                        setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
-                    }, "6000")
-
-                }).catch(error => {
-                    setBetting(false)
-                })
-            }).catch(error => {
-                setBetting(false)
+            if (userInfo.balance < userBet) {
                 SetErrorMessage("Insufficient Balance")
                 setTimeout(() => {
                     SetErrorMessage("")
                 }, 6000)
-            })
+            } else {
+                setBetting(true)
+                let point = 0;
+                // assign task to backend to create random number and match
+                threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
+                    axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
+                        point = res['data']['point'];
+                        setStarNumber(res['data']['starNumber'])
+                        checkUserNumberMatch(res['data']['starNumber'])
+
+                        setBetting(false)
+
+                        if (point > 2) {
+                            setStatusMessage("YOU WON!!")
+                            setWinTT(res['data']['winTT'])
+                            setTToken((Number(TTToken) - Number(userBet) + Number(res['data']['winTT'])).toFixed(2))
+                        } else {
+                            setStatusMessage("YOU GOT 3Star!")
+                            setWinTS(res['data']['winTS'])
+                            setTToken((Number(TTToken) - Number(userBet)).toFixed(2))
+                            setTSToken((Number(TSToken) + Number(res['data']['winTS'])).toFixed(2))
+                        }
+
+                        setTimeout(() => {
+                            setStatusMessage("YOU WILL WIN " + token)
+                            setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
+                        }, "6000")
+
+                    }).catch(error => {
+                        setBetting(false)
+                    })
+                }).catch(error => {
+                    setBetting(false)
+                })
+            }
         }
     }
 
@@ -190,46 +194,46 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const changeBetNumber = (number) => {
         switch (number) {
             case 'one':
-                if(token === "TT"){
+                if (token === "TT") {
                     setUserBet(20)
-                }else{
+                } else {
                     setUserBet(0.01)
                 }
-                
+
                 setBetNumberCircle({ "one": "2", "two": "1", "three": "1", "four": "1", "five": "1" })
                 break
 
             case 'two':
-                if(token === "TT"){
+                if (token === "TT") {
                     setUserBet(80)
-                }else{
+                } else {
                     setUserBet(0.1)
                 }
                 setBetNumberCircle({ "one": "1", "two": "2", "three": "1", "four": "1", "five": "1" })
                 break
 
             case 'three':
-                if(token === "TT"){
+                if (token === "TT") {
                     setUserBet(100)
-                }else{
+                } else {
                     setUserBet(1)
                 }
                 setBetNumberCircle({ "one": "1", "two": "1", "three": "2", "four": "1", "five": "1" })
                 break
 
             case 'four':
-                if(token === "TT"){
+                if (token === "TT") {
                     setUserBet(1000)
-                }else{
+                } else {
                     setUserBet(10)
                 }
                 setBetNumberCircle({ "one": "1", "two": "1", "three": "1", "four": "2", "five": "1" })
                 break
 
             case 'five':
-                if(token === "TT"){
+                if (token === "TT") {
                     setUserBet(10000)
-                }else{
+                } else {
                     setUserBet(100)
                 }
                 setBetNumberCircle({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "2" })
@@ -271,8 +275,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
     const mainContainer = {
         textAlign: "center",
-        color: "white",
-        paddingBottom: "5%"
+        color: "white"
     }
 
     const randomNumberStyle = {
@@ -283,8 +286,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         borderStyle: "solid",
         borderWidth: "3px",
         borderColor: "#26C4FF",
-        paddingTop: "20px",
-        paddingBottom: "20px"
+        paddingTop: "10px",
+        paddingBottom: "10px"
     }
 
     const changeBtStyle = {
@@ -344,9 +347,9 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     return (
         <>
             <Sidebar />
-            <div style={{ backgroundColor: "#1AB3FF", margin: "20px", borderRadius: "6px" }}>
+            <div style={{ backgroundColor: "#1AB3FF", marginLeft: "20px", marginRight: "20px", marginTop: "10px", borderRadius: "6px" }}>
                 <Container style={mainContainer}>
-                    <Row style={{ paddingTop: "10px" }}>
+                    <Row style={{ paddingTop: "5px" }}>
                         <Col xs={{ span: 6, offset: 3 }}><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
                         <Col xs={{ span: 2, offset: 1 }} style={{ textAlign: "right" }}>
                             <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
@@ -404,47 +407,21 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                         : statusMessage === "YOU GOT 3Star!"
                             ?
                             <Row>
-                                <Col><img src={ThreeStarToken} style={{ width: "35px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTS}</font></Col>
+                                <Col className="winTokenRowStyle"><img src={ThreeStarToken} style={{ width: "30px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTS}</font></Col>
                             </Row>
                             :
                             <Row>
                                 <Confetti width={width} height={height} />
-                                <Col><img src={originTokenUrl} style={{ width: "35px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTT}</font></Col>
+                                <Col className="winTokenRowStyle"><img src={originTokenUrl} style={{ width: "30px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTT}</font></Col>
                             </Row>
                     }
 
 
                     <div style={{ paddingLeft: "40px", paddingRight: "40px" }}>
-                        <Row style={{ color: "#FDCE20" }}>
-                            <Col style={{ textAlign: "left" }}>
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                            </Col>
-                            <Col style={{ textAlign: "right" }}>2X</Col>
-                        </Row>
-                        <Row style={{ color: "#FDCE20" }}>
-                            <Col style={{ textAlign: "left" }}>
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                            </Col>
-                            <Col style={{ textAlign: "right" }}>20X</Col>
-                        </Row>
-                        <Row style={{ color: "#FDCE20" }}>
-                            <Col style={{ textAlign: "left" }}>
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                                <TiStarFullOutline size={18} />
-                            </Col>
-                            <Col style={{ textAlign: "right" }}>100X</Col>
-                        </Row>
+                        <WinRule />
                     </div>
 
-                    <Row style={{ paddingTop: "20px" }}>
+                    <Row style={{ paddingTop: "10px" }}>
                         <font style={{ color: "#E47600", fontSize: "12px" }}>{errorMessage}</font>
                         {userInfo.account.length === 0
                             ? <>
@@ -463,11 +440,11 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                                             <font>{TTToken} {token}</font>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item onClick={() => metaConnect.changeChain("BSC")}>
+                                            <Dropdown.Item onClick={() => { if (!betting) metaConnect.changeChain("BSC") }}>
                                                 <img src={BNBTokenImage} width="20px"></img>
                                                 <font style={{ paddingLeft: "10px" }}>BNB</font>
                                             </Dropdown.Item>
-                                            <Dropdown.Item onClick={() => metaConnect.changeChain("ThunderCore")}>
+                                            <Dropdown.Item onClick={() => { if (!betting) metaConnect.changeChain("ThunderCore") }}>
                                                 <img src={TTTokenImage} width="20px"></img>
                                                 <font style={{ paddingLeft: "10px" }}>TT</font>
                                             </Dropdown.Item>
@@ -484,20 +461,20 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
                     </Row>
 
-                    <Row xs={5} sm={5} style={{ paddingTop: "20px", paddingLeft: "20px", paddingRight: "20px" }}>
-                        <Col onClick={() => changeBetNumber("one")}>
+                    <Row xs={5} sm={5} style={{ paddingTop: "15px", paddingLeft: "20px", paddingRight: "20px" }}>
+                        <Col onClick={() => { if (!betting) changeBetNumber("one") }}>
                             <BetCircle bcColor={betNumberCircle.one} betNumber={betNumberDefault[0]} />
                         </Col>
-                        <Col onClick={() => changeBetNumber("two")}>
+                        <Col onClick={() => { if (!betting) changeBetNumber("two") }}>
                             <BetCircle bcColor={betNumberCircle.two} betNumber={betNumberDefault[1]} />
                         </Col>
-                        <Col onClick={() => changeBetNumber("three")}>
+                        <Col onClick={() => { if (!betting) changeBetNumber("three") }}>
                             <BetCircle bcColor={betNumberCircle.three} betNumber={betNumberDefault[2]} />
                         </Col>
-                        <Col onClick={() => changeBetNumber("four")}>
+                        <Col onClick={() => { if (!betting) changeBetNumber("four") }}>
                             <BetCircle bcColor={betNumberCircle.four} betNumber={betNumberDefault[3]} />
                         </Col>
-                        <Col onClick={() => changeBetNumber("five")}>
+                        <Col onClick={() => { if (!betting) changeBetNumber("five") }}>
                             <BetCircle bcColor={betNumberCircle.five} betNumber={betNumberDefault[4]} />
                         </Col>
                     </Row>
