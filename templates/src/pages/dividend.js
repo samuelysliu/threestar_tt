@@ -140,7 +140,7 @@ function Dividend({ userInfo, connectWallet, token }) {
             }).catch(error => {
                 console.log(error)
             });
-
+            
             if (userInfo.account.length !== 0) {
                 checkContractInfo();
             }

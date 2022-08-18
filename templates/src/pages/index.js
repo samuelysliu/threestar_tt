@@ -24,7 +24,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
     const [userLuckyNumber, setUserLuckyNumber] = useState([])
     const [starNumber, setStarNumber] = useState([])
-    const [userBet, setUserBet] = useState(20);
+    const [userBet, setUserBet] = useState(100);
     const [estimateEarn, setEstimateEarn] = useState(userBet * 100)
 
     const [threeStarcontract, setThreeStarContract] = useState();
@@ -38,7 +38,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const [winTS, setWinTS] = useState(0)
     const [winTT, setWinTT] = useState(0)
 
-    const [betNumberCircle, setBetNumberCircle] = useState({ "one": "2", "two": "1", "three": "1", "four": "1", "five": "1" })
+    const [betNumberCircle, setBetNumberCircle] = useState({ "one": "1", "two": "1", "three": "2", "four": "1", "five": "1" })
     const [userNumberColor, setUserNumberColor] = useState({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
 
     const [walletConnecting, setWalletConnecting] = useState(false)
@@ -58,13 +58,13 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         metaConnect.getChainId().then((value) => {
             const pathController = new PathController(value)
             setApiPath(pathController.getApiPath())
-            const threeStarcontract_abi = ThreeStarABI.abi;
-            const threeStarcontract_address = pathController.getThreeStarContractAddress();
+            const threeStarcontractABI = ThreeStarABI.abi;
+            const threeStarcontractAddress = pathController.getThreeStarContractAddress();
             const TSTokenContractABI = ThreeStarTokenABI.abi;
             const TSTokenContractAddress = pathController.getTSTokenContractAddress();
 
             setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress));
-            setThreeStarContract(new web3.eth.Contract(threeStarcontract_abi, threeStarcontract_address));
+            setThreeStarContract(new web3.eth.Contract(threeStarcontractABI, threeStarcontractAddress));
 
             setStatusMessage("YOU WILL WIN " + token)
         }).catch(error => {
