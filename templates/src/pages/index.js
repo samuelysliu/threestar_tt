@@ -139,25 +139,27 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     }
 
     const randomCreateuserLuckyNumber = () => {
-        setUserLuckyNumber([])
-        let randomTemp = [Math.floor(Math.random() * 80) + 1]
-        let temp;
-        while (randomTemp.length < 5) {
-            temp = Math.floor(Math.random() * 80) + 1
-            if (!randomTemp.includes(temp)) {
-                randomTemp.push(temp)
+        if (!betting) {
+            setUserLuckyNumber([])
+            let randomTemp = [Math.floor(Math.random() * 80) + 1]
+            let temp;
+            while (randomTemp.length < 5) {
+                temp = Math.floor(Math.random() * 80) + 1
+                if (!randomTemp.includes(temp)) {
+                    randomTemp.push(temp)
+                }
             }
+            randomTemp.sort((a, b) => {
+                if (a < b) {
+                    return -1
+                }
+                if (a > b) {
+                    return 1
+                }
+                return 0
+            })
+            setUserLuckyNumber(randomTemp)
         }
-        randomTemp.sort((a, b) => {
-            if (a < b) {
-                return -1
-            }
-            if (a > b) {
-                return 1
-            }
-            return 0
-        })
-        setUserLuckyNumber(randomTemp)
     }
 
     const checkUserNumberMatch = (_starNumber) => {
@@ -347,155 +349,157 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     return (
         <>
             <Sidebar />
-            <div style={{ backgroundColor: "#1AB3FF", marginLeft: "20px", marginRight: "20px", marginTop: "10px", borderRadius: "6px" }}>
-                <Container style={mainContainer}>
-                    <Row style={{ paddingTop: "5px" }}>
-                        <Col xs={{ span: 6, offset: 3 }}><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
-                        <Col xs={{ span: 2, offset: 1 }} style={{ textAlign: "right" }}>
-                            <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
-                        </Col>
-                    </Row>
-                    <Row ref={infoRef}>
-                        <Overlay
-                            show={infoShow}
-                            target={infoTarget}
-                            placement="bottom"
-                            container={infoRef}
-                            rootClose
-                            onHide={() => setInfoShow(false)}
-                        >
-                            <div style={infoStyle}>
-                                <font>winning {token} will be charged 1% fee </font>
-                            </div>
-                        </Overlay>
-                    </Row>
-                    <div style={randomNumberStyle}>
-                        <Row style={{ justifyContent: "center" }}>
-                            <Col xs="3" style={{ padding: "0px", height: "56px" }}>
-                                <UserNumber userLuckyNumber={userLuckyNumber[0]} userColor={userNumberColor.one} />
-                            </Col>
-                            <Col xs="3" style={{ padding: "0px", height: "56px" }}>
-                                <UserNumber userLuckyNumber={userLuckyNumber[1]} userColor={userNumberColor.two} />
-                            </Col>
-                            <Col xs="3" style={{ padding: "0px", height: "56px" }}>
-                                <UserNumber userLuckyNumber={userLuckyNumber[2]} userColor={userNumberColor.three} />
-                            </Col>
-                            <Col xs="4" style={{ padding: "0px", height: "56px" }}>
-                                <UserNumber userLuckyNumber={userLuckyNumber[3]} userColor={userNumberColor.four} />
-                            </Col>
-                            <Col xs="4" style={{ padding: "0px", height: "56px" }}>
-                                <UserNumber userLuckyNumber={userLuckyNumber[4]} userColor={userNumberColor.five} />
+            <div style={{ margin: "auto", marginLeft: "20px", marginRight: "20px" }}>
+                <div style={{ backgroundColor: "#1AB3FF", margin: "auto", marginTop: "10px", borderRadius: "6px", maxWidth: "720px" }}>
+                    <Container style={mainContainer}>
+                        <Row style={{ paddingTop: "5px" }}>
+                            <Col xs={{ span: 6, offset: 3 }}><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
+                            <Col xs={{ span: 2, offset: 1 }} style={{ textAlign: "right" }}>
+                                <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
                             </Col>
                         </Row>
+                        <Row ref={infoRef}>
+                            <Overlay
+                                show={infoShow}
+                                target={infoTarget}
+                                placement="bottom"
+                                container={infoRef}
+                                rootClose
+                                onHide={() => setInfoShow(false)}
+                            >
+                                <div style={infoStyle}>
+                                    <font>winning {token} will be charged 1% fee </font>
+                                </div>
+                            </Overlay>
+                        </Row>
+                        <div style={randomNumberStyle}>
+                            <Row style={{ justifyContent: "center" }}>
+                                <Col xs="3" style={{ padding: "0px", height: "56px" }}>
+                                    <UserNumber userLuckyNumber={userLuckyNumber[0]} userColor={userNumberColor.one} />
+                                </Col>
+                                <Col xs="3" style={{ padding: "0px", height: "56px" }}>
+                                    <UserNumber userLuckyNumber={userLuckyNumber[1]} userColor={userNumberColor.two} />
+                                </Col>
+                                <Col xs="3" style={{ padding: "0px", height: "56px" }}>
+                                    <UserNumber userLuckyNumber={userLuckyNumber[2]} userColor={userNumberColor.three} />
+                                </Col>
+                                <Col xs="4" style={{ padding: "0px", height: "56px" }}>
+                                    <UserNumber userLuckyNumber={userLuckyNumber[3]} userColor={userNumberColor.four} />
+                                </Col>
+                                <Col xs="4" style={{ padding: "0px", height: "56px" }}>
+                                    <UserNumber userLuckyNumber={userLuckyNumber[4]} userColor={userNumberColor.five} />
+                                </Col>
+                            </Row>
 
-                    </div>
-                    <Row style={{ paddingTop: "10px" }}>
-                        <Col>
-                            <button style={changeBtStyle} onClick={randomCreateuserLuckyNumber}><strong>CHANGE</strong></button>
-                        </Col>
-                    </Row>
-                    <Row style={{ paddingTop: "10px" }}>
-                        <Col><font>{statusMessage}</font></Col>
-                    </Row>
-
-                    {statusMessage === "YOU WILL WIN " + token
-                        ?
-                        <Row>
-                            <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn}</font></Col>
+                        </div>
+                        <Row style={{ paddingTop: "10px" }}>
+                            <Col>
+                                <button style={changeBtStyle} onClick={randomCreateuserLuckyNumber}><strong>CHANGE</strong></button>
+                            </Col>
+                        </Row>
+                        <Row style={{ paddingTop: "10px" }}>
+                            <Col><font>{statusMessage}</font></Col>
                         </Row>
 
-                        : statusMessage === "YOU GOT 3Star!"
+                        {statusMessage === "YOU WILL WIN " + token
                             ?
                             <Row>
-                                <Col className="winTokenRowStyle"><img src={ThreeStarToken} style={{ width: "30px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTS}</font></Col>
+                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn}</font></Col>
                             </Row>
-                            :
-                            <Row>
-                                <Confetti width={width} height={height} />
-                                <Col className="winTokenRowStyle"><img src={originTokenUrl} style={{ width: "30px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTT}</font></Col>
-                            </Row>
-                    }
 
-
-                    <div style={{ paddingLeft: "40px", paddingRight: "40px" }}>
-                        <WinRule />
-                    </div>
-
-                    <Row style={{ paddingTop: "10px" }}>
-                        <font style={{ color: "#E47600", fontSize: "12px" }}>{errorMessage}</font>
-                        {userInfo.account.length === 0
-                            ? <>
-                                <Col>
-                                    <button style={connectBtStyle} onClick={() => { connectWallet(); setWalletConnecting(true) }}>
-                                        <strong>CONNECT WALLET</strong>
-                                        {walletConnecting ? <Spinner animation="border" style={{ color: "#FFF", width: "1rem", height: "1rem", marginLeft: "5px" }} /> : ""}
-                                    </button>
-                                </Col>
-                            </>
-                            : <>
-                                <Col className='tokenNumBc' style={{ marginLeft: "20px" }}>
-                                    <img className='tokenStyle' src={originTokenUrl}></img>
-                                    <Dropdown>
-                                        <Dropdown.Toggle>
-                                            <font>{TTToken} {token}</font>
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item onClick={() => { if (!betting) metaConnect.changeChain("BSC") }}>
-                                                <img src={BNBTokenImage} width="20px"></img>
-                                                <font style={{ paddingLeft: "10px" }}>BNB</font>
-                                            </Dropdown.Item>
-                                            <Dropdown.Item onClick={() => { if (!betting) metaConnect.changeChain("ThunderCore") }}>
-                                                <img src={TTTokenImage} width="20px"></img>
-                                                <font style={{ paddingLeft: "10px" }}>TT</font>
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </Col>
-                                <Col className='tokenNumBc' style={{ marginRight: "20px" }}>
-                                    <img className='tokenStyle' src={ThreeStarToken}></img>
-                                    <font>{TSToken} 3Star</font>
-                                </Col>
-                            </>
+                            : statusMessage === "YOU GOT 3Star!"
+                                ?
+                                <Row>
+                                    <Col className="winTokenRowStyle"><img src={ThreeStarToken} style={{ width: "30px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTS}</font></Col>
+                                </Row>
+                                :
+                                <Row>
+                                    <Confetti width={width} height={height} />
+                                    <Col className="winTokenRowStyle"><img src={originTokenUrl} style={{ width: "30px" }}></img><font style={{ fontSize: "28px", color: "#FEE63A" }}>{winTT}</font></Col>
+                                </Row>
                         }
 
 
-                    </Row>
+                        <div style={{ paddingLeft: "40px", paddingRight: "40px" }}>
+                            <WinRule />
+                        </div>
 
-                    <Row xs={5} sm={5} style={{ paddingTop: "15px", paddingLeft: "20px", paddingRight: "20px" }}>
-                        <Col onClick={() => { if (!betting) changeBetNumber("one") }}>
-                            <BetCircle bcColor={betNumberCircle.one} betNumber={betNumberDefault[0]} />
-                        </Col>
-                        <Col onClick={() => { if (!betting) changeBetNumber("two") }}>
-                            <BetCircle bcColor={betNumberCircle.two} betNumber={betNumberDefault[1]} />
-                        </Col>
-                        <Col onClick={() => { if (!betting) changeBetNumber("three") }}>
-                            <BetCircle bcColor={betNumberCircle.three} betNumber={betNumberDefault[2]} />
-                        </Col>
-                        <Col onClick={() => { if (!betting) changeBetNumber("four") }}>
-                            <BetCircle bcColor={betNumberCircle.four} betNumber={betNumberDefault[3]} />
-                        </Col>
-                        <Col onClick={() => { if (!betting) changeBetNumber("five") }}>
-                            <BetCircle bcColor={betNumberCircle.five} betNumber={betNumberDefault[4]} />
-                        </Col>
-                    </Row>
-                </Container>
-                <div style={betNowStyle.cardStyle}>
-                    {betting
-                        ? <button style={betNowStyle.btStyle}>
-                            <strong>
-                                <font style={{ fontSize: "48px" }}>BET</font>
-                                <br></br>
-                                <Spinner animation="border" style={{ color: "#0AB700" }} />
-                            </strong>
-                        </button>
-                        : <button style={betNowStyle.btStyle} onClick={startGame}>
-                            <strong>
-                                <font style={{ fontSize: "48px" }}>BET</font>
-                                <br></br>
-                                <font style={{ fontSize: "24px", color: "#0AB700" }}>NOW</font>
-                            </strong>
-                        </button>
-                    }
+                        <Row style={{ paddingTop: "10px" }}>
+                            <font style={{ color: "#E47600", fontSize: "12px" }}>{errorMessage}</font>
+                            {userInfo.account.length === 0
+                                ? <>
+                                    <Col>
+                                        <button style={connectBtStyle} onClick={() => { connectWallet(); setWalletConnecting(true) }}>
+                                            <strong>CONNECT WALLET</strong>
+                                            {walletConnecting ? <Spinner animation="border" style={{ color: "#FFF", width: "1rem", height: "1rem", marginLeft: "5px" }} /> : ""}
+                                        </button>
+                                    </Col>
+                                </>
+                                : <>
+                                    <Col className='tokenNumBc' style={{ marginLeft: "20px" }}>
+                                        <img className='tokenStyle' src={originTokenUrl}></img>
+                                        <Dropdown>
+                                            <Dropdown.Toggle>
+                                                <font>{TTToken} {token}</font>
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                <Dropdown.Item onClick={() => { if (!betting) metaConnect.changeChain("BSC") }}>
+                                                    <img src={BNBTokenImage} width="20px"></img>
+                                                    <font style={{ paddingLeft: "10px" }}>BNB</font>
+                                                </Dropdown.Item>
+                                                <Dropdown.Item onClick={() => { if (!betting) metaConnect.changeChain("ThunderCore") }}>
+                                                    <img src={TTTokenImage} width="20px"></img>
+                                                    <font style={{ paddingLeft: "10px" }}>TT</font>
+                                                </Dropdown.Item>
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </Col>
+                                    <Col className='tokenNumBc' style={{ marginRight: "20px" }}>
+                                        <img className='tokenStyle' src={ThreeStarToken}></img>
+                                        <font>{TSToken} 3Star</font>
+                                    </Col>
+                                </>
+                            }
+
+
+                        </Row>
+
+                        <Row xs={5} sm={5} style={{ paddingTop: "15px", paddingLeft: "20px", paddingRight: "20px" }}>
+                            <Col onClick={() => { if (!betting) changeBetNumber("one") }}>
+                                <BetCircle bcColor={betNumberCircle.one} betNumber={betNumberDefault[0]} />
+                            </Col>
+                            <Col onClick={() => { if (!betting) changeBetNumber("two") }}>
+                                <BetCircle bcColor={betNumberCircle.two} betNumber={betNumberDefault[1]} />
+                            </Col>
+                            <Col onClick={() => { if (!betting) changeBetNumber("three") }}>
+                                <BetCircle bcColor={betNumberCircle.three} betNumber={betNumberDefault[2]} />
+                            </Col>
+                            <Col onClick={() => { if (!betting) changeBetNumber("four") }}>
+                                <BetCircle bcColor={betNumberCircle.four} betNumber={betNumberDefault[3]} />
+                            </Col>
+                            <Col onClick={() => { if (!betting) changeBetNumber("five") }}>
+                                <BetCircle bcColor={betNumberCircle.five} betNumber={betNumberDefault[4]} />
+                            </Col>
+                        </Row>
+                    </Container>
+                    <div style={betNowStyle.cardStyle}>
+                        {betting
+                            ? <button style={betNowStyle.btStyle}>
+                                <strong>
+                                    <font style={{ fontSize: "48px" }}>BET</font>
+                                    <br></br>
+                                    <Spinner animation="border" style={{ color: "#0AB700" }} />
+                                </strong>
+                            </button>
+                            : <button style={betNowStyle.btStyle} onClick={startGame}>
+                                <strong>
+                                    <font style={{ fontSize: "48px" }}>BET</font>
+                                    <br></br>
+                                    <font style={{ fontSize: "24px", color: "#0AB700" }}>NOW</font>
+                                </strong>
+                            </button>
+                        }
+                    </div>
                 </div>
             </div>
         </>

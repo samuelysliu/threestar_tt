@@ -55,6 +55,8 @@ function Dividend({ userInfo, connectWallet, token }) {
 
     const [isStaking, setIsStaking] = useState(false)
     const [isClaiming, setIsClaiming] = useState(false)
+    const [isConnecting, setIsConnecting] = useState(false)
+    const [isUnlocking, setIsUnlocking] = useState(false)
 
 
     const checkContractInfo = () => {
@@ -83,10 +85,12 @@ function Dividend({ userInfo, connectWallet, token }) {
     }
 
     const unlock = () => {
+        setIsUnlocking(true);
         TSTokenContract.methods.approve(stakeContractAddress, totalAllowance).send({ from: userInfo.account }).then(function (receipt) {
             checkContractInfo();
+            setIsUnlocking(false);
         }).catch(error => {
-            console.log(error)
+            setIsUnlocking(false);
         })
     }
 
@@ -154,6 +158,7 @@ function Dividend({ userInfo, connectWallet, token }) {
         if (userInfo.account.length !== 0) {
             checkContractInfo();
         }
+        setIsConnecting(false)
     }, [userInfo])
 
     const card = {
@@ -244,12 +249,27 @@ function Dividend({ userInfo, connectWallet, token }) {
                     {userInfo.account.length === 0
                         ?
                         <Row>
-                            <Col><Button style={longButtonStyle} onClick={connectWallet}>Connect Wallet</Button></Col>
+                            <Col>
+                                {isConnecting ?
+                                    <Button disabled={true} style={longButtonStyle}>
+                                        <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+                                        Loading...
+                                    </Button>
+                                    : <Button style={longButtonStyle} onClick={()=>{setIsConnecting(true);connectWallet().then(value=>{setIsConnecting(false)}).catch(error=>{setIsConnecting(false)})}}>Connect Wallet</Button>
+                                }
+                            </Col>
                         </Row>
                         : unlockBool
                             ?
                             <Row>
-                                <Col><Button style={longButtonStyle} onClick={unlock}>Unlock</Button></Col>
+                                <Col>
+                                    {isUnlocking ?
+                                        <Button disabled={true} style={longButtonStyle}>
+                                            <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+                                            Loading...
+                                        </Button>
+                                        : <Button style={longButtonStyle} onClick={unlock}>Unlock</Button>}
+                                </Col>
                             </Row>
                             :
                             ""

@@ -14,10 +14,10 @@ function App() {
   const [token, setToken] = useState()
   const [originTokenUrl, setOriginTokenUrl] = useState()
 
-  const connectWallet = () => {
+  const connectWallet = async() => {
     const web3 = new Web3(window.ethereum)
 
-    metaConnect.thunderCore().then(value => {
+    await metaConnect.thunderCore().then(value => { 
       try {
         if (value.account) {
           setUserInfo(value);
@@ -46,12 +46,9 @@ function App() {
       } catch (e) {
         console.log(e)
       }
-
     }).catch(error => {
       console.log(error)
     })
-
-
   }
 
   const chainIdSetting = (value) => {
