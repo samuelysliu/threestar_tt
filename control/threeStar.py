@@ -153,10 +153,7 @@ def setReward():
         dividend = getTodayDividend(web3, threeStarContract)
         withdrawThreeStar({"privateKey": os.getenv("privateKey"),
                            "amount": float(blockchain.getOwnerRemain(web3, threeStarContract)) - float(dividend)})
-
         try:
-            time.sleep(60)
-
             tx = {
                 'nonce': web3.eth.get_transaction_count(owner['address']),
                 'to': stakeContractAddress,
@@ -190,10 +187,7 @@ def setReward_bsc():
         withdrawThreeStar_bsc({"privateKey": os.getenv("privateKey"),
                                "amount": float(blockchain.getOwnerRemain(web3_bsc, threeStarContract_bsc)) - float(
                                    dividend)})
-
         try:
-            time.sleep(60)
-
             tx = {
                 'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
                 'to': stakeContractAddress_bsc,

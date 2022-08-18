@@ -89,12 +89,6 @@ def getTSToken_bsc(web3):
 
 
 def sendTransaction(web3, transaction):
-    txCreate = web3.eth.account.sign_transaction(transaction, owner['privateKey'])
-
-    txHash = web3.eth.send_raw_transaction(txCreate.rawTransaction)
-    txReceipt = web3.eth.wait_for_transaction_receipt(txHash)
-    print(txReceipt)
-    """
     try:
         txCreate = web3.eth.account.sign_transaction(transaction, owner['privateKey'])
 
@@ -106,7 +100,6 @@ def sendTransaction(web3, transaction):
     except Exception:
         print(Exception)
         return "failed"
-    """
 
 
 
