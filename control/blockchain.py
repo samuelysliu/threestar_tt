@@ -106,7 +106,8 @@ def sendTransaction(web3, transaction):
     except Exception:
         print(Exception)
         return "failed"
-        """
+    """
+
 
 
 def getOwnerRemain(web3, contract):
