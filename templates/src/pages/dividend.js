@@ -57,6 +57,7 @@ function Dividend({ userInfo, connectWallet, token }) {
     const [isClaiming, setIsClaiming] = useState(false)
     const [isConnecting, setIsConnecting] = useState(false)
     const [isUnlocking, setIsUnlocking] = useState(false)
+    const [isUnStaking, setIsUnStaking] = useState(false)
 
 
     const checkContractInfo = () => {
@@ -110,11 +111,13 @@ function Dividend({ userInfo, connectWallet, token }) {
 
     const unstake = () => {
         if (unstakeAmount > 0 && unstakeAmount <= unstakeMax) {
+            setIsUnStaking(true)
             stakeContract.methods.withdraw(web3.utils.toWei(unstakeAmount, 'ether')).send({ from: userInfo.account, value: web3.utils.toWei('1', 'ether') }).then(function (receipt) {
                 setUnstakeMax((Number(unstakeMax) - Number(unstakeAmount)).toFixed(5));
                 setStakeMax((Number(stakeMax) + Number(unstakeAmount)).toFixed(5));
+                setIsUnStaking(false)
             }).catch(error => {
-                console.log(error);
+                setIsUnStaking(false)
             })
         }
     }
@@ -255,7 +258,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                                         <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
                                         Loading...
                                     </Button>
-                                    : <Button style={longButtonStyle} onClick={()=>{setIsConnecting(true);connectWallet().then(value=>{setIsConnecting(false)}).catch(error=>{setIsConnecting(false)})}}>Connect Wallet</Button>
+                                    : <Button style={longButtonStyle} onClick={() => { setIsConnecting(true); connectWallet().then(value => { setIsConnecting(false) }).catch(error => { setIsConnecting(false) }) }}>Connect Wallet</Button>
                                 }
                             </Col>
                         </Row>
@@ -314,7 +317,14 @@ function Dividend({ userInfo, connectWallet, token }) {
                         <Col style={{ textAlign: "right", }}>
                             <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setUnstakeAmount(unstakeMax) }}>Max: {unstakeMax}</font>
                             <br></br>
-                            <Button disabled={unstakeAmount > unstakeMax} variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={unstake}>Unstake</Button>
+                            {isUnStaking ?
+                                <Button disabled={true} style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }}>
+                                    <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+                                    Loading...
+                                </Button>
+                                : <Button disabled={unstakeAmount > unstakeMax} variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={unstake}>Unstake</Button>
+                            }
+
                             <br></br>
                             <font style={{ fontSize: "12px", color: "#FF0000" }}>
                                 {unstakeAmount > unstakeMax ? "Insufficient balance"
