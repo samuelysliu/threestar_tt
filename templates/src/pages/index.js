@@ -71,8 +71,10 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             setStatusMessage("YOU WILL WIN " + token)
             if(token === "TT"){
                 setBetNumberDefault(["20", "80", "100", "1K", "10K"])
+                setUserBet(100)
             }else{
                 setBetNumberDefault(["0.01", "0.1", "1", "10", "100"])
+                setUserBet(1)
             }
             
         }).catch(error => {
