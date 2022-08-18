@@ -103,62 +103,126 @@ export class ConnectWallet {
 
     async changeChain(chainName) {
         if (chainName === "ThunderCore") {
-            try {
-                await this.web3.currentProvider.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0x6c" }],
-                });
-            } catch (error) {
-                if (error.code === 4902) {
-                    try {
-                        await this.web3.currentProvider.request({
-                            method: "wallet_addEthereumChain",
-                            params: [
-                                {
-                                    chainId: "0x6c",
-                                    chainName: "ThunderCore",
-                                    rpcUrls: ["https://mainnet-rpc.thundercore.com"],
-                                    nativeCurrency: {
-                                        name: "TT token",
-                                        symbol: "TT",
-                                        decimals: 18,
+            if (process.env.REACT_APP_ThunderCore === "108") {
+                try {
+                    await this.web3.currentProvider.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x6c" }],
+                    });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await this.web3.currentProvider.request({
+                                method: "wallet_addEthereumChain",
+                                params: [
+                                    {
+                                        chainId: "0x6c",
+                                        chainName: "ThunderCore",
+                                        rpcUrls: ["https://mainnet-rpc.thundercore.com"],
+                                        nativeCurrency: {
+                                            name: "TT token",
+                                            symbol: "TT",
+                                            decimals: 18,
+                                        },
+                                        blockExplorerUrls: ["https://viewblock.io/thundercore"],
                                     },
-                                    blockExplorerUrls: ["https://viewblock.io/thundercore"],
-                                },
-                            ],
-                        });
-                    } catch (error) {
-                        alert(error.message);
+                                ],
+                            });
+                        } catch (error) {
+                            alert(error.message);
+                        }
+                    }
+                }
+            } else if (process.env.REACT_APP_ThunderCore === "18") {
+                try {
+                    await this.web3.currentProvider.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x12" }],
+                    });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await this.web3.currentProvider.request({
+                                method: "wallet_addEthereumChain",
+                                params: [
+                                    {
+                                        chainId: "0x6c",
+                                        chainName: "ThunderCore Testnet",
+                                        rpcUrls: ["https://testnet-rpc.thundercore.com"],
+                                        nativeCurrency: {
+                                            name: "TST token",
+                                            symbol: "TST",
+                                            decimals: 18,
+                                        },
+                                        blockExplorerUrls: ["https://explorer-testnet.thundercore.com/"],
+                                    },
+                                ],
+                            });
+                        } catch (error) {
+                            alert(error.message);
+                        }
                     }
                 }
             }
         } else if (chainName === "BSC") {
-            try {
-                await this.web3.currentProvider.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0x38"}],
-                });
-            } catch (error) {
-                if (error.code === 4902) {
-                    try {
-                        await this.web3.currentProvider.request({
-                            method: "wallet_addEthereumChain",
-                            params: [
-                                {
-                                    chainId: "0x38",
-                                    chainName: "Smart Chain",
-                                    rpcUrls: ["https://bsc-dataseed.binance.org/"],
-                                    nativeCurrency: {
-                                        name: "BNB token",
-                                        symbol: "BNB",
-                                        decimals: 18,
+            if (process.env.REACT_APP_BSC === "56") {
+                try {
+                    await this.web3.currentProvider.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x38" }],
+                    });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await this.web3.currentProvider.request({
+                                method: "wallet_addEthereumChain",
+                                params: [
+                                    {
+                                        chainId: "0x38",
+                                        chainName: "Smart Chain",
+                                        rpcUrls: ["https://bsc-dataseed.binance.org/"],
+                                        nativeCurrency: {
+                                            name: "BNB token",
+                                            symbol: "BNB",
+                                            decimals: 18,
+                                        },
+                                        blockExplorerUrls: ["https://bscscan.com"],
                                     },
-                                    blockExplorerUrls: ["https://bscscan.com"],
-                                },
-                            ],
-                        });
-                    } catch (error) {
-                        alert(error.message);
+                                ],
+                            });
+                        } catch (error) {
+                            alert(error.message);
+                        }
+                    }
+                }
+            } else if (process.env.REACT_APP_BSC === "97") {
+                try {
+                    await this.web3.currentProvider.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x61" }],
+                    });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await this.web3.currentProvider.request({
+                                method: "wallet_addEthereumChain",
+                                params: [
+                                    {
+                                        chainId: "0x61",
+                                        chainName: "Smart Chain-Testnet",
+                                        rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                                        nativeCurrency: {
+                                            name: "BNB token",
+                                            symbol: "BNB",
+                                            decimals: 18,
+                                        },
+                                        blockExplorerUrls: ["https://testnet.bscscan.com"],
+                                    },
+                                ],
+                            });
+                        } catch (error) {
+                            alert(error.message);
+                        }
                     }
                 }
             }

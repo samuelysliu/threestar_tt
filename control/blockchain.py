@@ -21,14 +21,14 @@ owner = getOwner()
 def thunderCore():
     web3 = Web3(Web3.HTTPProvider(os.getenv("httpProvider"), request_kwargs={'timeout': 60}))
     web3.middleware_onion.inject(geth_poa_middleware, layer=0)
-    chainID = os.getenv("chainId")
+    chainID = os.getenv("REACT_APP_ThunderCore")
     return web3, chainID
 
 
 def bsc():
     web3 = Web3(Web3.HTTPProvider(os.getenv("httpProvider_bsc"), request_kwargs={'timeout': 60}))
     web3.middleware_onion.inject(geth_poa_middleware, layer=0)
-    chainID = os.getenv("chainId_bsc")
+    chainID = os.getenv("REACT_APP_BSC")
     return web3, chainID
 
 
@@ -36,7 +36,7 @@ def getThreeStarContract(web3):
     threeStarABIJson = open('./static/abi/threeStarABI.json')
     threeStarABI = json.load(threeStarABIJson)['abi']
 
-    threeStarContractAddress = os.getenv("threeStarContractAddress")
+    threeStarContractAddress = os.getenv("REACT_APP_ThreeStarContractAddress")
     threeStarContract = web3.eth.contract(address=threeStarContractAddress, abi=threeStarABI)
 
     return threeStarContractAddress, threeStarContract
@@ -46,7 +46,7 @@ def getThreeStarContract_bsc(web3):
     threeStarABIJson = open('./static/abi/threeStarABI.json')
     threeStarABI = json.load(threeStarABIJson)['abi']
 
-    threeStarContractAddress = os.getenv("threeStarContractAddress_bsc")
+    threeStarContractAddress = os.getenv("REACT_APP_ThreeStarContractAddress_bsc")
     threeStarContract = web3.eth.contract(address=threeStarContractAddress, abi=threeStarABI)
 
     return threeStarContractAddress, threeStarContract
@@ -55,7 +55,7 @@ def getThreeStarContract_bsc(web3):
 def getStakeContract(web3):
     stakeABIJson = open('./static/abi/stakingReward.json')
     stakeABI = json.load(stakeABIJson)['abi']
-    stakeContractAddress = os.getenv("stakeContractAddress")
+    stakeContractAddress = os.getenv("REACT_APP_StakeContractAddress")
     stakeContract = web3.eth.contract(address=stakeContractAddress, abi=stakeABI)
 
     return stakeContractAddress, stakeContract
@@ -64,7 +64,7 @@ def getStakeContract(web3):
 def getStakeContract_bsc(web3):
     stakeABIJson = open('./static/abi/stakingReward.json')
     stakeABI = json.load(stakeABIJson)['abi']
-    stakeContractAddress = os.getenv("stakeContractAddress_bsc")
+    stakeContractAddress = os.getenv("REACT_APP_StakeContractAddress_bsc")
     stakeContract = web3.eth.contract(address=stakeContractAddress, abi=stakeABI)
 
     return stakeContractAddress, stakeContract
@@ -73,7 +73,7 @@ def getStakeContract_bsc(web3):
 def getTSToken(web3):
     TSABIJson = open('./static/abi/threeStarTokenABI.json')
     TSABI = json.load(TSABIJson)['abi']
-    TSContractAddress = os.getenv("3StarTokenContractAddress")
+    TSContractAddress = os.getenv("REACT_APP_3StarTokenContractAddress")
     TSContract = web3.eth.contract(address=TSContractAddress, abi=TSABI)
 
     return TSContractAddress, TSContract
@@ -82,7 +82,7 @@ def getTSToken(web3):
 def getTSToken_bsc(web3):
     TSABIJson = open('./static/abi/threeStarTokenABI.json')
     TSABI = json.load(TSABIJson)['abi']
-    TSContractAddress = os.getenv("3StarTokenContractAddress_bsc")
+    TSContractAddress = os.getenv("REACT_APP_3StarTokenContractAddress_bsc")
     TSContract = web3.eth.contract(address=TSContractAddress, abi=TSABI)
 
     return TSContractAddress, TSContract

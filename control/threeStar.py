@@ -111,8 +111,8 @@ def game_bsc(*args):
         elif point == 5:
             winTT = playerAmount * 99 / 100 * 100
     else:
-        giveTSToken_bsc(args[0]["playerAddress"], playerAmount * 52000)
-        winTS = playerAmount * 52000
+        giveTSToken_bsc(args[0]["playerAddress"], playerAmount * 200)
+        winTS = playerAmount * 200
 
     return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
 

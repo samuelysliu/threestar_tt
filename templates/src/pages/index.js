@@ -38,6 +38,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const [winTS, setWinTS] = useState(0)
     const [winTT, setWinTT] = useState(0)
 
+    const [betNumberDefault, setBetNumberDefault] = useState(["20", "80", "100", "1K", "10K"])
+
     const [betNumberCircle, setBetNumberCircle] = useState({ "one": "1", "two": "1", "three": "2", "four": "1", "five": "1" })
     const [userNumberColor, setUserNumberColor] = useState({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
 
@@ -67,6 +69,12 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             setThreeStarContract(new web3.eth.Contract(threeStarcontractABI, threeStarcontractAddress));
 
             setStatusMessage("YOU WILL WIN " + token)
+            if(token === "TT"){
+                setBetNumberDefault(["20", "80", "100", "1K", "10K"])
+            }else{
+                setBetNumberDefault(["0.01", "0.1", "1", "10", "100"])
+            }
+            
         }).catch(error => {
             console.log(error)
         })
@@ -180,27 +188,48 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const changeBetNumber = (number) => {
         switch (number) {
             case 'one':
-                setUserBet(20)
+                if(token === "TT"){
+                    setUserBet(20)
+                }else{
+                    setUserBet(0.01)
+                }
+                
                 setBetNumberCircle({ "one": "2", "two": "1", "three": "1", "four": "1", "five": "1" })
                 break
 
             case 'two':
-                setUserBet(80)
+                if(token === "TT"){
+                    setUserBet(80)
+                }else{
+                    setUserBet(0.1)
+                }
                 setBetNumberCircle({ "one": "1", "two": "2", "three": "1", "four": "1", "five": "1" })
                 break
 
             case 'three':
-                setUserBet(100)
+                if(token === "TT"){
+                    setUserBet(100)
+                }else{
+                    setUserBet(1)
+                }
                 setBetNumberCircle({ "one": "1", "two": "1", "three": "2", "four": "1", "five": "1" })
                 break
 
             case 'four':
-                setUserBet(1000)
+                if(token === "TT"){
+                    setUserBet(1000)
+                }else{
+                    setUserBet(10)
+                }
                 setBetNumberCircle({ "one": "1", "two": "1", "three": "1", "four": "2", "five": "1" })
                 break
 
             case 'five':
-                setUserBet(10000)
+                if(token === "TT"){
+                    setUserBet(10000)
+                }else{
+                    setUserBet(100)
+                }
                 setBetNumberCircle({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "2" })
                 break
         }
@@ -455,19 +484,19 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
                     <Row xs={5} sm={5} style={{ paddingTop: "20px", paddingLeft: "20px", paddingRight: "20px" }}>
                         <Col onClick={() => changeBetNumber("one")}>
-                            <BetCircle bcColor={betNumberCircle.one} betNumber="20" />
+                            <BetCircle bcColor={betNumberCircle.one} betNumber={betNumberDefault[0]} />
                         </Col>
                         <Col onClick={() => changeBetNumber("two")}>
-                            <BetCircle bcColor={betNumberCircle.two} betNumber="80" />
+                            <BetCircle bcColor={betNumberCircle.two} betNumber={betNumberDefault[1]} />
                         </Col>
                         <Col onClick={() => changeBetNumber("three")}>
-                            <BetCircle bcColor={betNumberCircle.three} betNumber="100" />
+                            <BetCircle bcColor={betNumberCircle.three} betNumber={betNumberDefault[2]} />
                         </Col>
                         <Col onClick={() => changeBetNumber("four")}>
-                            <BetCircle bcColor={betNumberCircle.four} betNumber="1k" />
+                            <BetCircle bcColor={betNumberCircle.four} betNumber={betNumberDefault[3]} />
                         </Col>
                         <Col onClick={() => changeBetNumber("five")}>
-                            <BetCircle bcColor={betNumberCircle.five} betNumber="10k" />
+                            <BetCircle bcColor={betNumberCircle.five} betNumber={betNumberDefault[4]} />
                         </Col>
                     </Row>
                 </Container>

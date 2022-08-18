@@ -2,15 +2,15 @@ export class PathController {
     constructor(chainId) {
         if (String(chainId) === process.env.REACT_APP_BSC) {
             this.apiPath = process.env.REACT_APP_APIPATH + "bsc"
-            this.threeStarContractAddress = process.env.REACT_APP_BSC_THREESTARCONTRACTADDRESS
-            this.TSTokenContractAddress = process.env.REACT_APP_BSC_TSTOKENCONTRACTADDRESS
-            this.stakeContractAddress = process.env.REACT_APP_BSC_STAKECONTRACTADDRESS
+            this.threeStarContractAddress = process.env.REACT_APP_ThreeStarContractAddress_bsc
+            this.TSTokenContractAddress = process.env.REACT_APP_3StarTokenContractAddress_bsc
+            this.stakeContractAddress = process.env.REACT_APP_StakeContractAddress_bsc
             this.title = "BSC 3Star"
         } else {
             this.apiPath = process.env.REACT_APP_APIPATH + "api"
-            this.threeStarContractAddress = process.env.REACT_APP_THREESTARCONTRACTADDRESS
-            this.TSTokenContractAddress = process.env.REACT_APP_TSTOKENCONTRACTADDRESS
-            this.stakeContractAddress = process.env.REACT_APP_STAKECONTRACTADDRESS
+            this.threeStarContractAddress = process.env.REACT_APP_ThreeStarContractAddress
+            this.TSTokenContractAddress = process.env.REACT_APP_3StarTokenContractAddress
+            this.stakeContractAddress = process.env.REACT_APP_StakeContractAddress
             this.title = "TT 3Star"
         }
     }

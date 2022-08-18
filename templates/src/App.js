@@ -32,41 +32,13 @@ function App() {
         //Update data when user switch the network
         window.ethereum.on('chainChanged', async (chainId) => {
           let network = parseInt(chainId, 16)
-          if (network === 108 || String(network) === process.env.REACT_APP_BSC) {
+          if (String(network) === process.env.REACT_APP_ThunderCore || String(network) === process.env.REACT_APP_BSC) {
             let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             let balance = web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether')
             setUserInfo({ account: accounts[0], balance: balance })
             chainIdSetting(network)
           } else {
-            try {
-              await web3.currentProvider.request({
-                method: "wallet_switchEthereumChain",
-                params: [{ chainId: "0x6c" }],
-              });
-            } catch (error) {
-              if (error.code === 4902) {
-                try {
-                  await web3.currentProvider.request({
-                    method: "wallet_addEthereumChain",
-                    params: [
-                      {
-                        chainId: "0x6c",
-                        chainName: "ThunderCore",
-                        rpcUrls: ["https://mainnet-rpc.thundercore.com"],
-                        nativeCurrency: {
-                          name: "TT token",
-                          symbol: "TT",
-                          decimals: 18,
-                        },
-                        blockExplorerUrls: ["https://viewblock.io/thundercore"],
-                      },
-                    ],
-                  });
-                } catch (error) {
-                  alert(error.message);
-                }
-              }
-            }
+            metaConnect.changeChain("ThunderCore")
           }
 
         });
