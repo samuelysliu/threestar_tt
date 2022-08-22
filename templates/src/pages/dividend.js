@@ -345,7 +345,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                         </Col>
                     </Row>
                     <Row style={blockFourStyle}>
-                        <Col><p style={{ color: "red", fontSize: "12px" }}>*Dividends must be claimed within 1 days</p></Col>
+                        <Col><p style={{ color: "red", fontSize: "12px" }}>*Dividends must be claimed within 1 day</p></Col>
                     </Row>
                 </Container>
 
@@ -354,7 +354,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                         <Col><font style={{ fontSize: "26px" }}>Get <font style={{ color: "#669BFD" }}>3Star</font></font></Col>
                     </Row>
                     <Row style={blockFiveStyle}>
-                        <Col><font>You can also get <font style={{ color: "#669BFD" }}>3 Star</font> tokens, by playing the games!</font></Col>
+                        <Col><font>You can also get <font style={{ color: "#669BFD" }}>3Star</font> tokens, by playing the games!</font></Col>
                     </Row>
                     <Row style={blockFourStyle}>
                         <Col><a href='/'><Button style={longButtonStyle}>Go to play</Button></a></Col>
