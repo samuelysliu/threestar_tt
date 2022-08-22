@@ -89,7 +89,7 @@ def game(*args):
             elif point == 5:
                 winTT = playerAmount * 99 / 100 * 100
         else:
-            giveTSToken(args[0]["playerAddress"], playerAmount * 0.004)
+            giveTSToken(args[0]["playerAddress"], float(playerAmount) * 0.004)
             winTS = playerAmount * 0.004
 
         transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"], "chainName": "thunderCore"})
@@ -225,9 +225,12 @@ def claimPrize(*args):
                         prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
                         return "success"
 
-                userPrizeInfo.saveUserPrize({"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
+                userPrizeInfo.saveUserPrize({"address": address, "prizeId": prizeId, "chainName": "thunderCore", "number": 1})
                 prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
                 return "success"
+            return "failed"
+
+        else:
             return "failed"
     except:
         return "failed"

@@ -22,7 +22,7 @@ class prizeClaimInfo:
             prizeArray = []
             for i in result:
                 prizeArray.append(
-                    {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+                    {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"],
                      "createdTime": i["createdTime"]})
 
             return prizeArray
@@ -34,7 +34,7 @@ class prizeClaimInfo:
         try:
             result = col.find({"_id": ObjectId(str(i["_id"]))})
             i = result[0]
-            return {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+            return {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"],
                     "createdTime": i["createdTime"]}
 
         except:
@@ -50,7 +50,7 @@ class prizeClaimInfo:
             todayPrizeClaimArray = []
             for i in result:
                 todayPrizeClaimArray.append(
-                    {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+                    {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"],
                      "createdTime": i["createdTime"]})
             return todayPrizeClaimArray
         except:

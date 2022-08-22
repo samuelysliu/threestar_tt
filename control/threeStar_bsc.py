@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 from control import blockchain
 import datetime, pytz
 import time
+from module.prizeInfo import prizeInfo
+from module.prizeClaimInfo import prizeClaimInfo
+from module.userPrizeInfo import userPrizeInfo
+from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
 
 load_dotenv()
@@ -86,7 +90,7 @@ def game_bsc(*args):
             elif point == 5:
                 winTT = playerAmount * 99 / 100 * 100
         else:
-            giveTSToken_bsc(args[0]["playerAddress"], playerAmount * 200)
+            giveTSToken_bsc(args[0]["playerAddress"], float(playerAmount) * 200)
             winTS = playerAmount * 200
 
         return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
@@ -183,3 +187,44 @@ def withdrawThreeStar_bsc(*args):
         return {"result": "success"}
     else:
         return {"result": "failed"}
+
+def canClaimBool(prizeType, address):
+    prizeType = prizeType
+    if prizeType == "double bonus":
+        prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
+        todayPrizeClaim = prizeClaimInfo.getTodayClaim(self="")
+        if todayPrizeClaim != "failed":
+            for i in todayPrizeClaim:
+                if address == i["address"] and "bsc" == i["chainName"] and prizeId == str(i["prizeId"]):
+                    return False
+            return True
+        else:
+            return False
+
+
+def claimPrize(*args):
+    try:
+        prizeType = args[0]["prizeType"]
+        address = args[0]["address"]
+
+        if prizeType == "double bonus":
+            if canClaimBool(prizeType, address):
+                prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
+                userHavePrizeList = userPrizeInfo.getUserPrizeByAddress({"address": address})
+                for i in userHavePrizeList:
+                    if i["prizeId"] == prizeId and i["chainName"] == "bsc":
+                        myquery = {"_id": ObjectId(i["id"])}
+                        newValues = {"$set": {"number": int(i["number"]) + 1}}
+                        userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+                        prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "bsc"})
+                        return "success"
+
+                userPrizeInfo.saveUserPrize({"address": address, "prizeId": prizeId, "chainName": "bsc", "number": 1})
+                prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "bsc"})
+                return "success"
+            return "failed"
+
+        else:
+            return "failed"
+    except:
+        return "failed"

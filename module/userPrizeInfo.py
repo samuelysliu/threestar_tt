@@ -6,6 +6,11 @@ col = dbInfo.userPrize(self='')
 
 class userPrizeInfo:
     def saveUserPrize(self):
+        result = col.insert_one(
+            {"address": self["address"], "prizeId": ObjectId(self["prizeId"]), "chainName": self["chainName"],
+             "number": self["number"], "createdTime": tools.getTimeNow()})
+
+        return result.inserted_id
         try:
             result = col.insert_one({"address": self["address"], "prizeId": ObjectId(self["prizeId"]), "chainName": self["chainName"], "number": self["number"] ,"createdTime": tools.getTimeNow()})
 
@@ -25,7 +30,7 @@ class userPrizeInfo:
             result = col.find()
             userPrizeArray = []
             for i in result:
-                userPrizeArray.append({"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"], "number": i["number"]})
+                userPrizeArray.append({"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"], "number": i["number"]})
 
             return userPrizeArray
 
@@ -36,7 +41,7 @@ class userPrizeInfo:
         try:
             result = col.find({"_id": ObjectId(str(self["_id"]))})
             i = result[0]
-            return {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"], "number": i["number"]}
+            return {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"], "number": i["number"]}
 
         except:
             return "failed"
@@ -48,7 +53,7 @@ class userPrizeInfo:
             userPrizeArray = []
             for i in result:
                 userPrizeArray.append(
-                    {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+                    {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"],
                      "number": i["number"]})
 
             return userPrizeArray

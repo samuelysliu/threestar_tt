@@ -18,6 +18,7 @@ import UseWindowSize from '../components/useWindowSize'
 import { ConnectWallet } from '../components/connectWallet'
 import BNBTokenImage from '../images/BNB.png'
 import WinRule from '../components/winRule';
+import PrizePopUp from '../components/prizePopUp';
 
 function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const metaConnect = new ConnectWallet()
@@ -349,6 +350,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     return (
         <>
             <Sidebar />
+            <PrizePopUp />
             <div style={{ margin: "auto", marginLeft: "20px", marginRight: "20px" }}>
                 <div style={{ backgroundColor: "#1AB3FF", margin: "auto", marginTop: "10px", borderRadius: "6px", maxWidth: "720px" }}>
                     <Container style={mainContainer}>
