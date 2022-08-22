@@ -30,6 +30,9 @@ function Sidebar() {
                     <ul>
                         <li><a className="sd-link" href='/'>Home</a></li>
                         <li><a className="sd-link" href='/dividend'>Dividend</a></li>
+                        <li><a className="sd-link" href='/dividend'>Bonus</a></li>
+                        <li><a className="sd-link" href='https://twitter.com/3star_tt'>Twitter</a></li>
+                        <li><a className="sd-link" href='https://t.me/ThreeStarDapp'>Telegram</a></li>
                     </ul>
                 </div>
             </div>

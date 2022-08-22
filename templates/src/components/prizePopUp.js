@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
-import { Modal, Row, Col } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Modal, Row, Col, Spinner } from 'react-bootstrap';
 import PrizePopUpIcon from '../images/prizePopUpIcon.png'
 import '../styles/prizePopUp.css'
 import threeStarTokenIcon2 from '../images/3StarToken2.png'
 import TTTokenIcon2 from '../images/TTToken2.png'
+import { ImCheckmark } from 'react-icons/im'
 
-function PrizePopUp() {
-    const [show, setShow] = useState(true);
-
+function PrizePopUp({ _show, _setShow, _userInfo }) {
+    const show = _show
+    const setShow = _setShow
+    const userInfo = _userInfo
+    const [errorMessage, setErrorMessage] = useState("")
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+
+    const [isClaiming, setIsClaiming] = useState(true)
+    const [isClaimDone, setIsClaimDone] = useState(true)
+
+    const claimBonus = () => {
+        if (userInfo.account.length === 0) {
+            setErrorMessage("invalid wallet")
+            setTimeout(() => {
+                setErrorMessage("")
+            }, 6000)
+        }
+    }
 
     return (
         <>
             <Modal show={show} onHide={handleClose} centered>
                 <div className='modalStyle'>
-                    <img src={PrizePopUpIcon} alt="prizePopUp" width="80px" className='popUpIcon'></img>
+                    <img src={PrizePopUpIcon} alt="prizePopUp" width="90px" className='popUpIcon'></img>
                     <div className='modalHeader'>
                         <font style={{ fontSize: "12px" }}>DAILY BONUS</font>
                         <br></br>
@@ -23,26 +37,31 @@ function PrizePopUp() {
                     </div>
 
                     <div className='modalContent'>
-                        <Row>
+                        <Row style={{ padding: "9px" }}>
                             <Col><font>Claim once a day.<br></br>Make you win DOUBLE reward.</font></Col>
                         </Row>
-                        <Row style={{justifyContent:"center"}}>
-                            <Col xs={5} style={{textAlign:"right"}}><img src={TTTokenIcon2}></img></Col>
+                        <Row style={{ justifyContent: "center" }}>
+                            <Col xs={5} style={{ textAlign: "right" }}><img src={TTTokenIcon2}></img></Col>
                             <Col xs={1}><div style={{ borderLeft: "1px solid #0CB1FD", height: "100%" }}></div></Col>
-                            <Col xs={5} style={{textAlign:"left"}}><img src={threeStarTokenIcon2}></img></Col>
+                            <Col xs={5} style={{ textAlign: "left" }}><img src={threeStarTokenIcon2}></img></Col>
                         </Row>
-                        <Row style={{padding: "9px"}}>
+                        <Row style={{ padding: "9px" }}>
                             <Col>
                                 <font>Spend your original BET and get <strong>TWICE</strong> as much TT or 3Star.</font>
                             </Col>
                         </Row>
                     </div>
-                    <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-                    <Modal.Footer>
-                        <button onClick={handleClose}>
-                            Close
-                        </button>
-                    </Modal.Footer>
+
+                    <div className='claimDiv'>
+                        <font style={{ color: "red", fontSize: "12px" }}>{errorMessage}</font>
+                        <br></br>
+                        {isClaimDone ?
+                            <button className='disableBt' disabled><ImCheckmark style={{paddingBottom: "3px"}} />CLAIM BONUS</button>
+                            : isClaiming
+                                ? <button><Spinner animation="border" style={{ color: "#0AB700", width: "1rem", height: "1rem" }} />CLAIM BONUS</button>
+                                : <button onClick={claimBonus}>CLAIM BONUS</button>}
+
+                    </div>
                 </div>
 
             </Modal>

@@ -19,6 +19,8 @@ import { ConnectWallet } from '../components/connectWallet'
 import BNBTokenImage from '../images/BNB.png'
 import WinRule from '../components/winRule';
 import PrizePopUp from '../components/prizePopUp';
+import GiftIcon from '../images/gift.png'
+import BonusNumber from '../components/bonusNumber';
 
 function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const metaConnect = new ConnectWallet()
@@ -46,7 +48,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const [userNumberColor, setUserNumberColor] = useState({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
 
     const [walletConnecting, setWalletConnecting] = useState(false)
-    const [errorMessage, SetErrorMessage] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
 
     const { width, height } = UseWindowSize();
 
@@ -55,6 +57,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const infoRef = useRef(null);
 
     const TTTokenImage = "https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1.25,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1"
+
+    const [prizePopUpShow, setPrizePopUpShow] = useState(true)
 
     let web3 = new Web3(window.ethereum);
 
@@ -88,18 +92,18 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const startGame = () => {
         if (userInfo.account.length === 0) {
             connectWallet()
-            SetErrorMessage("Invalid Wallet")
+            setErrorMessage("Invalid Wallet")
             setTimeout(() => {
-                SetErrorMessage("")
+                setErrorMessage("")
             }, 6000)
         }
 
         // user must choose five lucky number
         else if (userLuckyNumber.length === 5) {
             if (userInfo.balance < userBet) {
-                SetErrorMessage("Insufficient Balance")
+                setErrorMessage("Insufficient Balance")
                 setTimeout(() => {
-                    SetErrorMessage("")
+                    setErrorMessage("")
                 }, 6000)
             } else {
                 setBetting(true)
@@ -350,13 +354,14 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     return (
         <>
             <Sidebar />
-            <PrizePopUp />
+            <PrizePopUp _show={prizePopUpShow} _setShow={setPrizePopUpShow} _userInfo={userInfo} />
             <div style={{ margin: "auto", marginLeft: "20px", marginRight: "20px" }}>
                 <div style={{ backgroundColor: "#1AB3FF", margin: "auto", marginTop: "10px", borderRadius: "6px", maxWidth: "720px" }}>
                     <Container style={mainContainer}>
                         <Row style={{ paddingTop: "5px" }}>
-                            <Col xs={{ span: 6, offset: 3 }}><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
-                            <Col xs={{ span: 2, offset: 1 }} style={{ textAlign: "right" }}>
+                            <Col style={{ textAlign: "left" }}><img src={GiftIcon} onClick={() => setPrizePopUpShow(!prizePopUpShow)}></img></Col>
+                            <Col><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
+                            <Col style={{ textAlign: "right" }}>
                                 <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
                             </Col>
                         </Row>
@@ -406,7 +411,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                         {statusMessage === "YOU WILL WIN " + token
                             ?
                             <Row>
-                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn}</font></Col>
+                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn} + <BonusNumber number={estimateEarn}/> </font></Col>
                             </Row>
 
                             : statusMessage === "YOU GOT 3Star!"
