@@ -5,10 +5,13 @@ import datetime
 
 col = dbInfo.prizeClaim(self='')
 
+
 class prizeClaimInfo:
     def savePrizeClaim(self):
         try:
-            result = col.insert_one({"address": self["address"], "prizeId": self["prizeId"], "createdTime": tools.getTimeNow()})
+            result = col.insert_one(
+                {"address": self["address"], "prizeId": self["prizeId"], "chainName": self["chainName"],
+                 "createdTime": tools.getTimeNow()})
             return result.inserted_id
         except:
             return "failed"
@@ -18,7 +21,9 @@ class prizeClaimInfo:
             result = col.find()
             prizeArray = []
             for i in result:
-                prizeArray.append({"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "createdTime": i["createdTime"]})
+                prizeArray.append(
+                    {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+                     "createdTime": i["createdTime"]})
 
             return prizeArray
 
@@ -29,7 +34,8 @@ class prizeClaimInfo:
         try:
             result = col.find({"_id": ObjectId(str(i["_id"]))})
             i = result[0]
-            return {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "createdTime": i["createdTime"]}
+            return {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+                    "createdTime": i["createdTime"]}
 
         except:
             return "failed"
@@ -37,13 +43,15 @@ class prizeClaimInfo:
     def getTodayClaim(self):
         try:
             now = tools.getTimeNow()
-            start = datetime.datetime(now.strftime("%Y"), now.strftime("%m"), now.strftime("%d"), 0, 0, 0)
-            end = datetime.datetime(now.strftime("%Y"), now.strftime("%m"), now.strftime("%d"), 23, 59, 59)
-            result = col.find({"createdTime":{"$gte": start, "lte": end}})
+            start = datetime.datetime(int(now.strftime("%Y")), int(now.strftime("%m")), int(now.strftime("%d")), 0, 0, 0)
+            end = datetime.datetime(int(now.strftime("%Y")), int(now.strftime("%m")), int(now.strftime("%d")), 23, 59, 59)
+            result = col.find({"createdTime": {"$gte": start, "$lte": end}})
 
             todayPrizeClaimArray = []
             for i in result:
-                todayPrizeClaimArray.append({"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "createdTime": i["createdTime"]})
+                todayPrizeClaimArray.append(
+                    {"id": str(i["_id"]), "address": i["address"], "prizeId": i["prizeId"], "chainName": i["chainName"],
+                     "createdTime": i["createdTime"]})
             return todayPrizeClaimArray
         except:
             return "failed"

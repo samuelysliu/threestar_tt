@@ -2,14 +2,14 @@ import json
 from flask import Flask, request, send_from_directory, Response
 from flask_restful import Api, Resource
 from flask_cors import CORS
-from control import threeStar
+from control import threeStar_tt, threeStar_bsc
 import os
 
 app = Flask(__name__, static_folder='templates/build')
-CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
-CORS(app, resources={r"/bsc/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+#CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+#CORS(app, resources={r"/bsc/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
 CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
-#CORS(app)
+CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -29,41 +29,55 @@ def serve(path):
 class startGame(Resource):
     def post(self):
         data = request.get_json()
-        result = threeStar.game(data)
+        result = threeStar_tt.game(data)
         return result
 
 
 class starGame_bsc(Resource):
     def post(self):
         data = request.get_json()
-        result = threeStar.game_bsc(data)
+        result = threeStar_bsc.game_bsc(data)
         return result
 
 
 class withdrawThreeStar(Resource):
     def post(self):
-        result = threeStar.withdrawThreeStar(request.get_json())
+        result = threeStar_tt.withdrawThreeStar(request.get_json())
         return result
 
 class withdrawThreeStar_bsc(Resource):
     def post(self):
-        result = threeStar.withdrawThreeStar_bsc(request.get_json())
+        result = threeStar_bsc.withdrawThreeStar_bsc(request.get_json())
         return result
 
 
 class getDividendInfo(Resource):
     def get(self):
-        dividends, APR, payout = threeStar.getDividendInfo()
+        dividends, APR, payout = threeStar_tt.getDividendInfo()
         return {"dividends": dividends, "APR": APR, "payout": str(payout)}
 
 class getDividendInfo_bsc(Resource):
     def get(self):
-        dividends, APR, payout = threeStar.getDividendInfo_bsc()
+        dividends, APR, payout = threeStar_bsc.getDividendInfo_bsc()
         return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+
+class claimPrize(Resource):
+    def get(self):
+        prizeType = request.args.get("prizeType")
+        address = request.args.get("address")
+        result = threeStar_tt.canClaimBool(prizeType, address)
+        return {"result": result}
+
+    def post(self):
+        data = request.get_json()
+        result = threeStar_tt.claimPrize(data)
+        return {"result": result}
+
 
 api.add_resource(startGame, '/api/startGame')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
 api.add_resource(withdrawThreeStar, '/master/withdraw')
+api.add_resource(claimPrize, '/api/claimPrize')
 
 api.add_resource(starGame_bsc, '/bsc/startGame')
 api.add_resource(getDividendInfo_bsc, '/bsc/getDividendInfo')

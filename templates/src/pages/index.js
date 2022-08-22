@@ -104,8 +104,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                 setBetting(true)
                 let point = 0;
                 // assign task to backend to create random number and match
-                threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), "ether") }).then(function (receipt) {
-                    axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet }).then(res => {
+                threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(0.1), "ether") }).then(function (receipt) {
+                    axios.post(apiPath + "/startGame", { "userLuckyNum": userLuckyNumber, "playerAddress": userInfo.account, "betNum": userBet, "hash": receipt["transactionHash"] }).then(res => {
                         point = res['data']['point'];
                         setStarNumber(res['data']['starNumber'])
                         checkUserNumberMatch(res['data']['starNumber'])
@@ -127,7 +127,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                             setStatusMessage("YOU WILL WIN " + token)
                             setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
                         }, "6000")
-
+                        
                     }).catch(error => {
                         setBetting(false)
                     })

@@ -4,7 +4,7 @@ import tools
 
 col = dbInfo.transactionHash(self='')
 
-class transactionHashInfo:
+class transactionInfo:
     def saveTransaction(self):
         try:
             result = col.insert_one({"address": self["address"], "hash": self["hash"], "chainName": self["chainName"], "createdTime": tools.getTimeNow()})

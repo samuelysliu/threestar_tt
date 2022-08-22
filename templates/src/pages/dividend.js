@@ -33,6 +33,7 @@ function Dividend({ userInfo, connectWallet, token }) {
 
             setTSTokenContract(new web3.eth.Contract(TSTokenContractABI, pathController.getTSTokenContractAddress()));
             setStakeContract(new web3.eth.Contract(stakeContractABI, pathController.getStakeContractAddress()));
+            //setStakeContract(new web3.eth.Contract(stakeContractABI, "0xa931A981edfCd9cA80A0Be1653CE3b1C4ceb757e"));
         }).catch(error => {
             console.log(error)
         })

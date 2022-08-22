@@ -1,6 +1,6 @@
-from control import threeStar
+from control import threeStar_tt
 
-threeStar.setReward()
-threeStar.setReward_bsc()
+threeStar_tt.setReward()
+threeStar_tt.setReward_bsc()
 #threeStar.test()
 
