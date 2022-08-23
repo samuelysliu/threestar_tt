@@ -4,10 +4,13 @@ from flask_restful import Api, Resource
 from flask_cors import CORS
 from control import threeStar_tt, threeStar_bsc
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
-CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
-CORS(app, resources={r"/bsc/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
 #CORS(app)
 
