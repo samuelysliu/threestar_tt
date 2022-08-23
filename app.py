@@ -6,10 +6,10 @@ from control import threeStar_tt, threeStar_bsc
 import os
 
 app = Flask(__name__, static_folder='templates/build')
-#CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
-#CORS(app, resources={r"/bsc/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+CORS(app, resources={r"/api/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
+CORS(app, resources={r"/bsc/.*": {"origins": ["https://three-star.herokuapp.com/"]}})
 CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
-CORS(app)
+#CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
