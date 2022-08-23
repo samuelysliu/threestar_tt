@@ -1,6 +1,7 @@
 import '../styles/sidebar.css';
 import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa'
+import NewIcon from '../images/newIcon.png'
 
 function Sidebar() {
     const [isOpen, setIsopen] = useState(false);
@@ -30,7 +31,7 @@ function Sidebar() {
                     <ul>
                         <li><a className="sd-link" href='/'>Home</a></li>
                         <li><a className="sd-link" href='/dividend'>Dividend</a></li>
-                        <li><a className="sd-link" href='/dividend'>Bonus</a></li>
+                        <li><a className="sd-link" href='/bonus'>Bonus<img src={NewIcon} style={{paddingLeft: "5px"}}></img></a></li>
                         <li><a className="sd-link" href='https://twitter.com/3star_tt'>Twitter</a></li>
                         <li><a className="sd-link" href='https://t.me/ThreeStarDapp'>Telegram</a></li>
                     </ul>

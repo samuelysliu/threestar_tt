@@ -58,7 +58,11 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
     const TTTokenImage = "https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1.25,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1"
 
-    const [prizePopUpShow, setPrizePopUpShow] = useState(true)
+    const [prizePopUpShow, setPrizePopUpShow] = useState(false)
+    const [isClaiming, setIsClaiming] = useState(false)
+    const [isClaimDone, setIsClaimDone] = useState(false)
+    const [todayNotClaim, setTodayNotClaim] = useState(false)
+    const [isHaveCoupon, setIsHaveCoupon] = useState(false)
 
     let web3 = new Web3(window.ethereum);
 
@@ -132,7 +136,9 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                             setStatusMessage("YOU WILL WIN " + token)
                             setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
                         }, "6000")
-                        
+
+                        checkPrizeList()
+
                     }).catch(error => {
                         setBetting(false)
                     })
@@ -256,7 +262,47 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             console.log(error);
         })
 
+        checkPrizeList()
 
+        axios.get(apiPath + "/claimPrize?prizeType=double bonus&address=" + userInfo.account).then(res => {
+            console.log(apiPath)
+            setPrizePopUpShow(res["data"]["result"])
+            setTodayNotClaim(res["data"]["result"])
+        }).catch(error => { console.log(error) })
+    }
+
+    const checkIfHaveCoupon = (userPrizeList) => {
+        for (let i = 0; i < userPrizeList.length; i++) {
+            if (token === "TT" && userPrizeList[i]["chainName"] === "thunderCore" && Number(userPrizeList[i]["number"]) > 0) {
+                setIsHaveCoupon(true)
+            } else if (token === "BNB" && userPrizeList[i]["chainName"] === "bsc" && Number(userPrizeList[i]["number"]) > 0) {
+                setIsHaveCoupon(true)
+            }else{
+                setIsHaveCoupon(false)
+            }
+        }
+    }
+
+    const claimBonus = () => {
+        if (userInfo.account.length === 0) {
+            setErrorMessage("invalid wallet")
+            setTimeout(() => {
+                setErrorMessage("")
+            }, 6000)
+        } else {
+            setIsClaiming(true)
+            axios.post(apiPath + "/claimPrize", { "prizeType": "double bonus", "address": userInfo.account }).then(res => {
+                setIsClaimDone(true)
+                setTodayNotClaim(false)
+                checkPrizeList()
+            }).catch(error => console.log(error))
+        }
+    }
+
+    const checkPrizeList = () => {
+        axios.get(apiPath + "/userPrizeList?playerAddress=" + userInfo.account).then(res => {
+            checkIfHaveCoupon(res["data"]["result"])
+        }).catch(error => { console.log(error) })
     }
 
     useEffect(() => {
@@ -274,7 +320,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             checkBalance()
             setWalletConnecting(false)
         }
-    }, [userInfo])
+    }, [apiPath, userInfo])
 
     useEffect(() => {
         loadWeb3()
@@ -354,12 +400,12 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     return (
         <>
             <Sidebar />
-            <PrizePopUp _show={prizePopUpShow} _setShow={setPrizePopUpShow} _userInfo={userInfo} />
+            <PrizePopUp show={prizePopUpShow} setShow={setPrizePopUpShow} isClaiming={isClaiming} isClaimDone={isClaimDone} claimBonus={claimBonus} />
             <div style={{ margin: "auto", marginLeft: "20px", marginRight: "20px" }}>
                 <div style={{ backgroundColor: "#1AB3FF", margin: "auto", marginTop: "10px", borderRadius: "6px", maxWidth: "720px" }}>
                     <Container style={mainContainer}>
                         <Row style={{ paddingTop: "5px" }}>
-                            <Col style={{ textAlign: "left" }}><img src={GiftIcon} onClick={() => setPrizePopUpShow(!prizePopUpShow)}></img></Col>
+                            <Col style={{ textAlign: "left" }}>{todayNotClaim ? <img src={GiftIcon} onClick={() => setPrizePopUpShow(!prizePopUpShow)}></img> : ""}</Col>
                             <Col><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
                             <Col style={{ textAlign: "right" }}>
                                 <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
@@ -411,7 +457,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                         {statusMessage === "YOU WILL WIN " + token
                             ?
                             <Row>
-                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn} + <BonusNumber number={estimateEarn}/> </font></Col>
+                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn} {isHaveCoupon ? <>+ <BonusNumber number={estimateEarn} /></> : ""} </font></Col>
                             </Row>
 
                             : statusMessage === "YOU GOT 3Star!"

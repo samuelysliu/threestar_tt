@@ -77,23 +77,38 @@ class claimPrize_bsc(Resource):
     def get(self):
         prizeType = request.args.get("prizeType")
         address = request.args.get("address")
-        result = threeStar_bsc.canClaimBool(prizeType, address)
+        result = threeStar_bsc.canClaimBool_bsc(prizeType, address)
         return {"result": result}
 
     def post(self):
         data = request.get_json()
-        result = threeStar_bsc.claimPrize(data)
+        result = threeStar_bsc.claimPrize_bsc(data)
         return {"result": result}
+
+class userPrizeList(Resource):
+    def get(self):
+        playerAddress = request.args.get("playerAddress")
+        result = threeStar_tt.getUserPrizeList(playerAddress)
+        return {"result": result}
+
+class userPrizeList_bsc(Resource):
+    def get(self):
+        playerAddress = request.args.get("playerAddress")
+        result = threeStar_bsc.getUserPrizeList(playerAddress)
+        return result
+
 
 api.add_resource(startGame, '/api/startGame')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
 api.add_resource(withdrawThreeStar, '/master/withdraw')
 api.add_resource(claimPrize, '/api/claimPrize')
+api.add_resource(userPrizeList, '/api/userPrizeList')
 
 api.add_resource(starGame_bsc, '/bsc/startGame')
 api.add_resource(getDividendInfo_bsc, '/bsc/getDividendInfo')
 api.add_resource(withdrawThreeStar_bsc, '/master/withdraw_bsc')
 api.add_resource(claimPrize_bsc, '/bsc/claimPrize')
+api.add_resource(userPrizeList_bsc, '/bsc/userPrizeList')
 
 if __name__ == '__main__':
     app.run(app, debug=True, port=int(os.environ.get("PORT", 5000)))

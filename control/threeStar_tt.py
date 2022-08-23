@@ -18,7 +18,6 @@ threeStarContractAddress, threeStarContract = blockchain.getThreeStarContract(we
 stakeContractAddress, stakeContract = blockchain.getStakeContract(web3)
 TSContractAddress, TSContract = blockchain.getTSToken(web3)
 
-
 def cannotLose(point, contractRemain, playerAmount):
     point -= 2
     if (point > 0):
@@ -88,11 +87,20 @@ def game(*args):
                 winTT = playerAmount * 99 / 100 * 20
             elif point == 5:
                 winTT = playerAmount * 99 / 100 * 100
-        else:
-            giveTSToken(args[0]["playerAddress"], float(playerAmount) * 0.004)
-            winTS = playerAmount * 0.004
 
-        transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"], "chainName": "thunderCore"})
+            if userUseBonus(args[0]["playerAddress"]):
+                giveTT(args[0]["playerAddress"], winTT)
+                winTT = winTT*2
+
+        else:
+            winTS = float(playerAmount) * 0.004
+            giveTSToken(args[0]["playerAddress"], winTS)
+            if userUseBonus(args[0]["playerAddress"]):
+                giveTSToken(args[0]["playerAddress"], winTS)
+                winTS = winTS*2
+
+        transactionInfo.saveTransaction(
+            {"address": args[0]["playerAddress"], "hash": args[0]["hash"], "chainName": "thunderCore"})
 
         return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
     else:
@@ -118,7 +126,8 @@ def setReward():
     try:
         dividend = getTodayDividend(web3)
         withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                           "amount": float(blockchain.getOwnerRemain(web3, threeStarContractAddress)) - float(dividend)})
+                           "amount": float(blockchain.getOwnerRemain(web3, threeStarContractAddress)) - float(
+                               dividend)})
         try:
             tx = {
                 'nonce': web3.eth.get_transaction_count(owner['address']),
@@ -194,6 +203,7 @@ def withdrawThreeStar(*args):
         return {"result": "failed"}
 
 
+# if user can get daily check prize
 def canClaimBool(prizeType, address):
     prizeType = prizeType
     if prizeType == "double bonus":
@@ -208,6 +218,7 @@ def canClaimBool(prizeType, address):
             return False
 
 
+# usear request get daily prize
 def claimPrize(*args):
     try:
         prizeType = args[0]["prizeType"]
@@ -222,10 +233,12 @@ def claimPrize(*args):
                         myquery = {"_id": ObjectId(i["id"])}
                         newValues = {"$set": {"number": int(i["number"]) + 1}}
                         userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
-                        prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
+                        prizeClaimInfo.savePrizeClaim(
+                            {"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
                         return "success"
 
-                userPrizeInfo.saveUserPrize({"address": address, "prizeId": prizeId, "chainName": "thunderCore", "number": 1})
+                userPrizeInfo.saveUserPrize(
+                    {"address": address, "prizeId": prizeId, "chainName": "thunderCore", "number": 1})
                 prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
                 return "success"
             return "failed"
@@ -236,13 +249,65 @@ def claimPrize(*args):
         return "failed"
 
 
-def test():
-    """userStake = TSContract.functions.transferFrom('0xbB931B676919cDC9Fb6727609e70d94C3fdA7A42', stakeContractAddress, web3.toWei(10, 'ether')).buildTransaction(
-        {
-            'from': owner['address'],
-            'gas': 1041586,
-            'nonce': web3.eth.get_transaction_count(owner['address']),
-        }
-    )
+# get user all prize
+def getUserPrizeList(playerAddress):
+    userPrizeArray = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    return userPrizeArray
 
-    result = sendTransaction(userStake)"""
+
+# user using prize coupon
+def userUseBonus(playerAddress):
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    for i in userPrizeList:
+        if i["chainName"] == "thunderCore" and int(i["number"]) > 0:
+            myquery = {"_id": ObjectId(i["id"])}
+            newValues = {"$set": {"number": int(i["number"]) - 1}}
+            userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+            return True
+
+    return False
+
+
+def giveTT(receipient, amount):
+    receipient = Web3.toChecksumAddress(receipient)
+    tx = {
+        'nonce': web3.eth.get_transaction_count(owner['address']),
+        'to': receipient,
+        'value': web3.toWei(amount, 'ether'),
+        'gas': 6721975,
+        'gasPrice': web3.toWei('50', 'gwei'),
+        'chainId': int(chainID)
+    }
+    blockchain.sendTransaction(web3, tx)
+    try:
+        receipient = Web3.toChecksumAddress(receipient)
+        tx = {
+            'nonce': web3.eth.get_transaction_count(owner['address']),
+            'to': receipient,
+            'value': web3.toWei(amount, 'ether'),
+            'gas': 6721975,
+            'gasPrice': web3.toWei('50', 'gwei'),
+            'chainId': int(chainID)
+        }
+        blockchain.sendTransaction(web3, tx)
+        return "success"
+    except:
+        return "failed"
+
+
+def test(*args):
+    """if args[0]['privateKey'] == os.getenv("privateKey"):
+        try:
+            dividendWithdraw = stakeContract.functions.setReward(
+                web3.toWei(122, "ether")).buildTransaction({
+                'from': owner['address'],
+                'gas': 1041586,
+                'nonce': web3.eth.get_transaction_count(owner['address']),
+            })
+            blockchain.sendTransaction(web3, dividendWithdraw)
+        except:
+            return {"result": "failed"}
+
+        return {"result": "success"}
+    else:
+        return {"result": "failed"}"""

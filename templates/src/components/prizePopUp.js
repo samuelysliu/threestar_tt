@@ -5,25 +5,11 @@ import '../styles/prizePopUp.css'
 import threeStarTokenIcon2 from '../images/3StarToken2.png'
 import TTTokenIcon2 from '../images/TTToken2.png'
 import { ImCheckmark } from 'react-icons/im'
+import axios from 'axios';
 
-function PrizePopUp({ _show, _setShow, _userInfo }) {
-    const show = _show
-    const setShow = _setShow
-    const userInfo = _userInfo
+function PrizePopUp({ show, setShow, isClaiming, isClaimDone, claimBonus }) {
     const [errorMessage, setErrorMessage] = useState("")
     const handleClose = () => setShow(false);
-
-    const [isClaiming, setIsClaiming] = useState(true)
-    const [isClaimDone, setIsClaimDone] = useState(true)
-
-    const claimBonus = () => {
-        if (userInfo.account.length === 0) {
-            setErrorMessage("invalid wallet")
-            setTimeout(() => {
-                setErrorMessage("")
-            }, 6000)
-        }
-    }
 
     return (
         <>
