@@ -389,18 +389,6 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         }
     }
 
-    const infoStyle = {
-        backgroundColor: "white",
-        color: "black",
-        width: "210px",
-        fontSize: "12px",
-        borderRadius: "5px",
-        height: "30px",
-        display: "flex",
-        alignItems: "center"
-    }
-
-
     return (
         <>
             <Sidebar />
@@ -409,7 +397,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                 <div style={{ backgroundColor: "#1AB3FF", margin: "auto", marginTop: "10px", borderRadius: "6px", maxWidth: "720px" }}>
                     <Container style={mainContainer}>
                         <Row style={{ paddingTop: "5px" }}>
-                            <Col style={{ textAlign: "left" }}>{todayNotClaim ? <img src={GiftIcon} onClick={() => setPrizePopUpShow(!prizePopUpShow)}></img> : ""}</Col>
+                            <Col style={{ textAlign: "left" }}>{todayNotClaim ? <img src={GiftIcon} onClick={() => setPrizePopUpShow(!prizePopUpShow)} style={{cursor: "pointer", width: "25px"}}></img> : ""}</Col>
                             <Col><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
                             <Col style={{ textAlign: "right" }}>
                                 <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
@@ -424,8 +412,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                                 rootClose
                                 onHide={() => setInfoShow(false)}
                             >
-                                <div style={infoStyle}>
-                                    <font>winning {token} will be charged 1% fee </font>
+                                <div className='info'>
+                                    <font>winning {token} will be charged 1% fee, lose can get 3Star tokens </font>
                                 </div>
                             </Overlay>
                         </Row>
