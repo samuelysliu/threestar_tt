@@ -85,8 +85,8 @@ function Bonus({ userInfo, connectWallet, token }) {
         <>
             <Sidebar />
             <PrizePopUp show={prizePopUpShow} setShow={setPrizePopUpShow} isClaiming={isClaiming} isClaimDone={isClaimDone} claimBonus={claimBonus} />
-            <Container style={{ textAlign: "center", marginTop: "20px", maxWidth: "720px" }}>
-                <Row>
+            <Container style={{ textAlign: "center", marginTop: "10px", maxWidth: "720px" }}>
+                <Row style={{marginBottom: "10px"}}>
                     <Col xs={{ span: 1, offset: 0 }}><a href='/'><IoChevronBackOutline className='backIcon' size="20px" /></a></Col>
                 </Row>
                 <Row className="prizeCard">
