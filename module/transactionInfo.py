@@ -7,7 +7,8 @@ col = dbInfo.transactionHash(self='')
 class transactionInfo:
     def saveTransaction(self):
         try:
-            result = col.insert_one({"address": self["address"], "hash": self["hash"], "chainName": self["chainName"], "createdTime": tools.getTimeNow()})
+            result = col.insert_one({"address": self["address"], "hash": self["hash"], "chainName": self["chainName"], "betAmount": self["betAmount"],
+                                    "winTT": self["winTT"],"createdTime": tools.getTimeNow()})
 
             return result.inserted_id
         except:

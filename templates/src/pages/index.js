@@ -264,11 +264,15 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
         checkPrizeList()
 
-        axios.get(apiPath + "/claimPrize?prizeType=double bonus&address=" + userInfo.account).then(res => {
-            console.log(apiPath)
-            setPrizePopUpShow(res["data"]["result"])
-            setTodayNotClaim(res["data"]["result"])
-        }).catch(error => { console.log(error) })
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value)
+            axios.get(pathController.getApiPath() + "/claimPrize?prizeType=double bonus&address=" + userInfo.account).then(res => {
+                setPrizePopUpShow(res["data"]["result"])
+                setTodayNotClaim(res["data"]["result"])
+            }).catch(error => { console.log(error) })
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
     const checkIfHaveCoupon = (userPrizeList) => {
@@ -277,7 +281,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                 setIsHaveCoupon(true)
             } else if (token === "BNB" && userPrizeList[i]["chainName"] === "bsc" && Number(userPrizeList[i]["number"]) > 0) {
                 setIsHaveCoupon(true)
-            }else{
+            } else {
                 setIsHaveCoupon(false)
             }
         }

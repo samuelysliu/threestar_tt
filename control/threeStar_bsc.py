@@ -94,6 +94,7 @@ def game_bsc(*args):
                 winTT = playerAmount * 99 / 100 * 20
             elif point == 5:
                 winTT = playerAmount * 99 / 100 * 100
+
             if userUseBonus_bsc(args[0]["playerAddress"]):
                 giveBNB(args[0]["playerAddress"], winTT)
                 winTT = winTT*2
@@ -104,6 +105,9 @@ def game_bsc(*args):
             if userUseBonus_bsc(args[0]["playerAddress"]):
                 giveTSToken_bsc(args[0]["playerAddress"], winTS)
                 winTS = winTS*2
+
+        transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"],
+                                         "chainName": "thunderCore", "betAmount": playerAmount, "winTT": winTT})
 
         return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
     else:

@@ -52,10 +52,14 @@ function Bonus({ userInfo, connectWallet, token }) {
     }
 
     const checkTodayHasClaim = () => {
-        axios.get(apiPath + "/claimPrize?prizeType=double bonus&address=" + userInfo.account).then(res => {
-            console.log(res["data"]["result"])
-            setIsClaimDone(!res["data"]["result"])
-        }).catch(error => { console.log(error) })
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value)
+            axios.get(pathController.getApiPath() + "/claimPrize?prizeType=double bonus&address=" + userInfo.account).then(res => {
+                setIsClaimDone(!res["data"]["result"])
+            }).catch(error => { console.log(error) })
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
     useEffect(() => {
@@ -65,6 +69,9 @@ function Bonus({ userInfo, connectWallet, token }) {
 
     useEffect(() => {
         loadWeb3();
+        if (userInfo.account.length !== 0) {
+            checkTodayHasClaim()
+        }
     }, [token])
 
     useEffect(() => {

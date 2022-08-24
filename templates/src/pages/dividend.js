@@ -140,9 +140,7 @@ function Dividend({ userInfo, connectWallet, token }) {
 
     useEffect(() => {
         loadWeb3();
-    }, [token])
 
-    useEffect(() => {
         if (apiPath !== "") {
             axios.get(apiPath + "/getDividendInfo").then(res => {
                 setDividends(res['data']['dividends'])
@@ -156,7 +154,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                 checkContractInfo();
             }
         }
-    }, [apiPath])
+    }, [token])
 
     useEffect(() => {
         if (userInfo.account.length !== 0) {

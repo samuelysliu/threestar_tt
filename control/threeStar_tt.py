@@ -99,8 +99,8 @@ def game(*args):
                 giveTSToken(args[0]["playerAddress"], winTS)
                 winTS = winTS*2
 
-        transactionInfo.saveTransaction(
-            {"address": args[0]["playerAddress"], "hash": args[0]["hash"], "chainName": "thunderCore"})
+        transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"],
+                                         "chainName": "thunderCore", "betAmount": playerAmount, "winTT": winTT})
 
         return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
     else:
