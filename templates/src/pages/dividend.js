@@ -195,10 +195,6 @@ function Dividend({ userInfo, connectWallet, token }) {
         paddingBottom: "10px"
     }
 
-    const blockTwoStyle = {
-        marginTop: "10px",
-    }
-
     const blockThreeStyle = {
         border: "1px",
         borderStyle: "solid",
@@ -239,7 +235,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                             <font style={{ fontSize: "22px" }}>{dividends} {token}</font>
                         </Col>
                     </Row>
-                    <Row style={blockTwoStyle}>
+                    <Row style={{ marginTop: "10px" }}>
                         <Col style={{ fontSize: "15px", textAlign: "left" }}>APR</Col>
                         <Col style={{ fontSize: "15px", textAlign: "right" }}>{APR}</Col>
                     </Row>
@@ -303,7 +299,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                                 />
                                 Loading...
                             </Button>
-                                : <Button disabled={stakeAmount > stakeMax || stakeAmount<1} style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
+                                : <Button disabled={stakeAmount > stakeMax || stakeAmount < 1} style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
                             }
 
 
@@ -315,13 +311,13 @@ function Dividend({ userInfo, connectWallet, token }) {
                         </Col>
                     </Row>
 
-                    <Row style={blockTwoStyle} className="claimBlock">
+                    <Row style={{ marginTop: "10px" }} className="claimBlock">
                         <Col style={{ textAlign: "left" }}>
                             <font style={{ color: "#00B3F7" }}>TT Earned</font>
                             <br></br>
                             <font>0.00000</font>
                         </Col>
-                        <Col>
+                        <Col className="claimBtDiv">
                             {isClaiming ?
                                 <Button disabled={true}>
                                     <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
@@ -337,8 +333,8 @@ function Dividend({ userInfo, connectWallet, token }) {
 
                     <Row className='detailBlock'>
                         {detailOpen
-                            ? <Col {...getToggleProps({onClick: () => setDetailOpen(false),})} >Detail <AiOutlineDown /></Col>
-                            : <Col {...getToggleProps({onClick: () => setDetailOpen(true),})}>Detail <AiOutlineUp /></Col>
+                            ? <Col {...getToggleProps({ onClick: () => setDetailOpen(false), })} >Detail <AiOutlineDown /></Col>
+                            : <Col {...getToggleProps({ onClick: () => setDetailOpen(true), })}>Detail <AiOutlineUp /></Col>
                         }
                     </Row>
                     <div {...getCollapseProps()}>
