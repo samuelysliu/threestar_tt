@@ -10,10 +10,14 @@ function Sidebar() {
         isOpen === true ? setIsopen(false) : setIsopen(true);
     }
 
+    const backHome = () => {
+        window.location.href="/"
+    }
+
     return (
         <div className="container-fluid" style={{ backgroundColor: "#01AFFB", position:"sticky", top: "0px", zIndex: "99" }}>
             <nav className="navbar navbar-expand-lg navbar-light shadow-md">
-                <font style={{ fontSize: "28px", color: "white", position: "absolute", left: "50%", marginLeft: "-60px" }}><strong>TT 3Star</strong></font>
+                <font style={{ fontSize: "28px", color: "white", position: "absolute", left: "50%", marginLeft: "-60px", cursor: "pointer" }} onClick={backHome}><strong>TT 3Star</strong></font>
                 <div className="form-inline ml-auto">
                     <div className="btn btn-primary" onClick={ToggleSidebar} >
                         <FaBars />
