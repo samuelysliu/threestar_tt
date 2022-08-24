@@ -58,7 +58,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
     const TTTokenImage = "https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1.25,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1"
 
-    const [prizePopUpShow, setPrizePopUpShow] = useState(false)
+    const [prizePopUpShow, setPrizePopUpShow] = useState(true)
     const [isClaiming, setIsClaiming] = useState(false)
     const [isClaimDone, setIsClaimDone] = useState(false)
     const [todayNotClaim, setTodayNotClaim] = useState(false)
