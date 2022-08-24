@@ -27,9 +27,9 @@ function PrizePopUp({ show, setShow, isClaiming, isClaimDone, claimBonus }) {
                             <Col><font>Claim once a day.<br></br>Make you win DOUBLE reward.</font></Col>
                         </Row>
                         <Row style={{ justifyContent: "center" }}>
-                            <Col xs={5} style={{ textAlign: "right" }}><img src={TTTokenIcon2}></img></Col>
+                            <Col xs={5} style={{ textAlign: "right" }}><img src={TTTokenIcon2} style={{width: "60px"}}></img></Col>
                             <Col xs={1}><div style={{ borderLeft: "1px solid #0CB1FD", height: "100%" }}></div></Col>
-                            <Col xs={5} style={{ textAlign: "left" }}><img src={threeStarTokenIcon2}></img></Col>
+                            <Col xs={5} style={{ textAlign: "left" }}><img src={threeStarTokenIcon2} style={{width: "60px"}}></img></Col>
                         </Row>
                         <Row style={{ padding: "9px" }}>
                             <Col>

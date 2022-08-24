@@ -16,7 +16,7 @@ import { ImCheckmark } from 'react-icons/im'
 function Bonus({ userInfo, connectWallet, token }) {
     const metaConnect = new ConnectWallet()
     const web3 = new Web3(window.ethereum);
-    const [prizePopUpShow, setPrizePopUpShow] = useState(true)
+    const [prizePopUpShow, setPrizePopUpShow] = useState(false)
     const [isClaiming, setIsClaiming] = useState(false)
     const [isClaimDone, setIsClaimDone] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")

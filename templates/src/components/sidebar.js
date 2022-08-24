@@ -31,7 +31,7 @@ function Sidebar() {
                     <ul>
                         <li><a className="sd-link" href='/'>Home</a></li>
                         <li><a className="sd-link" href='/dividend'>Dividend</a></li>
-                        <li><a className="sd-link" href='/bonus'>Bonus<img src={NewIcon} style={{paddingLeft: "5px"}}></img></a></li>
+                        <li><a className="sd-link" href='/bonus'>Bonus<img src={NewIcon} style={{paddingLeft: "5px", width: "35px"}}></img></a></li>
                         <li><a className="sd-link" href='https://twitter.com/3star_tt'>Twitter</a></li>
                         <li><a className="sd-link" href='https://t.me/ThreeStarDapp'>Telegram</a></li>
                     </ul>
