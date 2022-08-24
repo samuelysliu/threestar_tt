@@ -10,6 +10,7 @@ from module.prizeClaimInfo import prizeClaimInfo
 from module.userPrizeInfo import userPrizeInfo
 from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
+from module.dividendRoundInfo_bsc import dividendRoundInfo
 
 load_dotenv()
 
@@ -20,7 +21,9 @@ stakeContractAddress_bsc, stakeContract_bsc = blockchain.getStakeContract_bsc(we
 TSContractAddress_bsc, TSContract_bsc = blockchain.getTSToken_bsc(web3_bsc)
 
 
-def cannotLose(point, contractRemain, playerAmount):
+def cannotLose(point, contractRemain, playerAmount, userHaveBonus):
+    if userHaveBonus:
+        playerAmount = playerAmount * 2
     point -= 2
     if (point > 0):
         if (point == 1):
@@ -82,7 +85,7 @@ def game_bsc(*args):
         contractRemain = blockchain.getOwnerRemain(web3_bsc, threeStarContract_bsc)
         playerAmount = args[0]["betNum"]
 
-        while (cannotLose(point, contractRemain, playerAmount) == False):
+        while (cannotLose(point, contractRemain, playerAmount, isUserHaveBonus_bsc(args[0]["playerAddress"])) == False):
             starNumber = createRandom()
             point = countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
 
@@ -167,11 +170,29 @@ def setReward_bsc():
 
 def getDividendInfo_bsc():
     dividend = getTodayDividend(web3_bsc, threeStarContractAddress_bsc)
-    APR = blockchain.getAPR_bsc(web3_bsc, dividend)
+    APR = blockchain.getAPR(web3_bsc, dividend, stakeContract_bsc)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
+    totalStake = blockchain.getTotalStake(web3_bsc, TSContract_bsc, stakeContractAddress_bsc)
+    roundNumber = int(dividendRoundInfo.getLastRound(self='')["roundNumber"]) + 1
 
-    return str(dividend), APR, payout
+    return str(dividend), APR, payout, totalStake, roundNumber
+
+def saveLastRound_bsc():
+    try:
+        dividend, APR, payout, totalStake, roundNumber = getDividendInfo_bsc()
+        dividendRoundInfo.saveDividendRound({"roundNumber": roundNumber, "payout": payout, "totalStake": totalStake, "APR": APR,
+                                             "dividend": dividend})
+        return "success"
+    except:
+        return "failed"
+
+def getLastRound():
+    lastRound = dividendRoundInfo.getLastRound(self='')
+
+    return {"roundNumber": lastRound["roundNumber"], "payout": lastRound["payout"],
+            "totalStake": lastRound["totalStake"],
+            "APR": lastRound["APR"], "dividend": lastRound["dividend"], "createdTime": lastRound["createdTime"]}
 
 
 def giveTSToken_bsc(receipient, amount):
@@ -257,6 +278,12 @@ def getUserPrizeList(playerAddress):
     userPrizeArray = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
     return userPrizeArray
 
+def isUserHaveBonus_bsc(playerAddress):
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    for i in userPrizeList:
+        if i["chainName"] == "bsc" and int(i["number"]) > 0:
+            return True
+    return False
 
 # user using prize coupon
 def userUseBonus_bsc(playerAddress):

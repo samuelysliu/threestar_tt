@@ -56,13 +56,13 @@ class withdrawThreeStar_bsc(Resource):
 
 class getDividendInfo(Resource):
     def get(self):
-        dividends, APR, payout = threeStar_tt.getDividendInfo()
-        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+        dividends, APR, payout, totalStake, roundNumber = threeStar_tt.getDividendInfo()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": str(totalStake)}
 
 class getDividendInfo_bsc(Resource):
     def get(self):
-        dividends, APR, payout = threeStar_bsc.getDividendInfo_bsc()
-        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+        dividends, APR, payout, totalStake, roundNumber = threeStar_bsc.getDividendInfo_bsc()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": str(totalStake)}
 
 class claimPrize(Resource):
     def get(self):
@@ -100,18 +100,29 @@ class userPrizeList_bsc(Resource):
         result = threeStar_bsc.getUserPrizeList(playerAddress)
         return result
 
+class lastRound(Resource):
+    def get(self):
+        result = threeStar_tt.getLastRound()
+        return result
+
+class lastRound_bsc(Resource):
+    def get(self):
+        result = threeStar_bsc.getLastRound()
+        return result
 
 api.add_resource(startGame, '/api/startGame')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
 api.add_resource(withdrawThreeStar, '/master/withdraw')
 api.add_resource(claimPrize, '/api/claimPrize')
 api.add_resource(userPrizeList, '/api/userPrizeList')
+api.add_resource(lastRound, '/api/lastRound')
 
 api.add_resource(starGame_bsc, '/bsc/startGame')
 api.add_resource(getDividendInfo_bsc, '/bsc/getDividendInfo')
 api.add_resource(withdrawThreeStar_bsc, '/master/withdraw_bsc')
 api.add_resource(claimPrize_bsc, '/bsc/claimPrize')
 api.add_resource(userPrizeList_bsc, '/bsc/userPrizeList')
+api.add_resource(lastRound_bsc, '/bsc/lastRound')
 
 if __name__ == '__main__':
     app.run(app, debug=True, port=int(os.environ.get("PORT", 5000)))

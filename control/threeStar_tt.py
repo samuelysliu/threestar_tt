@@ -9,6 +9,7 @@ from module.prizeClaimInfo import prizeClaimInfo
 from module.userPrizeInfo import userPrizeInfo
 from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
+from module.dividendRoundInfo import dividendRoundInfo
 
 load_dotenv()
 
@@ -18,7 +19,11 @@ threeStarContractAddress, threeStarContract = blockchain.getThreeStarContract(we
 stakeContractAddress, stakeContract = blockchain.getStakeContract(web3)
 TSContractAddress, TSContract = blockchain.getTSToken(web3)
 
-def cannotLose(point, contractRemain, playerAmount):
+
+# to detect if this random lucky number we can't afford
+def cannotLose(point, contractRemain, playerAmount, userHaveBonus):
+    if userHaveBonus:
+        playerAmount = playerAmount * 2
     point -= 2
     if (point > 0):
         if (point == 1):
@@ -36,6 +41,7 @@ def cannotLose(point, contractRemain, playerAmount):
     return True
 
 
+# create random lucky number
 def createRandom():
     randomNumber = [random.randint(1, 80)]
     while len(randomNumber) < 20:
@@ -50,6 +56,7 @@ def createRandom():
     return randomNumber
 
 
+# count point number
 def countPoint(starNumber, userNumber):
     point = 0
     for i in starNumber:
@@ -59,6 +66,7 @@ def countPoint(starNumber, userNumber):
     return point
 
 
+# start game
 def game(*args):
     transactionList = transactionInfo.getTransactionByHash({"hash": args[0]["hash"]})
     if blockchain.verifyHashInfo(web3, args[0]["hash"], threeStarContractAddress):
@@ -75,7 +83,7 @@ def game(*args):
         contractRemain = blockchain.getOwnerRemain(web3, threeStarContractAddress)
         playerAmount = args[0]["betNum"]
 
-        while (cannotLose(point, contractRemain, playerAmount) == False):
+        while (cannotLose(point, contractRemain, playerAmount, isUserHaveBonus(args[0]["playerAddress"])) == False):
             starNumber = createRandom()
             point = countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
 
@@ -90,14 +98,14 @@ def game(*args):
 
             if userUseBonus(args[0]["playerAddress"]):
                 giveTT(args[0]["playerAddress"], winTT)
-                winTT = winTT*2
+                winTT = winTT * 2
 
         else:
             winTS = float(playerAmount) * 0.004
             giveTSToken(args[0]["playerAddress"], winTS)
             if userUseBonus(args[0]["playerAddress"]):
                 giveTSToken(args[0]["playerAddress"], winTS)
-                winTS = winTS*2
+                winTS = winTS * 2
 
         transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"],
                                          "chainName": "thunderCore", "betAmount": playerAmount, "winTT": winTT})
@@ -107,6 +115,7 @@ def game(*args):
         return {"point": 0, "starNumber": [0], "winTS": 0, "winTT": 0}
 
 
+# if player win the game this function will tell contract the result and the contract will send the prize
 def sendPrize(winner, point):
     winner = Web3.toChecksumAddress(winner)
 
@@ -122,6 +131,7 @@ def sendPrize(winner, point):
     return result
 
 
+# set dividend every day
 def setReward():
     try:
         dividend = getTodayDividend(web3)
@@ -156,20 +166,45 @@ def setReward():
         return "contract insufficient balance"
 
 
+# get today dividend
 def getTodayDividend(web3):
     ownerRemain = blockchain.getOwnerRemain(web3, threeStarContractAddress)
     return round(ownerRemain * 20 / 100, 5)
 
 
+# get this round dividend info
 def getDividendInfo():
     dividend = getTodayDividend(web3)
-    APR = blockchain.getAPR(web3, dividend)
+    APR = blockchain.getAPR(web3, dividend, stakeContract)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
+    totalStake = blockchain.getTotalStake(web3, TSContract, stakeContractAddress)
+    roundNumber = int(dividendRoundInfo.getLastRound(self='')["roundNumber"]) + 1
 
-    return str(dividend), APR, payout
+    return str(dividend), APR, payout, totalStake, roundNumber
 
 
+# scheduler will auto save lastRound
+def saveLastRound():
+    try:
+        dividend, APR, payout, totalStake, roundNumber = getDividendInfo()
+        dividendRoundInfo.saveDividendRound(
+            {"roundNumber": roundNumber, "payout": payout, "totalStake": totalStake, "APR": APR,
+             "dividend": dividend})
+        return "success"
+    except:
+        return "failed"
+
+
+def getLastRound():
+    lastRound = dividendRoundInfo.getLastRound(self='')
+
+    return {"roundNumber": lastRound["roundNumber"], "payout": lastRound["payout"],
+            "totalStake": lastRound["totalStake"],
+            "APR": lastRound["APR"], "dividend": lastRound["dividend"], "createdTime": lastRound["createdTime"]}
+
+
+# function let owner transfer 3star token
 def giveTSToken(receipient, amount):
     try:
         receipient = Web3.toChecksumAddress(receipient)
@@ -185,6 +220,7 @@ def giveTSToken(receipient, amount):
         return "failed"
 
 
+# master withdraw the tt in threestar main contract
 def withdrawThreeStar(*args):
     if args[0]['privateKey'] == os.getenv("privateKey"):
         try:
@@ -255,6 +291,15 @@ def getUserPrizeList(playerAddress):
     return userPrizeArray
 
 
+# check user have bonus but not use it only for check
+def isUserHaveBonus(playerAddress):
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    for i in userPrizeList:
+        if i["chainName"] == "thunderCore" and int(i["number"]) > 0:
+            return True
+    return False
+
+
 # user using prize coupon
 def userUseBonus(playerAddress):
     userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
@@ -268,17 +313,8 @@ def userUseBonus(playerAddress):
     return False
 
 
+# function let master transfer tt from owner wallet
 def giveTT(receipient, amount):
-    receipient = Web3.toChecksumAddress(receipient)
-    tx = {
-        'nonce': web3.eth.get_transaction_count(owner['address']),
-        'to': receipient,
-        'value': web3.toWei(amount, 'ether'),
-        'gas': 6721975,
-        'gasPrice': web3.toWei('50', 'gwei'),
-        'chainId': int(chainID)
-    }
-    blockchain.sendTransaction(web3, tx)
     try:
         receipient = Web3.toChecksumAddress(receipient)
         tx = {
