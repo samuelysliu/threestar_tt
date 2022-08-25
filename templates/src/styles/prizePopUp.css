@@ -1,0 +1,68 @@
+.modalStyle{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #0CB1FD;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    height: 320px
+}
+
+.popUpIcon{
+    position: relative;
+    top: -10%;
+}
+
+.modal-content{
+    margin-left: 10%;
+    margin-right: 10%;
+    border-radius: 15px;
+    border-width: 0px;
+    background-color: #108EEC;
+    box-shadow: 0px 5px 0px 0px #0052B2;
+}
+
+.modalHeader{
+    color: white;
+    font-weight: bolder;
+    text-align: center;
+    position: relative;
+    top: -10%;
+}
+
+.modalContent{
+    font-size: 12px;
+    background-color: white;
+    width: 95%;
+    border-radius: 10px;
+    padding: 2px;
+    text-align: center;
+    position: relative;
+    top: -10%;
+}
+
+.claimDiv{
+    text-align: center;
+    position: absolute;
+    bottom: 5%;
+}
+
+.disableBt{
+    background-color: #AEAEAE !important;
+    box-shadow: 0px 5px 0px 0px #969696 !important;
+    color: #969696 !important;
+}
+
+.claimDiv button{
+    background-color: #70E545;
+    border-width: 0px;
+    border-radius: 6px;
+    box-shadow: 0px 5px 0px 0px #09C401;
+    padding: 6px;
+    width: 180px;
+    color: white;
+    font-size: 14px;
+    font-weight: bolder;
+    height: 35px;
+}
+

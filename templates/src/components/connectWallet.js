@@ -63,7 +63,6 @@ export class ConnectWallet {
     }
 
     async getChainId() {
-
         if (typeof window.ethereum === 'undefined') {
             console.log('Please install MetaMask!');
             return 0

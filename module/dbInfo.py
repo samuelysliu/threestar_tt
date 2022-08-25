@@ -26,3 +26,11 @@ class dbInfo:
     def transactionHash(self):
         col = db["transactionHash"]
         return col
+
+    def dividendRound(self):
+        col = db["dividendRound"]
+        return col
+
+    def dividendRound_bsc(self):
+        col = db["dividendRound_bsc"]
+        return col

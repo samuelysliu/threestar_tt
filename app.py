@@ -4,15 +4,12 @@ from flask_restful import Api, Resource
 from flask_cors import CORS
 from control import threeStar_tt, threeStar_bsc
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
-CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
-#CORS(app)
+CORS(app, resources={"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={"/master/.*": {"origins": ["192.168.100.10"]}})
+CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -20,8 +17,8 @@ api = Api(app)
 
 
 # Serve React App
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@ app.route('/', defaults={'path': ''})
+@ app.route('/<path:path>')
 def serve(path):
     if path != "" and os.path.exists(app.static_folder + '/' + path):
         return send_from_directory(app.static_folder, path)
@@ -48,6 +45,7 @@ class withdrawThreeStar(Resource):
         result = threeStar_tt.withdrawThreeStar(request.get_json())
         return result
 
+
 class withdrawThreeStar_bsc(Resource):
     def post(self):
         result = threeStar_bsc.withdrawThreeStar_bsc(request.get_json())
@@ -56,13 +54,15 @@ class withdrawThreeStar_bsc(Resource):
 
 class getDividendInfo(Resource):
     def get(self):
-        dividends, APR, payout = threeStar_tt.getDividendInfo()
-        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+        dividends, APR, payout, totalStake, roundNumber = threeStar_tt.getDividendInfo()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": str(totalStake)}
+
 
 class getDividendInfo_bsc(Resource):
     def get(self):
-        dividends, APR, payout = threeStar_bsc.getDividendInfo_bsc()
-        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+        dividends, APR, payout, totalStake, roundNumber = threeStar_bsc.getDividendInfo_bsc()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": str(totalStake)}
+
 
 class claimPrize(Resource):
     def get(self):
@@ -77,14 +77,58 @@ class claimPrize(Resource):
         return {"result": result}
 
 
+class claimPrize_bsc(Resource):
+    def get(self):
+        prizeType = request.args.get("prizeType")
+        address = request.args.get("address")
+        result = threeStar_bsc.canClaimBool_bsc(prizeType, address)
+        return {"result": result}
+
+    def post(self):
+        data = request.get_json()
+        result = threeStar_bsc.claimPrize_bsc(data)
+        return {"result": result}
+
+
+class userPrizeList(Resource):
+    def get(self):
+        playerAddress = request.args.get("playerAddress")
+        result = threeStar_tt.getUserPrizeList(playerAddress)
+        return {"result": result}
+
+
+class userPrizeList_bsc(Resource):
+    def get(self):
+        playerAddress = request.args.get("playerAddress")
+        result = threeStar_bsc.getUserPrizeList(playerAddress)
+        return result
+
+
+class lastRound(Resource):
+    def get(self):
+        result = threeStar_tt.getLastRound()
+        return result
+
+
+class lastRound_bsc(Resource):
+    def get(self):
+        result = threeStar_bsc.getLastRound()
+        return result
+
+
 api.add_resource(startGame, '/api/startGame')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
 api.add_resource(withdrawThreeStar, '/master/withdraw')
 api.add_resource(claimPrize, '/api/claimPrize')
+api.add_resource(userPrizeList, '/api/userPrizeList')
+api.add_resource(lastRound, '/api/lastRound')
 
 api.add_resource(starGame_bsc, '/bsc/startGame')
 api.add_resource(getDividendInfo_bsc, '/bsc/getDividendInfo')
 api.add_resource(withdrawThreeStar_bsc, '/master/withdraw_bsc')
+api.add_resource(claimPrize_bsc, '/bsc/claimPrize')
+api.add_resource(userPrizeList_bsc, '/bsc/userPrizeList')
+api.add_resource(lastRound_bsc, '/bsc/lastRound')
 
 if __name__ == '__main__':
     app.run(app, debug=True, port=int(os.environ.get("PORT", 5000)))
