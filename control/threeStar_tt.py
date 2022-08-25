@@ -194,9 +194,9 @@ def getDividendInfo():
 def saveLastRound():
     try:
         dividend, APR, payout, totalStake, roundNumber = getDividendInfo()
-        print(dividendRoundInfo.saveDividendRound(
+        dividendRoundInfo.saveDividendRound(
             {"roundNumber": roundNumber, "payout": payout, "totalStake": totalStake, "APR": APR,
-             "dividend": dividend}))
+             "dividend": dividend})
         return "success"
     except:
         return "failed"
@@ -298,6 +298,7 @@ def claimPrize(*args):
 # get user all prize
 def getUserPrizeList(playerAddress):
     playerAddress = playerAddress.lower()
+
     userPrizeArray = userPrizeInfo.getUserPrizeByAddress(
         {"address": playerAddress})
     return userPrizeArray

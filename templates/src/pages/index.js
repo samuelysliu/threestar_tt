@@ -98,7 +98,6 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
       .then((value) => {
         const pathController = new PathController(value);
         setApiPath(pathController.getApiPath());
-        console.log(pathController.getApiPath());
         const threeStarcontractABI = ThreeStarABI.abi;
         const threeStarcontractAddress =
           pathController.getThreeStarContractAddress();
@@ -411,8 +410,6 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         Number(userPrizeList[i]['number']) > 0
       ) {
         setIsHaveCoupon(true);
-      } else {
-        setIsHaveCoupon(false);
       }
     }
   };
@@ -469,6 +466,9 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
   useEffect(() => {
     loadWeb3();
+    if (userInfo.account.length !== 0) {
+      checkBalance();
+    }
   }, [token]);
 
   const mainContainer = {

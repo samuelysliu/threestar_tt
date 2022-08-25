@@ -4,6 +4,7 @@ import tools
 
 col = dbInfo.userPrize(self='')
 
+
 class userPrizeInfo:
     def saveUserPrize(self):
         result = col.insert_one(
@@ -12,7 +13,8 @@ class userPrizeInfo:
 
         return result.inserted_id
         try:
-            result = col.insert_one({"address": self["address"], "prizeId": ObjectId(self["prizeId"]), "chainName": self["chainName"], "number": self["number"] ,"createdTime": tools.getTimeNow()})
+            result = col.insert_one({"address": self["address"], "prizeId": ObjectId(
+                self["prizeId"]), "chainName": self["chainName"], "number": self["number"], "createdTime": tools.getTimeNow()})
 
             return result.inserted_id
         except:
@@ -30,7 +32,8 @@ class userPrizeInfo:
             result = col.find()
             userPrizeArray = []
             for i in result:
-                userPrizeArray.append({"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"], "number": i["number"]})
+                userPrizeArray.append({"id": str(i["_id"]), "address": i["address"], "prizeId": str(
+                    i["prizeId"]), "chainName": i["chainName"], "number": i["number"]})
 
             return userPrizeArray
 
@@ -52,6 +55,7 @@ class userPrizeInfo:
 
             userPrizeArray = []
             for i in result:
+                print(i)
                 userPrizeArray.append(
                     {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"],
                      "number": i["number"]})
