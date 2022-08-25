@@ -90,6 +90,8 @@ function Dividend({ userInfo, connectWallet, token }) {
   const [lastAPR, setLastAPR] = useState('');
   const [lastDividend, setLastDividend] = useState('');
 
+  const [ttEarnRoundTitle, setTTEarnRoundTitle] = useState('');
+
   const checkContractInfo = () => {
     TSTokenContract.methods
       .allowance(userInfo.account, stakeContractAddress)
@@ -124,8 +126,15 @@ function Dividend({ userInfo, connectWallet, token }) {
             .call()
             .then(function (receipt) {
               if (receipt > 0) {
+                setTTEarnRoundTitle('Last');
                 setTodayClaimNum(web3.utils.fromWei(receipt, 'ether'));
                 setDisableDividends(false);
+              } else {
+                setTTEarnRoundTitle('Next');
+                setTodayClaimNum(
+                  (Number(dividends) * Number(isStaking)) /
+                    Number(totalStakeNow)
+                );
               }
             })
             .catch((error) => {});
@@ -456,7 +465,9 @@ function Dividend({ userInfo, connectWallet, token }) {
 
           <Row style={{ marginTop: '10px' }} className='claimBlock'>
             <Col style={{ textAlign: 'left' }}>
-              <font style={{ color: '#00B3F7' }}>TT Earn</font>
+              <font style={{ color: '#00B3F7' }}>
+                {ttEarnRoundTitle} TT Earn
+              </font>
               <br></br>
               <font>{todayClaimNum}</font>
             </Col>
