@@ -55,7 +55,6 @@ class userPrizeInfo:
 
             userPrizeArray = []
             for i in result:
-                print(i)
                 userPrizeArray.append(
                     {"id": str(i["_id"]), "address": i["address"], "prizeId": str(i["prizeId"]), "chainName": i["chainName"],
                      "number": i["number"]})

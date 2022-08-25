@@ -404,12 +404,17 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         Number(userPrizeList[i]['number']) > 0
       ) {
         setIsHaveCoupon(true);
+        break;
       } else if (
         token === 'BNB' &&
         userPrizeList[i]['chainName'] === 'bsc' &&
         Number(userPrizeList[i]['number']) > 0
       ) {
         setIsHaveCoupon(true);
+        break;
+      } else {
+        setIsHaveCoupon(true);
+        break;
       }
     }
   };

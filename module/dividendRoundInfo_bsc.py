@@ -35,8 +35,8 @@ class dividendRoundInfo:
                 result = col.find().sort("_id", -1).limit(1)
                 i = result[0]
                 return {"id": str(i["_id"]), "roundNumber": i["roundNumber"], "payout": i["payout"],
-                        "totalStake": i["totalStake"], "APR": i["APR"],
-                        "dividend": i["dividend"], "createdTime": i["createdTime"]}
+                        "totalStake": round(i["totalStake"], 5), "APR": i["APR"],
+                        "dividend": round(float(i["dividend"]), 5), "createdTime": i["createdTime"]}
             else:
                 return {"id": 0, "roundNumber": 0, "payout": 0,
                         "totalStake": 0, "APR": 0,

@@ -10,9 +10,9 @@ import datetime
 load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
-#CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-#CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-#CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
+# CORS(app, resources={"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+# CORS(app, resources={"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={"/master/.*": {"origins": ["192.168.100.10"]}})
 CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -21,8 +21,8 @@ api = Api(app)
 
 
 # Serve React App
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@ app.route('/', defaults={'path': ''})
+@ app.route('/<path:path>')
 def serve(path):
     if path != "" and os.path.exists(app.static_folder + '/' + path):
         return send_from_directory(app.static_folder, path)
