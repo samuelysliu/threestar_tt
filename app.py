@@ -10,10 +10,10 @@ import datetime
 load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
-# CORS(app, resources={"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-# CORS(app, resources={"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 CORS(app, resources={"/master/.*": {"origins": ["192.168.100.10"]}})
-CORS(app)
+# CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
