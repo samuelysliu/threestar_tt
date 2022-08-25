@@ -25,6 +25,39 @@ function Dividend({ userInfo, connectWallet, token }) {
   const [stakeContract, setStakeContract] = useState();
   const [stakeContractAddress, setStakeContractAddress] = useState();
 
+  const [stakeMax, setStakeMax] = useState(0);
+  const [unstakeMax, setUnstakeMax] = useState(0);
+
+  const [stakeAmount, setStakeAmount] = useState(0);
+  const [unstakeAmount, setUnstakeAmount] = useState(0);
+
+  const [dividends, setDividends] = useState(0);
+  const [APR, setAPR] = useState(0);
+  const [payout, setPayout] = useState(0);
+
+  const [disableDividends, setDisableDividends] = useState(true);
+
+  let totalAllowance = '10000000000000000000000000000';
+  const [unlockBool, setUnlockBool] = useState(true);
+
+  const [isStaking, setIsStaking] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isUnStaking, setIsUnStaking] = useState(false);
+
+  const [totalStakeNow, setTotalStakeNow] = useState(0);
+
+  const [detailOpen, setDetailOpen] = useState(false);
+  const { getCollapseProps, getToggleProps } = useCollapse({ detailOpen });
+
+  const [lastPayout, setLastPayout] = useState('');
+  const [lastTotalStake, setLastTotalStake] = useState('');
+  const [lastAPR, setLastAPR] = useState('');
+  const [lastDividend, setLastDividend] = useState('');
+
+  const [ttEarnRoundTitle, setTTEarnRoundTitle] = useState('');
+
   const [todayClaimNum, setTodayClaimNum] = useState(0);
 
   const loadWeb3 = () => {
@@ -58,39 +91,6 @@ function Dividend({ userInfo, connectWallet, token }) {
         console.log(error);
       });
   };
-
-  const [stakeMax, setStakeMax] = useState(0);
-  const [unstakeMax, setUnstakeMax] = useState(0);
-
-  const [stakeAmount, setStakeAmount] = useState(0);
-  const [unstakeAmount, setUnstakeAmount] = useState(0);
-
-  const [dividends, setDividends] = useState(0);
-  const [APR, setAPR] = useState(0);
-  const [payout, setPayout] = useState(0);
-
-  const [disableDividends, setDisableDividends] = useState(true);
-
-  let totalAllowance = '10000000000000000000000000000';
-  const [unlockBool, setUnlockBool] = useState(true);
-
-  const [isStaking, setIsStaking] = useState(false);
-  const [isClaiming, setIsClaiming] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isUnlocking, setIsUnlocking] = useState(false);
-  const [isUnStaking, setIsUnStaking] = useState(false);
-
-  const [totalStakeNow, setTotalStakeNow] = useState(0);
-
-  const [detailOpen, setDetailOpen] = useState(false);
-  const { getCollapseProps, getToggleProps } = useCollapse({ detailOpen });
-
-  const [lastPayout, setLastPayout] = useState('');
-  const [lastTotalStake, setLastTotalStake] = useState('');
-  const [lastAPR, setLastAPR] = useState('');
-  const [lastDividend, setLastDividend] = useState('');
-
-  const [ttEarnRoundTitle, setTTEarnRoundTitle] = useState('');
 
   const checkContractInfo = () => {
     TSTokenContract.methods
@@ -127,14 +127,11 @@ function Dividend({ userInfo, connectWallet, token }) {
             .then(function (receipt) {
               if (receipt > 0) {
                 setTTEarnRoundTitle('Last');
+                console.log(web3.utils.fromWei(receipt, 'ether'));
                 setTodayClaimNum(web3.utils.fromWei(receipt, 'ether'));
                 setDisableDividends(false);
               } else {
                 setTTEarnRoundTitle('Next');
-                setTodayClaimNum(
-                  (Number(dividends) * Number(isStaking)) /
-                    Number(totalStakeNow)
-                );
               }
             })
             .catch((error) => {});
@@ -253,6 +250,14 @@ function Dividend({ userInfo, connectWallet, token }) {
     }
     setIsConnecting(false);
   }, [userInfo]);
+
+  useEffect(() => {
+    if (ttEarnRoundTitle === 'Next') {
+      setTodayClaimNum(
+        (Number(dividends) * Number(isStaking)) / Number(totalStakeNow)
+      );
+    }
+  }, [dividends, isStaking, totalStakeNow]);
 
   const blockOneStyle = {
     border: '1px',
