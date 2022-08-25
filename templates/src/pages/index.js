@@ -413,7 +413,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         setIsHaveCoupon(true);
         break;
       } else {
-        setIsHaveCoupon(true);
+        setIsHaveCoupon(false);
         break;
       }
     }
