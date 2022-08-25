@@ -247,6 +247,8 @@ def withdrawThreeStar(*args):
 # if user can get daily check prize
 def canClaimBool(prizeType, address):
     prizeType = prizeType
+    address = address.lower()
+
     if prizeType == "double bonus":
         prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
         todayPrizeClaim = prizeClaimInfo.getTodayClaim(self="")
@@ -295,6 +297,7 @@ def claimPrize(*args):
 
 # get user all prize
 def getUserPrizeList(playerAddress):
+    playerAddress = playerAddress.lower()
     userPrizeArray = userPrizeInfo.getUserPrizeByAddress(
         {"address": playerAddress})
     return userPrizeArray
@@ -302,6 +305,7 @@ def getUserPrizeList(playerAddress):
 
 # check user have bonus but not use it only for check
 def isUserHaveBonus(playerAddress):
+    playerAddress = playerAddress.lower()
     userPrizeList = userPrizeInfo.getUserPrizeByAddress(
         {"address": playerAddress})
     for i in userPrizeList:
@@ -312,6 +316,7 @@ def isUserHaveBonus(playerAddress):
 
 # user using prize coupon
 def userUseBonus(playerAddress):
+    playerAddress = playerAddress.lower()
     userPrizeList = userPrizeInfo.getUserPrizeByAddress(
         {"address": playerAddress})
     for i in userPrizeList:
