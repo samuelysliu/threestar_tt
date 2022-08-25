@@ -146,9 +146,9 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     // user must choose five lucky number
     else if (userLuckyNumber.length === 5) {
       if (userInfo.balance < userBet) {
-        SetErrorMessage('Insufficient Balance');
+        setErrorMessage('Insufficient Balance');
         setTimeout(() => {
-          SetErrorMessage('');
+          setErrorMessage('');
         }, 6000);
       } else {
         setBetting(true);
@@ -158,7 +158,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
           .game()
           .send({
             from: userInfo.account,
-            value: web3.utils.toWei(String(0.1), 'ether'),
+            value: web3.utils.toWei(String(userBet), 'ether'),
           })
           .then(function (receipt) {
             axios
@@ -204,6 +204,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                     five: '1',
                   });
                 }, '6000');
+
+                checkPrizeList();
               })
               .catch((error) => {
                 setBetting(false);
