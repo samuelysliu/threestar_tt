@@ -25,6 +25,8 @@ function Dividend({ userInfo, connectWallet, token }) {
   const [stakeContract, setStakeContract] = useState();
   const [stakeContractAddress, setStakeContractAddress] = useState();
 
+  const [todayClaimNum, setTodayClaimNum] = useState(0);
+
   const loadWeb3 = () => {
     metaConnect
       .getChainId()
@@ -122,6 +124,7 @@ function Dividend({ userInfo, connectWallet, token }) {
             .call()
             .then(function (receipt) {
               if (receipt > 0) {
+                setTodayClaimNum(web3.utils.fromWei(receipt, 'ether'));
                 setDisableDividends(false);
               }
             })
@@ -453,9 +456,9 @@ function Dividend({ userInfo, connectWallet, token }) {
 
           <Row style={{ marginTop: '10px' }} className='claimBlock'>
             <Col style={{ textAlign: 'left' }}>
-              <font style={{ color: '#00B3F7' }}>TT Earned</font>
+              <font style={{ color: '#00B3F7' }}>TT Earn</font>
               <br></br>
-              <font>0.00000</font>
+              <font>{todayClaimNum}</font>
             </Col>
             <Col className='claimBtDiv'>
               {isClaiming ? (
