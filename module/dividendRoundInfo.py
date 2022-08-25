@@ -8,8 +8,7 @@ class dividendRoundInfo:
     def saveDividendRound(self):
         try:
             result = col.insert_one(
-                {"roundNumber": self["Round"], "payout": self["payout"], "totalStake": self["totalStake"],
-                 "APR": self["APR"], "dividend": self["dividend"], "createdTime": tools.getTimeNow()})
+                {"roundNumber": self["roundNumber"], "payout": self["payout"], "totalStake": float(self["totalStake"]), "APR": self["APR"], "dividend": self["dividend"], "createdTime": tools.getTimeNow()})
             return result.inserted_id
         except:
             return "failed"
@@ -31,8 +30,9 @@ class dividendRoundInfo:
 
     def getLastRound(self):
         try:
-            result = col.find().sort("_id", -1).limit(1)
-            if int(result.count()) > 0:
+            cursorLen = col.count_documents({})
+            if cursorLen > 0:
+                result = col.find().sort("_id", -1).limit(1)
                 i = result[0]
                 return {"id": str(i["_id"]), "roundNumber": i["roundNumber"], "payout": i["payout"],
                         "totalStake": i["totalStake"], "APR": i["APR"],
@@ -42,7 +42,9 @@ class dividendRoundInfo:
                         "totalStake": 0, "APR": 0,
                         "dividend": 0, "createdTime": 0}
         except:
-            return "failed"
+            return {"id": 0, "roundNumber": 0, "payout": 0,
+                    "totalStake": 0, "APR": 0,
+                    "dividend": 0, "createdTime": 0}
 
     def getRoundByNumber(self):
         try:

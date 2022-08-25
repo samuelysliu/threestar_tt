@@ -5,12 +5,15 @@ from flask_cors import CORS
 from control import threeStar_tt, threeStar_bsc
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
-CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={
+     r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={
+     r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 #CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
 CORS(app)
 
@@ -48,6 +51,7 @@ class withdrawThreeStar(Resource):
         result = threeStar_tt.withdrawThreeStar(request.get_json())
         return result
 
+
 class withdrawThreeStar_bsc(Resource):
     def post(self):
         result = threeStar_bsc.withdrawThreeStar_bsc(request.get_json())
@@ -59,10 +63,12 @@ class getDividendInfo(Resource):
         dividends, APR, payout, totalStake, roundNumber = threeStar_tt.getDividendInfo()
         return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": str(totalStake)}
 
+
 class getDividendInfo_bsc(Resource):
     def get(self):
         dividends, APR, payout, totalStake, roundNumber = threeStar_bsc.getDividendInfo_bsc()
         return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": str(totalStake)}
+
 
 class claimPrize(Resource):
     def get(self):
@@ -76,6 +82,7 @@ class claimPrize(Resource):
         result = threeStar_tt.claimPrize(data)
         return {"result": result}
 
+
 class claimPrize_bsc(Resource):
     def get(self):
         prizeType = request.args.get("prizeType")
@@ -88,11 +95,13 @@ class claimPrize_bsc(Resource):
         result = threeStar_bsc.claimPrize_bsc(data)
         return {"result": result}
 
+
 class userPrizeList(Resource):
     def get(self):
         playerAddress = request.args.get("playerAddress")
         result = threeStar_tt.getUserPrizeList(playerAddress)
         return {"result": result}
+
 
 class userPrizeList_bsc(Resource):
     def get(self):
@@ -100,15 +109,18 @@ class userPrizeList_bsc(Resource):
         result = threeStar_bsc.getUserPrizeList(playerAddress)
         return result
 
+
 class lastRound(Resource):
     def get(self):
         result = threeStar_tt.getLastRound()
         return result
 
+
 class lastRound_bsc(Resource):
     def get(self):
         result = threeStar_bsc.getLastRound()
         return result
+
 
 api.add_resource(startGame, '/api/startGame')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
