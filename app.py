@@ -4,6 +4,9 @@ from flask_restful import Api, Resource
 from flask_cors import CORS
 from control import threeStar_tt, threeStar_bsc
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
 CORS(app, resources={"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
