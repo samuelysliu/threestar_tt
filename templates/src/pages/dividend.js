@@ -254,7 +254,10 @@ function Dividend({ userInfo, connectWallet, token }) {
   useEffect(() => {
     if (ttEarnRoundTitle === 'Next') {
       setTodayClaimNum(
-        (Number(dividends) * Number(isStaking)) / Number(totalStakeNow)
+        (
+          (Number(dividends) * Number(unstakeMax)) /
+          Number(totalStakeNow)
+        ).toFixed(5)
       );
     }
   }, [dividends, isStaking, totalStakeNow]);
