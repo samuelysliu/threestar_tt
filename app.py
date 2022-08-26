@@ -34,7 +34,7 @@ def serve(path):
 
 @app.before_request
 def before_request():
-    print(request.url_root)
+    print(request.remote_addr)
     if not request.is_secure:
         return redirect(request.url.replace('http://', 'https://'))
 
