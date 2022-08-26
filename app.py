@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request, send_from_directory, Response
+from flask import Flask, request, send_from_directory, Response, redirect
 from flask_restful import Api, Resource
 from flask_cors import CORS
 from control.threeStar import threeStar
@@ -29,6 +29,14 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
+
+
+
+@app.before_request
+def before_request():
+    print(request.url_root)
+    if not request.is_secure:
+        return redirect(request.url.replace('http://', 'https://'))
 
 
 
