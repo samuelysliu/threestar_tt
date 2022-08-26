@@ -3,7 +3,8 @@ import random
 import os
 from dotenv import load_dotenv
 from control import blockchain
-import datetime, pytz
+import datetime
+import pytz
 import time
 from module.prizeInfo import prizeInfo
 from module.prizeClaimInfo import prizeClaimInfo
@@ -16,8 +17,10 @@ load_dotenv()
 
 owner = blockchain.getOwner()
 web3_bsc, chainID_bsc = blockchain.bsc()
-threeStarContractAddress_bsc, threeStarContract_bsc = blockchain.getThreeStarContract_bsc(web3_bsc)
-stakeContractAddress_bsc, stakeContract_bsc = blockchain.getStakeContract_bsc(web3_bsc)
+threeStarContractAddress_bsc, threeStarContract_bsc = blockchain.getThreeStarContract_bsc(
+    web3_bsc)
+stakeContractAddress_bsc, stakeContract_bsc = blockchain.getStakeContract_bsc(
+    web3_bsc)
 TSContractAddress_bsc, TSContract_bsc = blockchain.getTSToken_bsc(web3_bsc)
 
 
@@ -70,7 +73,8 @@ def getTodayDividend(web3, threeStarContractAddress):
 
 
 def game_bsc(*args):
-    transactionList = transactionInfo.getTransactionByHash({"hash": args[0]["hash"]})
+    transactionList = transactionInfo.getTransactionByHash(
+        {"hash": args[0]["hash"]})
     if blockchain.verifyHashInfo(web3_bsc, args[0]["hash"], threeStarContractAddress_bsc):
         if transactionList != "failed":
             for i in transactionList:
@@ -82,7 +86,8 @@ def game_bsc(*args):
         winTS = 0
         winTT = 0
 
-        contractRemain = blockchain.getOwnerRemain(web3_bsc, threeStarContract_bsc)
+        contractRemain = blockchain.getOwnerRemain(
+            web3_bsc, threeStarContract_bsc)
         playerAmount = args[0]["betNum"]
 
         while (cannotLose(point, contractRemain, playerAmount, isUserHaveBonus_bsc(args[0]["playerAddress"])) == False):
@@ -173,10 +178,13 @@ def getDividendInfo_bsc():
     APR = blockchain.getAPR(web3_bsc, dividend, stakeContract_bsc)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
-    totalStake = blockchain.getTotalStake(web3_bsc, TSContract_bsc, stakeContractAddress_bsc)
-    roundNumber = int(dividendRoundInfo.getLastRound(self='')["roundNumber"]) + 1
+    totalStake = blockchain.getTotalStake(
+        web3_bsc, TSContract_bsc, stakeContractAddress_bsc)
+    roundNumber = int(dividendRoundInfo.getLastRound(
+        self='')["roundNumber"]) + 1
 
     return str(dividend), APR, payout, totalStake, roundNumber
+
 
 def saveLastRound_bsc():
     try:
@@ -186,6 +194,7 @@ def saveLastRound_bsc():
         return "success"
     except:
         return "failed"
+
 
 def getLastRound():
     lastRound = dividendRoundInfo.getLastRound(self='')
@@ -200,11 +209,11 @@ def giveTSToken_bsc(receipient, amount):
         receipient = Web3.toChecksumAddress(receipient)
         transferTSToken = TSContract_bsc.functions.transfer(receipient,
                                                             web3_bsc.toWei(amount, "ether")).buildTransaction({
-            'from': owner['address'],
-            'gas': 1041586,
-            'gasPrice': web3_bsc.toWei('50', 'gwei'),
-            'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
-        })
+                                                                'from': owner['address'],
+                                                                'gas': 1041586,
+                                                                'gasPrice': web3_bsc.toWei('50', 'gwei'),
+                                                                'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
+                                                            })
 
         blockchain.sendTransaction(web3_bsc, transferTSToken)
         return "success"
@@ -217,11 +226,11 @@ def withdrawThreeStar_bsc(*args):
         try:
             threeStarWithdraw = threeStarContract_bsc.functions.withdraw(
                 web3_bsc.toWei(args[0]['amount'], "ether")).buildTransaction({
-                'from': owner['address'],
-                'gas': 1041586,
-                'gasPrice': web3_bsc.toWei('50', 'gwei'),
-                'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
-            })
+                    'from': owner['address'],
+                    'gas': 1041586,
+                    'gasPrice': web3_bsc.toWei('50', 'gwei'),
+                    'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
+                })
             blockchain.sendTransaction(web3_bsc, threeStarWithdraw)
         except:
             return {"result": "failed"}
@@ -233,6 +242,7 @@ def withdrawThreeStar_bsc(*args):
 
 def canClaimBool_bsc(prizeType, address):
     prizeType = prizeType
+    address = address.lower()
     if prizeType == "double bonus":
         prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
         todayPrizeClaim = prizeClaimInfo.getTodayClaim(self="")
@@ -253,17 +263,22 @@ def claimPrize_bsc(*args):
         if prizeType == "double bonus":
             if canClaimBool_bsc(prizeType, address):
                 prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
-                userHavePrizeList = userPrizeInfo.getUserPrizeByAddress({"address": address})
+                userHavePrizeList = userPrizeInfo.getUserPrizeByAddress(
+                    {"address": address})
                 for i in userHavePrizeList:
                     if i["prizeId"] == prizeId and i["chainName"] == "bsc":
                         myquery = {"_id": ObjectId(i["id"])}
                         newValues = {"$set": {"number": int(i["number"]) + 1}}
-                        userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
-                        prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "bsc"})
+                        userPrizeInfo.updateUserPrize(
+                            {"myquery": myquery, "newValues": newValues})
+                        prizeClaimInfo.savePrizeClaim(
+                            {"address": address, "prizeId": prizeId, "chainName": "bsc"})
                         return "success"
 
-                userPrizeInfo.saveUserPrize({"address": address, "prizeId": prizeId, "chainName": "bsc", "number": 1})
-                prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "bsc"})
+                userPrizeInfo.saveUserPrize(
+                    {"address": address, "prizeId": prizeId, "chainName": "bsc", "number": 1})
+                prizeClaimInfo.savePrizeClaim(
+                    {"address": address, "prizeId": prizeId, "chainName": "bsc"})
                 return "success"
             return "failed"
 
@@ -275,24 +290,32 @@ def claimPrize_bsc(*args):
 
 # get user all prize
 def getUserPrizeList(playerAddress):
-    userPrizeArray = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    playerAddress = playerAddress.lower()
+    userPrizeArray = userPrizeInfo.getUserPrizeByAddress(
+        {"address": playerAddress})
     return userPrizeArray
 
+
 def isUserHaveBonus_bsc(playerAddress):
-    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    playerAddress = playerAddress.lower()
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress(
+        {"address": playerAddress})
     for i in userPrizeList:
         if i["chainName"] == "bsc" and int(i["number"]) > 0:
             return True
     return False
 
 # user using prize coupon
+
+
 def userUseBonus_bsc(playerAddress):
     userPrizeList = getUserPrizeList(playerAddress)
     for i in userPrizeList:
         if i["chainName"] == "bsc" and int(i["number"]) > 0:
             myquery = {"_id": ObjectId(i["id"])}
             newValues = {"$set": {"number": int(i["number"]) - 1}}
-            userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+            userPrizeInfo.updateUserPrize(
+                {"myquery": myquery, "newValues": newValues})
             return True
 
     return False

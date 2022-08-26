@@ -3,7 +3,8 @@ import random
 import os
 from dotenv import load_dotenv
 from control import blockchain
-import datetime, pytz
+import datetime
+import pytz
 from module.prizeInfo import prizeInfo
 from module.prizeClaimInfo import prizeClaimInfo
 from module.userPrizeInfo import userPrizeInfo
@@ -15,7 +16,8 @@ load_dotenv()
 
 owner = blockchain.getOwner()
 web3, chainID = blockchain.thunderCore()
-threeStarContractAddress, threeStarContract = blockchain.getThreeStarContract(web3)
+threeStarContractAddress, threeStarContract = blockchain.getThreeStarContract(
+    web3)
 stakeContractAddress, stakeContract = blockchain.getStakeContract(web3)
 TSContractAddress, TSContract = blockchain.getTSToken(web3)
 
@@ -68,7 +70,8 @@ def countPoint(starNumber, userNumber):
 
 # start game
 def game(*args):
-    transactionList = transactionInfo.getTransactionByHash({"hash": args[0]["hash"]})
+    transactionList = transactionInfo.getTransactionByHash(
+        {"hash": args[0]["hash"]})
     if blockchain.verifyHashInfo(web3, args[0]["hash"], threeStarContractAddress):
         if transactionList != "failed":
             for i in transactionList:
@@ -80,7 +83,8 @@ def game(*args):
         winTS = 0
         winTT = 0
 
-        contractRemain = blockchain.getOwnerRemain(web3, threeStarContractAddress)
+        contractRemain = blockchain.getOwnerRemain(
+            web3, threeStarContractAddress)
         playerAmount = args[0]["betNum"]
 
         while (cannotLose(point, contractRemain, playerAmount, isUserHaveBonus(args[0]["playerAddress"])) == False):
@@ -178,8 +182,10 @@ def getDividendInfo():
     APR = blockchain.getAPR(web3, dividend, stakeContract)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
-    totalStake = blockchain.getTotalStake(web3, TSContract, stakeContractAddress)
-    roundNumber = int(dividendRoundInfo.getLastRound(self='')["roundNumber"]) + 1
+    totalStake = blockchain.getTotalStake(
+        web3, TSContract, stakeContractAddress)
+    roundNumber = int(dividendRoundInfo.getLastRound(
+        self='')["roundNumber"]) + 1
 
     return str(dividend), APR, payout, totalStake, roundNumber
 
@@ -198,10 +204,9 @@ def saveLastRound():
 
 def getLastRound():
     lastRound = dividendRoundInfo.getLastRound(self='')
-
     return {"roundNumber": lastRound["roundNumber"], "payout": lastRound["payout"],
             "totalStake": lastRound["totalStake"],
-            "APR": lastRound["APR"], "dividend": lastRound["dividend"], "createdTime": lastRound["createdTime"]}
+            "APR": lastRound["APR"], "dividend": lastRound["dividend"]}
 
 
 # function let owner transfer 3star token
@@ -226,10 +231,10 @@ def withdrawThreeStar(*args):
         try:
             threeStarWithdraw = threeStarContract.functions.withdraw(
                 web3.toWei(args[0]['amount'], "ether")).buildTransaction({
-                'from': owner['address'],
-                'gas': 1041586,
-                'nonce': web3.eth.get_transaction_count(owner['address']),
-            })
+                    'from': owner['address'],
+                    'gas': 1041586,
+                    'nonce': web3.eth.get_transaction_count(owner['address']),
+                })
             blockchain.sendTransaction(web3, threeStarWithdraw)
         except:
             return {"result": "failed"}
@@ -242,6 +247,8 @@ def withdrawThreeStar(*args):
 # if user can get daily check prize
 def canClaimBool(prizeType, address):
     prizeType = prizeType
+    address = address.lower()
+
     if prizeType == "double bonus":
         prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
         todayPrizeClaim = prizeClaimInfo.getTodayClaim(self="")
@@ -263,19 +270,22 @@ def claimPrize(*args):
         if prizeType == "double bonus":
             if canClaimBool(prizeType, address):
                 prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
-                userHavePrizeList = userPrizeInfo.getUserPrizeByAddress({"address": address})
+                userHavePrizeList = userPrizeInfo.getUserPrizeByAddress(
+                    {"address": address})
                 for i in userHavePrizeList:
                     if i["prizeId"] == prizeId and i["chainName"] == "thunderCore":
                         myquery = {"_id": ObjectId(i["id"])}
                         newValues = {"$set": {"number": int(i["number"]) + 1}}
-                        userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+                        userPrizeInfo.updateUserPrize(
+                            {"myquery": myquery, "newValues": newValues})
                         prizeClaimInfo.savePrizeClaim(
                             {"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
                         return "success"
 
                 userPrizeInfo.saveUserPrize(
                     {"address": address, "prizeId": prizeId, "chainName": "thunderCore", "number": 1})
-                prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
+                prizeClaimInfo.savePrizeClaim(
+                    {"address": address, "prizeId": prizeId, "chainName": "thunderCore"})
                 return "success"
             return "failed"
 
@@ -287,13 +297,18 @@ def claimPrize(*args):
 
 # get user all prize
 def getUserPrizeList(playerAddress):
-    userPrizeArray = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    playerAddress = playerAddress.lower()
+
+    userPrizeArray = userPrizeInfo.getUserPrizeByAddress(
+        {"address": playerAddress})
     return userPrizeArray
 
 
 # check user have bonus but not use it only for check
 def isUserHaveBonus(playerAddress):
-    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    playerAddress = playerAddress.lower()
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress(
+        {"address": playerAddress})
     for i in userPrizeList:
         if i["chainName"] == "thunderCore" and int(i["number"]) > 0:
             return True
@@ -302,12 +317,15 @@ def isUserHaveBonus(playerAddress):
 
 # user using prize coupon
 def userUseBonus(playerAddress):
-    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    playerAddress = playerAddress.lower()
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress(
+        {"address": playerAddress})
     for i in userPrizeList:
         if i["chainName"] == "thunderCore" and int(i["number"]) > 0:
             myquery = {"_id": ObjectId(i["id"])}
             newValues = {"$set": {"number": int(i["number"]) - 1}}
-            userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+            userPrizeInfo.updateUserPrize(
+                {"myquery": myquery, "newValues": newValues})
             return True
 
     return False

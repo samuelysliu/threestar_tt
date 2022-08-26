@@ -1,42 +1,42 @@
-svg{
-    cursor: pointer
+svg {
+  cursor: pointer;
 }
 
-.blockFour{
-    margin-top: 10px;
+.blockFour {
+  margin-top: 10px;
 }
 
 .card {
-    border: 1px;
-    border-style: solid;
-    border-color: #669BFD;
-    border-radius: 10px;
-    background-color: white;
-    margin-top: 10px;
+  border: 1px;
+  border-style: solid;
+  border-color: #669bfd;
+  border-radius: 10px;
+  background-color: white;
+  margin-top: 10px;
 }
 
 .longButton {
-    background-color: #669BFD;
-    border-color: #669BFD;
-    width: 98%;
-    border-radius: 10px;
+  background-color: #669bfd;
+  border-color: #669bfd;
+  width: 98%;
+  border-radius: 10px;
 }
 
 .claimBlock {
-    font-weight: bolder;
+  font-weight: 500;
 }
 
 .claimBlock button {
-    width: 100%;
-    line-height: 1.1;
+  width: 100%;
+  line-height: 1.1;
 }
 
-.claimBtDiv{
-    text-align: right;
-    margin-right: 4px;
+.claimBtDiv {
+  text-align: right;
+  margin-right: 4px;
 }
 
-.detailBlock{
-    cursor: pointer;
-    color: #00B3F7
+.detailBlock {
+  cursor: pointer;
+  color: #00b3f7;
 }
