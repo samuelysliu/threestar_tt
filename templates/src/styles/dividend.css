@@ -1,0 +1,42 @@
+svg{
+    cursor: pointer
+}
+
+.blockFour{
+    margin-top: 10px;
+}
+
+.card {
+    border: 1px;
+    border-style: solid;
+    border-color: #669BFD;
+    border-radius: 10px;
+    background-color: white;
+    margin-top: 10px;
+}
+
+.longButton {
+    background-color: #669BFD;
+    border-color: #669BFD;
+    width: 98%;
+    border-radius: 10px;
+}
+
+.claimBlock {
+    font-weight: bolder;
+}
+
+.claimBlock button {
+    width: 100%;
+    line-height: 1.1;
+}
+
+.claimBtDiv{
+    text-align: right;
+    margin-right: 4px;
+}
+
+.detailBlock{
+    cursor: pointer;
+    color: #00B3F7
+}

@@ -9,6 +9,10 @@ import ThreeStarTokenABI from '../abi/threeStarTokenABI.json';
 import StakingRewardABI from '../abi/stakingRewardABI.json';
 import { PathController } from '../components/pathController';
 import { ConnectWallet } from '../components/connectWallet'
+import { FiExternalLink } from 'react-icons/fi'
+import "../styles/dividend.css"
+import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai'
+import useCollapse from 'react-collapsed'
 
 function Dividend({ userInfo, connectWallet, token }) {
     const metaConnect = new ConnectWallet()
@@ -60,10 +64,19 @@ function Dividend({ userInfo, connectWallet, token }) {
     const [isUnlocking, setIsUnlocking] = useState(false)
     const [isUnStaking, setIsUnStaking] = useState(false)
 
+    const [totalStakeNow, setTotalStakeNow] = useState(0)
+
+    const [detailOpen, setDetailOpen] = useState(false)
+    const { getCollapseProps, getToggleProps } = useCollapse({ detailOpen })
+
+    const [lastPayout, setLastPayout] = useState("")
+    const [lastTotalStake, setLastTotalStake] = useState("")
+    const [lastAPR, setLastAPR] = useState("")
+    const [lastDividend, setLastDividend] = useState("")
 
     const checkContractInfo = () => {
         TSTokenContract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
-            if (receipt >= 10000000000000000000000000) {
+            if (receipt >= 100000000000000000000000) {
                 setUnlockBool(false);
                 TSTokenContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
                     setStakeMax(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
@@ -140,23 +153,29 @@ function Dividend({ userInfo, connectWallet, token }) {
 
     useEffect(() => {
         loadWeb3();
-    }, [token])
 
-    useEffect(() => {
         if (apiPath !== "") {
             axios.get(apiPath + "/getDividendInfo").then(res => {
                 setDividends(res['data']['dividends'])
                 setAPR(res['data']['APR'])
                 setPayout(res['data']['payout'])
+                setTotalStakeNow(res['data']['totalStake'])
             }).catch(error => {
                 console.log(error)
             });
+
+            axios.get(apiPath + "/lastRound").then(res => {
+                setLastPayout(res['data']['payout'])
+                setLastTotalStake(res['data']['totalStake'])
+                setLastAPR(res['data']['APR'])
+                setLastDividend(res['data']['dividend'])
+            }).catch(error => console.log(error))
 
             if (userInfo.account.length !== 0) {
                 checkContractInfo();
             }
         }
-    }, [apiPath])
+    }, [token])
 
     useEffect(() => {
         if (userInfo.account.length !== 0) {
@@ -164,15 +183,6 @@ function Dividend({ userInfo, connectWallet, token }) {
         }
         setIsConnecting(false)
     }, [userInfo])
-
-    const card = {
-        border: "1px",
-        borderStyle: "solid",
-        borderColor: "#669BFD",
-        borderRadius: "10px",
-        backgroundColor: "white",
-        marginTop: "10px"
-    }
 
     const blockOneStyle = {
         border: "1px",
@@ -183,10 +193,6 @@ function Dividend({ userInfo, connectWallet, token }) {
         borderTop: "none",
         marginTop: "10px",
         paddingBottom: "10px"
-    }
-
-    const blockTwoStyle = {
-        marginTop: "10px",
     }
 
     const blockThreeStyle = {
@@ -202,22 +208,10 @@ function Dividend({ userInfo, connectWallet, token }) {
         paddingBottom: "10px"
     }
 
-    const blockFourStyle = {
-        marginTop: "10px",
-        marginBottom: "50px"
-    }
-
     const blockFiveStyle = {
         marginTop: "10px",
         marginLeft: "10px",
         marginRight: "10px",
-    }
-
-    const longButtonStyle = {
-        backgroundColor: "#669BFD",
-        borderColor: "#669BFD",
-        width: "98%",
-        borderRadius: "10px"
     }
 
     return (
@@ -227,7 +221,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                 <font style={{ fontSize: "26px" }}><font style={{ color: "#669BFD" }}>3Star </font><font>Dividend</font></font>
                 <br></br>
                 <font style={{ fontSize: "15px" }}>Stake 3Star to earn {token}</font>
-                <Container style={card}>
+                <Container className="card">
                     <Row style={blockOneStyle}>
                         <Col xs={2} sm={2}><img src={ThreeStarToken} width="50px"></img></Col>
                         <Col xs={4} sm={4} style={{ textAlign: "left" }}>
@@ -241,7 +235,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                             <font style={{ fontSize: "22px" }}>{dividends} {token}</font>
                         </Col>
                     </Row>
-                    <Row style={blockTwoStyle}>
+                    <Row style={{ marginTop: "10px" }}>
                         <Col style={{ fontSize: "15px", textAlign: "left" }}>APR</Col>
                         <Col style={{ fontSize: "15px", textAlign: "right" }}>{APR}</Col>
                     </Row>
@@ -249,17 +243,24 @@ function Dividend({ userInfo, connectWallet, token }) {
                         <Col style={{ fontSize: "15px", textAlign: "left" }}>Next Payout</Col>
                         <Col style={{ fontSize: "15px", textAlign: "right" }}>{payout}</Col>
                     </Row>
+                    <Row>
+                        <Col style={{ fontSize: "15px", textAlign: "left" }}>Total Staked</Col>
+                        <Col style={{ fontSize: "15px", textAlign: "right" }}>{totalStakeNow}</Col>
+                    </Row>
+                    <Row style={{ marginBottom: "10px" }}>
+                        <Col style={{ fontSize: "15px", textAlign: "left" }}><a href='https://ttswap.space/#/swap/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186' style={{ color: "black" }}><u>Get 3Star-TT LP<FiExternalLink /></u></a></Col>
+                    </Row>
 
                     {userInfo.account.length === 0
                         ?
                         <Row>
                             <Col>
                                 {isConnecting ?
-                                    <Button disabled={true} style={longButtonStyle}>
+                                    <Button disabled={true} className="longButton">
                                         <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
                                         Loading...
                                     </Button>
-                                    : <Button style={longButtonStyle} onClick={() => { setIsConnecting(true); connectWallet().then(value => { setIsConnecting(false) }).catch(error => { setIsConnecting(false) }) }}>Connect Wallet</Button>
+                                    : <Button className="longButton" onClick={() => { setIsConnecting(true); connectWallet().then(value => { setIsConnecting(false) }).catch(error => { setIsConnecting(false) }) }}>Connect Wallet</Button>
                                 }
                             </Col>
                         </Row>
@@ -268,11 +269,11 @@ function Dividend({ userInfo, connectWallet, token }) {
                             <Row>
                                 <Col>
                                     {isUnlocking ?
-                                        <Button disabled={true} style={longButtonStyle}>
+                                        <Button disabled={true} className="longButton">
                                             <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
                                             Loading...
                                         </Button>
-                                        : <Button style={longButtonStyle} onClick={unlock}>Unlock</Button>}
+                                        : <Button className="longButton" onClick={unlock}>Unlock</Button>}
                                 </Col>
                             </Row>
                             :
@@ -298,7 +299,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                                 />
                                 Loading...
                             </Button>
-                                : <Button disabled={stakeAmount > stakeMax} style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
+                                : <Button disabled={stakeAmount > stakeMax || stakeAmount < 1} style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
                             }
 
 
@@ -309,55 +310,87 @@ function Dividend({ userInfo, connectWallet, token }) {
                             </font>
                         </Col>
                     </Row>
-                    <Row style={blockThreeStyle}>
-                        <Col xs={5} sm={5} style={{ textAlign: "left" }}>
-                            <font style={{ fontSize: "13px", color: "#669BFD" }}>Staked 3Star</font>
-                            <br></br>
-                            <font style={{ fontSize: "15px" }}><Form.Control value={unstakeAmount} style={{ border: "0px" }} type="number" onChange={(e) => { setUnstakeAmount(e.target.value) }} /></font>
-                        </Col>
-                        <Col style={{ textAlign: "right", }}>
-                            <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setUnstakeAmount(unstakeMax) }}>Max: {unstakeMax}</font>
-                            <br></br>
-                            {isUnStaking ?
-                                <Button disabled={true} style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }}>
-                                    <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-                                    Loading...
-                                </Button>
-                                : <Button disabled={unstakeAmount > unstakeMax} variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={unstake}>Unstake</Button>
-                            }
 
+                    <Row style={{ marginTop: "10px" }} className="claimBlock">
+                        <Col style={{ textAlign: "left" }}>
+                            <font style={{ color: "#00B3F7" }}>TT Earned</font>
                             <br></br>
-                            <font style={{ fontSize: "12px", color: "#FF0000" }}>
-                                {unstakeAmount > unstakeMax ? "Insufficient balance"
-                                    : ""}
-                            </font>
+                            <font>0.00000</font>
                         </Col>
-                    </Row>
-                    <Row style={blockTwoStyle}>
-                        <Col>
+                        <Col className="claimBtDiv">
                             {isClaiming ?
-                                <Button disabled={true} style={longButtonStyle}>
+                                <Button disabled={true}>
                                     <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
                                     Loading...
                                 </Button>
-                                : <Button disabled={disableDividends} style={longButtonStyle} onClick={claimDevidends}>Claim Dividends</Button>
+                                : <Button disabled={disableDividends} onClick={claimDevidends}>Claim</Button>
                             }
                         </Col>
                     </Row>
-                    <Row style={blockFourStyle}>
+                    <Row style={{ marginTop: "10px" }}>
                         <Col><p style={{ color: "red", fontSize: "12px" }}>*Dividends must be claimed within 1 day</p></Col>
                     </Row>
+
+                    <Row className='detailBlock'>
+                        {detailOpen
+                            ? <Col {...getToggleProps({ onClick: () => setDetailOpen(false), })} >Detail <AiOutlineDown /></Col>
+                            : <Col {...getToggleProps({ onClick: () => setDetailOpen(true), })}>Detail <AiOutlineUp /></Col>
+                        }
+                    </Row>
+                    <div {...getCollapseProps()}>
+                        <Row style={blockThreeStyle}>
+                            <Col xs={5} sm={5} style={{ textAlign: "left" }}>
+                                <font style={{ fontSize: "13px", color: "#669BFD" }}>Staked 3Star</font>
+                                <br></br>
+                                <font style={{ fontSize: "15px" }}><Form.Control value={unstakeAmount} style={{ border: "0px" }} type="number" onChange={(e) => { setUnstakeAmount(e.target.value) }} /></font>
+                            </Col>
+                            <Col style={{ textAlign: "right", }}>
+                                <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setUnstakeAmount(unstakeMax) }}>Max: {unstakeMax}</font>
+                                <br></br>
+                                {isUnStaking ?
+                                    <Button disabled={true} style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }}>
+                                        <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+                                        Loading...
+                                    </Button>
+                                    : <Button disabled={unstakeAmount > unstakeMax} variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={unstake}>Unstake</Button>
+                                }
+
+                                <br></br>
+                                <font style={{ fontSize: "12px", color: "#FF0000" }}>
+                                    {unstakeAmount > unstakeMax ? "Insufficient balance"
+                                        : ""}
+                                </font>
+                            </Col>
+                        </Row>
+
+                        <Row style={{ marginTop: "10px" }}>
+                            <Col style={{ fontSize: "15px", textAlign: "left" }}>Last Payout</Col>
+                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastPayout}</Col>
+                        </Row>
+                        <Row>
+                            <Col style={{ fontSize: "15px", textAlign: "left" }}>Total Staked</Col>
+                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastTotalStake}</Col>
+                        </Row>
+                        <Row>
+                            <Col style={{ fontSize: "15px", textAlign: "left" }}>APR</Col>
+                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastAPR}</Col>
+                        </Row>
+                        <Row style={{ marginBottom: "10px" }}>
+                            <Col style={{ fontSize: "15px", textAlign: "left" }}>Dividends</Col>
+                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastDividend}</Col>
+                        </Row>
+                    </div>
                 </Container>
 
-                <Container style={card}>
+                <Container className="card">
                     <Row style={blockOneStyle}>
                         <Col><font style={{ fontSize: "26px" }}>Get <font style={{ color: "#669BFD" }}>3Star</font></font></Col>
                     </Row>
                     <Row style={blockFiveStyle}>
                         <Col><font>You can also get <font style={{ color: "#669BFD" }}>3Star</font> tokens, by playing the games!</font></Col>
                     </Row>
-                    <Row style={blockFourStyle}>
-                        <Col><a href='/'><Button style={longButtonStyle}>Go to play</Button></a></Col>
+                    <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
+                        <Col><a href='/'><Button className="longButton">Go to play</Button></a></Col>
                     </Row>
                 </Container>
             </Container>

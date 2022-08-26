@@ -5,7 +5,12 @@ from dotenv import load_dotenv
 from control import blockchain
 import datetime, pytz
 import time
+from module.prizeInfo import prizeInfo
+from module.prizeClaimInfo import prizeClaimInfo
+from module.userPrizeInfo import userPrizeInfo
+from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
+from module.dividendRoundInfo_bsc import dividendRoundInfo
 
 load_dotenv()
 
@@ -15,7 +20,10 @@ threeStarContractAddress_bsc, threeStarContract_bsc = blockchain.getThreeStarCon
 stakeContractAddress_bsc, stakeContract_bsc = blockchain.getStakeContract_bsc(web3_bsc)
 TSContractAddress_bsc, TSContract_bsc = blockchain.getTSToken_bsc(web3_bsc)
 
-def cannotLose(point, contractRemain, playerAmount):
+
+def cannotLose(point, contractRemain, playerAmount, userHaveBonus):
+    if userHaveBonus:
+        playerAmount = playerAmount * 2
     point -= 2
     if (point > 0):
         if (point == 1):
@@ -32,6 +40,7 @@ def cannotLose(point, contractRemain, playerAmount):
 
     return True
 
+
 def createRandom():
     randomNumber = [random.randint(1, 80)]
     while len(randomNumber) < 20:
@@ -45,6 +54,7 @@ def createRandom():
     randomNumber = sorted(randomNumber)
     return randomNumber
 
+
 def countPoint(starNumber, userNumber):
     point = 0
     for i in starNumber:
@@ -53,9 +63,11 @@ def countPoint(starNumber, userNumber):
                 point += 1
     return point
 
+
 def getTodayDividend(web3, threeStarContractAddress):
     ownerRemain = blockchain.getOwnerRemain(web3, threeStarContractAddress)
     return round(ownerRemain * 20 / 100, 5)
+
 
 def game_bsc(*args):
     transactionList = transactionInfo.getTransactionByHash({"hash": args[0]["hash"]})
@@ -73,7 +85,7 @@ def game_bsc(*args):
         contractRemain = blockchain.getOwnerRemain(web3_bsc, threeStarContract_bsc)
         playerAmount = args[0]["betNum"]
 
-        while (cannotLose(point, contractRemain, playerAmount) == False):
+        while (cannotLose(point, contractRemain, playerAmount, isUserHaveBonus_bsc(args[0]["playerAddress"])) == False):
             starNumber = createRandom()
             point = countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
 
@@ -85,13 +97,25 @@ def game_bsc(*args):
                 winTT = playerAmount * 99 / 100 * 20
             elif point == 5:
                 winTT = playerAmount * 99 / 100 * 100
+
+            if userUseBonus_bsc(args[0]["playerAddress"]):
+                giveBNB(args[0]["playerAddress"], winTT)
+                winTT = winTT*2
+
         else:
-            giveTSToken_bsc(args[0]["playerAddress"], playerAmount * 200)
-            winTS = playerAmount * 200
+            winTS = float(playerAmount) * 0.004
+            giveTSToken_bsc(args[0]["playerAddress"], winTS)
+            if userUseBonus_bsc(args[0]["playerAddress"]):
+                giveTSToken_bsc(args[0]["playerAddress"], winTS)
+                winTS = winTS*2
+
+        transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"],
+                                         "chainName": "thunderCore", "betAmount": playerAmount, "winTT": winTT})
 
         return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
     else:
         return {"point": 0, "starNumber": [0], "winTS": 0, "winTT": 0}
+
 
 def sendPrize_bsc(winner, point):
     winner = Web3.toChecksumAddress(winner)
@@ -107,6 +131,7 @@ def sendPrize_bsc(winner, point):
 
     result = blockchain.sendTransaction(web3_bsc, contractSendPrize)
     return result
+
 
 def setReward_bsc():
     try:
@@ -142,13 +167,33 @@ def setReward_bsc():
     except:
         return "contract insufficient balance"
 
+
 def getDividendInfo_bsc():
     dividend = getTodayDividend(web3_bsc, threeStarContractAddress_bsc)
-    APR = blockchain.getAPR_bsc(web3_bsc, dividend)
+    APR = blockchain.getAPR(web3_bsc, dividend, stakeContract_bsc)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
+    totalStake = blockchain.getTotalStake(web3_bsc, TSContract_bsc, stakeContractAddress_bsc)
+    roundNumber = int(dividendRoundInfo.getLastRound(self='')["roundNumber"]) + 1
 
-    return str(dividend), APR, payout
+    return str(dividend), APR, payout, totalStake, roundNumber
+
+def saveLastRound_bsc():
+    try:
+        dividend, APR, payout, totalStake, roundNumber = getDividendInfo_bsc()
+        dividendRoundInfo.saveDividendRound({"roundNumber": roundNumber, "payout": payout, "totalStake": totalStake, "APR": APR,
+                                             "dividend": dividend})
+        return "success"
+    except:
+        return "failed"
+
+def getLastRound():
+    lastRound = dividendRoundInfo.getLastRound(self='')
+
+    return {"roundNumber": lastRound["roundNumber"], "payout": lastRound["payout"],
+            "totalStake": lastRound["totalStake"],
+            "APR": lastRound["APR"], "dividend": lastRound["dividend"], "createdTime": lastRound["createdTime"]}
+
 
 def giveTSToken_bsc(receipient, amount):
     try:
@@ -165,6 +210,7 @@ def giveTSToken_bsc(receipient, amount):
         return "success"
     except:
         return "failed"
+
 
 def withdrawThreeStar_bsc(*args):
     if args[0]['privateKey'] == os.getenv("privateKey"):
@@ -183,3 +229,87 @@ def withdrawThreeStar_bsc(*args):
         return {"result": "success"}
     else:
         return {"result": "failed"}
+
+
+def canClaimBool_bsc(prizeType, address):
+    prizeType = prizeType
+    if prizeType == "double bonus":
+        prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
+        todayPrizeClaim = prizeClaimInfo.getTodayClaim(self="")
+        if todayPrizeClaim != "failed":
+            for i in todayPrizeClaim:
+                if address == i["address"] and "bsc" == i["chainName"] and prizeId == str(i["prizeId"]):
+                    return False
+            return True
+        else:
+            return False
+
+
+def claimPrize_bsc(*args):
+    try:
+        prizeType = args[0]["prizeType"]
+        address = args[0]["address"]
+
+        if prizeType == "double bonus":
+            if canClaimBool_bsc(prizeType, address):
+                prizeId = prizeInfo.getPrizeByName({"name": prizeType})["id"]
+                userHavePrizeList = userPrizeInfo.getUserPrizeByAddress({"address": address})
+                for i in userHavePrizeList:
+                    if i["prizeId"] == prizeId and i["chainName"] == "bsc":
+                        myquery = {"_id": ObjectId(i["id"])}
+                        newValues = {"$set": {"number": int(i["number"]) + 1}}
+                        userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+                        prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "bsc"})
+                        return "success"
+
+                userPrizeInfo.saveUserPrize({"address": address, "prizeId": prizeId, "chainName": "bsc", "number": 1})
+                prizeClaimInfo.savePrizeClaim({"address": address, "prizeId": prizeId, "chainName": "bsc"})
+                return "success"
+            return "failed"
+
+        else:
+            return "failed"
+    except:
+        return "failed"
+
+
+# get user all prize
+def getUserPrizeList(playerAddress):
+    userPrizeArray = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    return userPrizeArray
+
+def isUserHaveBonus_bsc(playerAddress):
+    userPrizeList = userPrizeInfo.getUserPrizeByAddress({"address": playerAddress})
+    for i in userPrizeList:
+        if i["chainName"] == "bsc" and int(i["number"]) > 0:
+            return True
+    return False
+
+# user using prize coupon
+def userUseBonus_bsc(playerAddress):
+    userPrizeList = getUserPrizeList(playerAddress)
+    for i in userPrizeList:
+        if i["chainName"] == "bsc" and int(i["number"]) > 0:
+            myquery = {"_id": ObjectId(i["id"])}
+            newValues = {"$set": {"number": int(i["number"]) - 1}}
+            userPrizeInfo.updateUserPrize({"myquery": myquery, "newValues": newValues})
+            return True
+
+    return False
+
+
+def giveBNB(receipient, amount):
+    try:
+        receipient = Web3.toChecksumAddress(receipient)
+        tx = {
+            'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
+            'to': receipient,
+            'value': web3_bsc.toWei(amount, 'ether'),
+            'gas': 6721975,
+            'gasPrice': web3_bsc.toWei('50', 'gwei'),
+            'chainId': int(chainID_bsc)
+        }
+        blockchain.sendTransaction(web3_bsc, tx)
+        return "success"
+    except:
+        return "failed"

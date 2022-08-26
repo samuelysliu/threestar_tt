@@ -100,8 +100,6 @@ def sendTransaction(web3, transaction):
     except Exception:
         return "failed"
 
-
-
 def getOwnerRemain(web3, contractAddress):
     ownerRemain = web3.fromWei(web3.eth.get_balance(contractAddress), 'ether')
     return ownerRemain
@@ -111,19 +109,9 @@ def getPlayerAmount(web3, contract, playerAddress):
     return playerAmount
 
 
-def getAPR(web3, dividends):
-    stakeContractAddress, stakeContract = getStakeContract(web3)
-    totalSupply = web3.fromWei(stakeContract.functions.totalSupply().call(), 'ether')
+def getAPR(web3, dividends, stakeContract):
     try:
-        return str(round(dividends * 365 / totalSupply, 2)) + '%'
-    except:
-        return '0%'
-
-
-def getAPR_bsc(web3, dividends):
-    stakeContractAddress, stakeContract = getStakeContract_bsc(web3)
-    totalSupply = web3.fromWei(stakeContract.functions.totalSupply().call(), 'ether')
-    try:
+        totalSupply = web3.fromWei(stakeContract.functions.totalSupply().call(), 'ether')
         return str(round(dividends * 365 / totalSupply, 2)) + '%'
     except:
         return '0%'
@@ -138,3 +126,10 @@ def verifyHashInfo(web3, hash, contractAddress):
             return False
     except:
         return False
+
+def getTotalStake(web3, TSTokenContract, stakeContractAddress):
+    try:
+        totalStake = web3.fromWei(TSTokenContract.functions.balanceOf(stakeContractAddress).call(), 'ether')
+        return totalStake
+    except:
+        return "failed"

@@ -18,6 +18,9 @@ import UseWindowSize from '../components/useWindowSize'
 import { ConnectWallet } from '../components/connectWallet'
 import BNBTokenImage from '../images/BNB.png'
 import WinRule from '../components/winRule';
+import PrizePopUp from '../components/prizePopUp';
+import GiftIcon from '../images/gift.png'
+import BonusNumber from '../components/bonusNumber';
 
 function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const metaConnect = new ConnectWallet()
@@ -45,7 +48,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const [userNumberColor, setUserNumberColor] = useState({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
 
     const [walletConnecting, setWalletConnecting] = useState(false)
-    const [errorMessage, SetErrorMessage] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
 
     const { width, height } = UseWindowSize();
 
@@ -54,6 +57,12 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const infoRef = useRef(null);
 
     const TTTokenImage = "https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=1.25,format=auto/https%3A%2F%2F1384322056-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FHVry7OTN1UZzjjhTeYXg%252Ficon%252Ftc2CvK0iK8pBB1anEcAT%252F10990.png%3Falt%3Dmedia%26token%3Dd308595a-a25f-4dc2-bd7e-8237f6d9f8e1"
+
+    const [prizePopUpShow, setPrizePopUpShow] = useState(false)
+    const [isClaiming, setIsClaiming] = useState(false)
+    const [isClaimDone, setIsClaimDone] = useState(false)
+    const [todayNotClaim, setTodayNotClaim] = useState(false)
+    const [isHaveCoupon, setIsHaveCoupon] = useState(false)
 
     let web3 = new Web3(window.ethereum);
 
@@ -87,18 +96,18 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     const startGame = () => {
         if (userInfo.account.length === 0) {
             connectWallet()
-            SetErrorMessage("Invalid Wallet")
+            setErrorMessage("Invalid Wallet")
             setTimeout(() => {
-                SetErrorMessage("")
+                setErrorMessage("")
             }, 6000)
         }
 
         // user must choose five lucky number
         else if (userLuckyNumber.length === 5) {
             if (userInfo.balance < userBet) {
-                SetErrorMessage("Insufficient Balance")
+                setErrorMessage("Insufficient Balance")
                 setTimeout(() => {
-                    SetErrorMessage("")
+                    setErrorMessage("")
                 }, 6000)
             } else {
                 setBetting(true)
@@ -127,7 +136,9 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                             setStatusMessage("YOU WILL WIN " + token)
                             setUserNumberColor({ "one": "1", "two": "1", "three": "1", "four": "1", "five": "1" })
                         }, "6000")
-                        
+
+                        checkPrizeList()
+
                     }).catch(error => {
                         setBetting(false)
                     })
@@ -251,7 +262,51 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             console.log(error);
         })
 
+        checkPrizeList()
 
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value)
+            axios.get(pathController.getApiPath() + "/claimPrize?prizeType=double bonus&address=" + userInfo.account).then(res => {
+                setPrizePopUpShow(res["data"]["result"])
+                setTodayNotClaim(res["data"]["result"])
+            }).catch(error => { console.log(error) })
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    const checkIfHaveCoupon = (userPrizeList) => {
+        for (let i = 0; i < userPrizeList.length; i++) {
+            if (token === "TT" && userPrizeList[i]["chainName"] === "thunderCore" && Number(userPrizeList[i]["number"]) > 0) {
+                setIsHaveCoupon(true)
+            } else if (token === "BNB" && userPrizeList[i]["chainName"] === "bsc" && Number(userPrizeList[i]["number"]) > 0) {
+                setIsHaveCoupon(true)
+            } else {
+                setIsHaveCoupon(false)
+            }
+        }
+    }
+
+    const claimBonus = () => {
+        if (userInfo.account.length === 0) {
+            setErrorMessage("invalid wallet")
+            setTimeout(() => {
+                setErrorMessage("")
+            }, 6000)
+        } else {
+            setIsClaiming(true)
+            axios.post(apiPath + "/claimPrize", { "prizeType": "double bonus", "address": userInfo.account }).then(res => {
+                setIsClaimDone(true)
+                setTodayNotClaim(false)
+                checkPrizeList()
+            }).catch(error => console.log(error))
+        }
+    }
+
+    const checkPrizeList = () => {
+        axios.get(apiPath + "/userPrizeList?playerAddress=" + userInfo.account).then(res => {
+            checkIfHaveCoupon(res["data"]["result"])
+        }).catch(error => { console.log(error) })
     }
 
     useEffect(() => {
@@ -269,7 +324,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
             checkBalance()
             setWalletConnecting(false)
         }
-    }, [userInfo])
+    }, [apiPath, userInfo])
 
     useEffect(() => {
         loadWeb3()
@@ -334,27 +389,17 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         }
     }
 
-    const infoStyle = {
-        backgroundColor: "white",
-        color: "black",
-        width: "210px",
-        fontSize: "12px",
-        borderRadius: "5px",
-        height: "30px",
-        display: "flex",
-        alignItems: "center"
-    }
-
-
     return (
         <>
             <Sidebar />
+            <PrizePopUp show={prizePopUpShow} setShow={setPrizePopUpShow} isClaiming={isClaiming} isClaimDone={isClaimDone} claimBonus={claimBonus} />
             <div style={{ margin: "auto", marginLeft: "20px", marginRight: "20px" }}>
                 <div style={{ backgroundColor: "#1AB3FF", margin: "auto", marginTop: "10px", borderRadius: "6px", maxWidth: "720px" }}>
                     <Container style={mainContainer}>
                         <Row style={{ paddingTop: "5px" }}>
-                            <Col xs={{ span: 6, offset: 3 }}><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
-                            <Col xs={{ span: 2, offset: 1 }} style={{ textAlign: "right" }}>
+                            <Col style={{ textAlign: "left" }}>{todayNotClaim ? <img src={GiftIcon} onClick={() => setPrizePopUpShow(!prizePopUpShow)} style={{cursor: "pointer", width: "25px"}}></img> : ""}</Col>
+                            <Col><font style={{ fontSize: "16px" }}><strong>Numbers</strong></font></Col>
+                            <Col style={{ textAlign: "right" }}>
                                 <BsInfoCircleFill ref={infoRef} style={{ color: '#27C7FA', backgroundColor: "white", borderRadius: "50%" }} onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target) }} />
                             </Col>
                         </Row>
@@ -367,8 +412,8 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                                 rootClose
                                 onHide={() => setInfoShow(false)}
                             >
-                                <div style={infoStyle}>
-                                    <font>winning {token} will be charged 1% fee </font>
+                                <div className='info'>
+                                    <font>winning {token} will be charged 1% fee, lose can get 3Star tokens </font>
                                 </div>
                             </Overlay>
                         </Row>
@@ -404,7 +449,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                         {statusMessage === "YOU WILL WIN " + token
                             ?
                             <Row>
-                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn}</font></Col>
+                                <Col><font style={{ fontSize: "28px", color: "#FEE63A" }}>{estimateEarn} {isHaveCoupon ? <>+ <BonusNumber number={estimateEarn} /></> : ""} </font></Col>
                             </Row>
 
                             : statusMessage === "YOU GOT 3Star!"
