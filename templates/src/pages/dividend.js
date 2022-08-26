@@ -128,7 +128,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                             if (receipt > 0) {
                                 setTTEarnRoundTitle('Last');
                                 console.log(web3.utils.fromWei(receipt, 'ether'));
-                                setTodayClaimNum(web3.utils.fromWei(receipt, 'ether'));
+                                setTodayClaimNum(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
                                 setDisableDividends(false);
                             } else {
                                 setTTEarnRoundTitle('Next');
@@ -216,27 +216,21 @@ function Dividend({ userInfo, connectWallet, token }) {
         loadWeb3();
 
         if (apiPath !== '') {
-            axios
-                .get(apiPath + '/getDividendInfo')
-                .then((res) => {
-                    setDividends(res['data']['dividends']);
-                    setAPR(res['data']['APR']);
-                    setPayout(res['data']['payout']);
-                    setTotalStakeNow(res['data']['totalStake']);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            axios.get(apiPath + '/getDividendInfo').then((res) => {
+                setDividends(res['data']['dividends']);
+                setAPR(res['data']['APR']);
+                setPayout(res['data']['payout']);
+                setTotalStakeNow(res['data']['totalStake']);
+            }).catch((error) => {
+                console.log(error);
+            });
 
-            axios
-                .get(apiPath + '/lastRound')
-                .then((res) => {
-                    setLastPayout(res['data']['payout']);
-                    setLastTotalStake(res['data']['totalStake']);
-                    setLastAPR(res['data']['APR']);
-                    setLastDividend(res['data']['dividend']);
-                })
-                .catch((error) => console.log(error));
+            axios.get(apiPath + '/lastRound').then((res) => {
+                setLastPayout(res['data']['payout']);
+                setLastTotalStake(res['data']['totalStake']);
+                setLastAPR(res['data']['APR']);
+                setLastDividend(res['data']['dividend']);
+            }).catch((error) => console.log(error));
 
             if (userInfo.account.length !== 0) {
                 checkContractInfo();
@@ -254,10 +248,7 @@ function Dividend({ userInfo, connectWallet, token }) {
     useEffect(() => {
         if (ttEarnRoundTitle === 'Next') {
             setTodayClaimNum(
-                (
-                    (Number(dividends) * Number(unstakeMax)) /
-                    Number(totalStakeNow)
-                ).toFixed(5)
+                ((Number(dividends) * Number(unstakeMax)) / Number(totalStakeNow)).toFixed(5)
             );
         }
     }, [dividends, isStaking, totalStakeNow]);
@@ -295,9 +286,7 @@ function Dividend({ userInfo, connectWallet, token }) {
     return (
         <div style={{ backgroundColor: '#FAF9FA', minHeight: '100vh' }}>
             <Sidebar />
-            <Container
-                style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }}
-            >
+            <Container style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }} >
                 <font style={{ fontSize: '26px' }}>
                     <font style={{ color: '#669BFD' }}>3Star </font>
                     <font>Dividend</font>
@@ -585,272 +574,94 @@ function Dividend({ userInfo, connectWallet, token }) {
                                 )}
 
                                 <br></br>
-<<<<<<< HEAD
-                <font style={{ fontSize: "15px" }}>Stake 3Star to earn {token}</font>
-                <Container className="card">
-                    <Row style={blockOneStyle}>
-                        <Col xs={2} sm={2}><img src={ThreeStarToken} width="50px"></img></Col>
-                        <Col xs={4} sm={4} style={{ textAlign: "left" }}>
-                            <font style={{ fontSize: "13px" }}>Stake</font>
-                            <br></br>
-                            <font style={{ fontSize: "17px" }}>3Star</font>
-                        </Col>
-                        <Col xs={6} sm={6} style={{ textAlign: "right" }}>
-                            <font style={{ fontSize: "13px" }}>Coming Dividend</font>
-                            <br></br>
-                            <font style={{ fontSize: "22px" }}>{dividends} {token}</font>
-                        </Col>
-                    </Row>
-                    <Row style={{ marginTop: "10px" }}>
-                        <Col style={{ fontSize: "15px", textAlign: "left" }}>APR</Col>
-                        <Col style={{ fontSize: "15px", textAlign: "right" }}>{APR}</Col>
-                    </Row>
-                    <Row>
-                        <Col style={{ fontSize: "15px", textAlign: "left" }}>Next Payout</Col>
-                        <Col style={{ fontSize: "15px", textAlign: "right" }}>{payout}</Col>
-                    </Row>
-                    <Row>
-                        <Col style={{ fontSize: "15px", textAlign: "left" }}>Total Staked</Col>
-                        <Col style={{ fontSize: "15px", textAlign: "right" }}>{totalStakeNow}</Col>
-                    </Row>
-                    <Row style={{ marginBottom: "10px" }}>
-                        <Col style={{ fontSize: "15px", textAlign: "left" }}><a href='https://ttswap.space/#/swap/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186' style={{ color: "black" }}><u>Get 3Star-TT LP<FiExternalLink /></u></a></Col>
-                    </Row>
 
-                    {userInfo.account.length === 0
-                        ?
-                        <Row>
-                            <Col>
-                                {isConnecting ?
-                                    <Button disabled={true} className="longButton">
-                                        <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-                                        Loading...
-                                    </Button>
-                                    : <Button className="longButton" onClick={() => { setIsConnecting(true); connectWallet().then(value => { setIsConnecting(false) }).catch(error => { setIsConnecting(false) }) }}>Connect Wallet</Button>
-                                }
-                            </Col>
-                        </Row>
-                        : unlockBool
-                            ?
-                            <Row>
-                                <Col>
-                                    {isUnlocking ?
-                                        <Button disabled={true} className="longButton">
-                                            <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-                                            Loading...
-                                        </Button>
-                                        : <Button className="longButton" onClick={unlock}>Unlock</Button>}
-                                </Col>
-                            </Row>
-                            :
-                            ""
-                    }
-
-                    <Row style={blockThreeStyle}>
-                        <Col xs={5} sm={5} style={{ textAlign: "left" }}>
-                            <font style={{ fontSize: "13px", color: "#669BFD" }}>Aviailable 3Star</font>
-                            <br></br>
-                            <font style={{ fontSize: "15px" }}><Form.Control value={stakeAmount} style={{ border: "0px" }} type="number" onChange={(e) => { setStakeAmount(e.target.value) }} /></font>
-                        </Col>
-                        <Col style={{ textAlign: "right" }}>
-                            <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setStakeAmount(stakeMax) }}>Max: {stakeMax}</font>
-                            <br></br>
-                            {isStaking ? <Button style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} disabled>
-                                <Spinner
-                                    as="span"
-                                    animation="grow"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                />
-                                Loading...
-                            </Button>
-                                : <Button disabled={stakeAmount > stakeMax || stakeAmount < 1} style={{ backgroundColor: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={stake}>Stake</Button>
-                            }
-
-
-                            <br></br>
-                            <font style={{ fontSize: "12px", color: "#FF0000" }}>
-                                {stakeAmount > stakeMax ? "Insufficient balance"
-                                    : ""}
-                            </font>
-                        </Col>
-                    </Row>
-
-                    <Row style={{ marginTop: "10px" }} className="claimBlock">
-                        <Col style={{ textAlign: "left" }}>
-                            <font style={{ color: "#00B3F7" }}>TT Earned</font>
-                            <br></br>
-                            <font>0.00000</font>
-                        </Col>
-                        <Col className="claimBtDiv">
-                            {isClaiming ?
-                                <Button disabled={true}>
-                                    <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-                                    Loading...
-                                </Button>
-                                : <Button disabled={disableDividends} onClick={claimDevidends}>Claim</Button>
-                            }
-                        </Col>
-                    </Row>
-                    <Row style={{ marginTop: "10px" }}>
-                        <Col><p style={{ color: "red", fontSize: "12px" }}>*Dividends must be claimed within 1 day</p></Col>
-                    </Row>
-
-                    <Row className='detailBlock'>
-                        {detailOpen
-                            ? <Col {...getToggleProps({ onClick: () => setDetailOpen(false), })} >Detail <AiOutlineDown /></Col>
-                            : <Col {...getToggleProps({ onClick: () => setDetailOpen(true), })}>Detail <AiOutlineUp /></Col>
-                        }
-                    </Row>
-                    <div {...getCollapseProps()}>
-                        <Row style={blockThreeStyle}>
-                            <Col xs={5} sm={5} style={{ textAlign: "left" }}>
-                                <font style={{ fontSize: "13px", color: "#669BFD" }}>Staked 3Star</font>
-                                <br></br>
-                                <font style={{ fontSize: "15px" }}><Form.Control value={unstakeAmount} style={{ border: "0px" }} type="number" onChange={(e) => { setUnstakeAmount(e.target.value) }} /></font>
-                            </Col>
-                            <Col style={{ textAlign: "right", }}>
-                                <font style={{ fontSize: "10px", color: "#669BFD", textDecoration: "underline" }} onClick={() => { setUnstakeAmount(unstakeMax) }}>Max: {unstakeMax}</font>
-                                <br></br>
-                                {isUnStaking ?
-                                    <Button disabled={true} style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }}>
-                                        <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-                                        Loading...
-                                    </Button>
-                                    : <Button disabled={unstakeAmount > unstakeMax} variant="outline-primary" style={{ color: "#669BFD", borderColor: "#669BFD", width: "70%", lineHeight: "1.1" }} onClick={unstake}>Unstake</Button>
-                                }
-
-                                <br></br>
-                                <font style={{ fontSize: "12px", color: "#FF0000" }}>
-                                    {unstakeAmount > unstakeMax ? "Insufficient balance"
-                                        : ""}
+                                <font style={{ fontSize: '12px', color: '#FF0000' }}>
+                                    {unstakeAmount > unstakeMax ? 'Insufficient balance' : ''}
                                 </font>
                             </Col>
                         </Row>
 
-                        <Row style={{ marginTop: "10px" }}>
-                            <Col style={{ fontSize: "15px", textAlign: "left" }}>Last Payout</Col>
-                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastPayout}</Col>
+                        <Row style={{ marginTop: '10px' }}>
+                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>
+                                Last Payout
+                            </Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
+                                {lastPayout}
+                            </Col>
                         </Row>
                         <Row>
-                            <Col style={{ fontSize: "15px", textAlign: "left" }}>Total Staked</Col>
-                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastTotalStake}</Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>
+                                Total Staked
+                            </Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
+                                {lastTotalStake}
+                            </Col>
                         </Row>
                         <Row>
-                            <Col style={{ fontSize: "15px", textAlign: "left" }}>APR</Col>
-                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastAPR}</Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>APR</Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
+                                {lastAPR}
+                            </Col>
                         </Row>
-                        <Row style={{ marginBottom: "10px" }}>
-                            <Col style={{ fontSize: "15px", textAlign: "left" }}>Dividends</Col>
-                            <Col style={{ fontSize: "15px", textAlign: "right" }}>{lastDividend}</Col>
+                        <Row style={{ marginBottom: '10px' }}>
+                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>
+                                Dividends
+                            </Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
+                                {lastDividend}
+                            </Col>
                         </Row>
                     </div>
                 </Container>
 
-                <Container className="card">
+                <Container className='card'>
                     <Row style={blockOneStyle}>
-                        <Col><font style={{ fontSize: "26px" }}>Get <font style={{ color: "#669BFD" }}>3Star</font></font></Col>
+                        <Col>
+                            <font style={{ fontSize: '26px' }}>
+                                Get <font style={{ color: '#669BFD' }}>3Star</font>
+                            </font>
+                        </Col>
                     </Row>
                     <Row style={blockFiveStyle}>
-                        <Col><font>You can also get <font style={{ color: "#669BFD" }}>3Star</font> tokens, by playing the games!</font></Col>
+                        <Col>
+                            <font>
+                                To get <font style={{ color: '#669BFD' }}>3Star</font> you just
+                                need to play the games!
+                            </font>
+                        </Col>
                     </Row>
-                    <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
-                        <Col><a href='/'><Button className="longButton">Go to play</Button></a></Col>
+                    <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
+                        <Col>
+                            <a href='/'>
+                                <Button className='longButton'>Go to play</Button>
+                            </a>
+                        </Col>
+                    </Row>
+
+                    <Row style={blockFiveStyle}>
+                        <Col>
+                            <font>
+                                You can also buy <font style={{ color: '#669BFD' }}>3Star</font>{' '}
+                                on TTSwap
+                            </font>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <img src={TTSwapIcon} alt='ttswapicon' width='45px'></img>
+                        </Col>
+                    </Row>
+                    <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
+                        <Col>
+                            <a href='https://ttswap.space/#/swap/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186'>
+                                <Button className='longButton'>Buy on TTSwap</Button>
+                            </a>
+                        </Col>
                     </Row>
                 </Container>
-            </Container >
-        </div >
+            </Container>
+        </div>
     );
-=======
-                <font style={{ fontSize: '12px', color: '#FF0000' }}>
-                  {unstakeAmount > unstakeMax ? 'Insufficient balance' : ''}
-                </font>
-              </Col>
-            </Row>
-
-            <Row style={{ marginTop: '10px' }}>
-              <Col style={{ fontSize: '15px', textAlign: 'left' }}>
-                Last Payout
-              </Col>
-              <Col style={{ fontSize: '15px', textAlign: 'right' }}>
-                {lastPayout}
-              </Col>
-            </Row>
-            <Row>
-              <Col style={{ fontSize: '15px', textAlign: 'left' }}>
-                Total Staked
-              </Col>
-              <Col style={{ fontSize: '15px', textAlign: 'right' }}>
-                {lastTotalStake}
-              </Col>
-            </Row>
-            <Row>
-              <Col style={{ fontSize: '15px', textAlign: 'left' }}>APR</Col>
-              <Col style={{ fontSize: '15px', textAlign: 'right' }}>
-                {lastAPR}
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: '10px' }}>
-              <Col style={{ fontSize: '15px', textAlign: 'left' }}>
-                Dividends
-              </Col>
-              <Col style={{ fontSize: '15px', textAlign: 'right' }}>
-                {lastDividend}
-              </Col>
-            </Row>
-          </div>
-        </Container>
-
-        <Container className='card'>
-          <Row style={blockOneStyle}>
-            <Col>
-              <font style={{ fontSize: '26px' }}>
-                Get <font style={{ color: '#669BFD' }}>3Star</font>
-              </font>
-            </Col>
-          </Row>
-          <Row style={blockFiveStyle}>
-            <Col>
-              <font>
-                To get <font style={{ color: '#669BFD' }}>3Star</font> you just
-                need to play the games!
-              </font>
-            </Col>
-          </Row>
-          <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
-            <Col>
-              <a href='/'>
-                <Button className='longButton'>Go to play</Button>
-              </a>
-            </Col>
-          </Row>
-
-          <Row style={blockFiveStyle}>
-            <Col>
-              <font>
-                You can also buy <font style={{ color: '#669BFD' }}>3Star</font>{' '}
-                on TTSwap
-              </font>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <img src={TTSwapIcon} alt='ttswapicon' width='45px'></img>
-            </Col>
-          </Row>
-          <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
-            <Col>
-              <a href='https://ttswap.space/#/swap/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186'>
-                <Button className='longButton'>Buy on TTSwap</Button>
-              </a>
-            </Col>
-          </Row>
-        </Container>
-      </Container>
-    </div>
-  );
->>>>>>> 1886b53b321086f3682f986e073ca54d5fc18699
 }
 
 export default Dividend;

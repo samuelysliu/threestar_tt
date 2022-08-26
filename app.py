@@ -9,17 +9,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
-<<<<<<< HEAD
+
 CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
 #CORS(app)
-=======
-CORS(app, resources={"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-CORS(app, resources={"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-CORS(app, resources={"/master/.*": {"origins": ["192.168.100.10"]}})
-# CORS(app)
->>>>>>> 1886b53b321086f3682f986e073ca54d5fc18699
+
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -27,8 +22,8 @@ api = Api(app)
 
 
 # Serve React App
-@ app.route('/', defaults={'path': ''})
-@ app.route('/<path:path>')
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
 def serve(path):
     if path != "" and os.path.exists(app.static_folder + '/' + path):
         return send_from_directory(app.static_folder, path)
@@ -64,14 +59,14 @@ class withdrawThreeStar_bsc(Resource):
 
 class getDividendInfo(Resource):
     def get(self):
-        dividends, APR, payout = threeStar_tt.getDividendInfo()
-        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+        dividends, APR, payout, totalStake, roundNumber = threeStar_tt.getDividendInfo()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": totalStake, "roundNumber": roundNumber}
 
 
 class getDividendInfo_bsc(Resource):
     def get(self):
-        dividends, APR, payout = threeStar_bsc.getDividendInfo_bsc()
-        return {"dividends": dividends, "APR": APR, "payout": str(payout)}
+        dividends, APR, payout, totalStake, roundNumber = threeStar_bsc.getDividendInfo_bsc()
+        return {"dividends": dividends, "APR": APR, "payout": str(payout), "totalStake": totalStake, "roundNumber": roundNumber}
 
 
 class claimPrize(Resource):
@@ -86,8 +81,6 @@ class claimPrize(Resource):
         result = threeStar_tt.claimPrize(data)
         return {"result": result}
 
-<<<<<<< HEAD
-=======
 
 class claimPrize_bsc(Resource):
     def get(self):
@@ -126,17 +119,21 @@ class lastRound_bsc(Resource):
     def get(self):
         result = threeStar_bsc.getLastRound()
         return result
->>>>>>> 1886b53b321086f3682f986e073ca54d5fc18699
 
 
 api.add_resource(startGame, '/api/startGame')
 api.add_resource(getDividendInfo, '/api/getDividendInfo')
 api.add_resource(withdrawThreeStar, '/master/withdraw')
 api.add_resource(claimPrize, '/api/claimPrize')
+api.add_resource(userPrizeList, '/api/userPrizeList')
+api.add_resource(lastRound, '/api/lastRound')
 
 api.add_resource(starGame_bsc, '/bsc/startGame')
 api.add_resource(getDividendInfo_bsc, '/bsc/getDividendInfo')
 api.add_resource(withdrawThreeStar_bsc, '/master/withdraw_bsc')
+api.add_resource(claimPrize_bsc, '/bsc/claimPrize')
+api.add_resource(userPrizeList_bsc, '/bsc/userPrizeList')
+api.add_resource(lastRound_bsc, '/bsc/lastRound_bsc')
 
 if __name__ == '__main__':
     app.run(app, debug=True, port=int(os.environ.get("PORT", 5000)))

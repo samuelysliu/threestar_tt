@@ -138,6 +138,7 @@ def sendPrize(winner, point):
 # set dividend every day
 def setReward():
     try:
+
         dividend = getTodayDividend(web3)
         withdrawThreeStar({"privateKey": os.getenv("privateKey"),
                            "amount": float(blockchain.getOwnerRemain(web3, threeStarContractAddress)) - float(
@@ -156,7 +157,7 @@ def setReward():
             setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
                 {
                     'from': owner['address'],
-                    'gas': 6721975,
+                    'gas': 9999999,
                     'nonce': web3.eth.get_transaction_count(owner['address']),
                 }
             )
@@ -182,12 +183,10 @@ def getDividendInfo():
     APR = blockchain.getAPR(web3, dividend, stakeContract)
     payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT')) + datetime.timedelta(days=1)).strftime(
         "%m/%d") + " 00:00"
-    totalStake = blockchain.getTotalStake(
-        web3, TSContract, stakeContractAddress)
-    roundNumber = int(dividendRoundInfo.getLastRound(
-        self='')["roundNumber"]) + 1
+    totalStake = blockchain.getTotalStake(web3, TSContract, stakeContractAddress)
+    roundNumber = int(dividendRoundInfo.getLastRound(self='')["roundNumber"]) + 1
 
-    return str(dividend), APR, payout, totalStake, roundNumber
+    return str(dividend), APR, payout, float(totalStake), roundNumber
 
 
 # scheduler will auto save lastRound
@@ -231,10 +230,10 @@ def withdrawThreeStar(*args):
         try:
             threeStarWithdraw = threeStarContract.functions.withdraw(
                 web3.toWei(args[0]['amount'], "ether")).buildTransaction({
-                    'from': owner['address'],
-                    'gas': 1041586,
-                    'nonce': web3.eth.get_transaction_count(owner['address']),
-                })
+                'from': owner['address'],
+                'gas': 1041586,
+                'nonce': web3.eth.get_transaction_count(owner['address']),
+            })
             blockchain.sendTransaction(web3, threeStarWithdraw)
         except:
             return {"result": "failed"}
