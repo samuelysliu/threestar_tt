@@ -4,6 +4,7 @@ import tools
 
 col = dbInfo.prize(self='')
 
+
 class prizeInfo:
     def savePrize(self):
         try:

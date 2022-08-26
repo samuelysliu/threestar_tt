@@ -101,6 +101,8 @@ def game(*args):
                 winTT = playerAmount * 99 / 100 * 100
 
             if userUseBonus(args[0]["playerAddress"]):
+                withdrawThreeStar({"privateKey": os.getenv("privateKey"),
+                                   "amount": winTT})
                 giveTT(args[0]["playerAddress"], winTT)
                 winTT = winTT * 2
 
@@ -138,11 +140,9 @@ def sendPrize(winner, point):
 # set dividend every day
 def setReward():
     try:
-
         dividend = getTodayDividend(web3)
         withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                           "amount": float(blockchain.getOwnerRemain(web3, threeStarContractAddress)) - float(
-                               dividend)})
+                           "amount": float(blockchain.getOwnerRemain(web3, threeStarContractAddress))})
         try:
             tx = {
                 'nonce': web3.eth.get_transaction_count(owner['address']),
@@ -346,21 +346,3 @@ def giveTT(receipient, amount):
         return "success"
     except:
         return "failed"
-
-
-def test(*args):
-    """if args[0]['privateKey'] == os.getenv("privateKey"):
-        try:
-            dividendWithdraw = stakeContract.functions.setReward(
-                web3.toWei(122, "ether")).buildTransaction({
-                'from': owner['address'],
-                'gas': 1041586,
-                'nonce': web3.eth.get_transaction_count(owner['address']),
-            })
-            blockchain.sendTransaction(web3, dividendWithdraw)
-        except:
-            return {"result": "failed"}
-
-        return {"result": "success"}
-    else:
-        return {"result": "failed"}"""

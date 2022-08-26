@@ -104,8 +104,10 @@ def game_bsc(*args):
                 winTT = playerAmount * 99 / 100 * 100
 
             if userUseBonus_bsc(args[0]["playerAddress"]):
+                withdrawThreeStar_bsc({"privateKey": os.getenv("privateKey"),
+                                   "amount": winTT})
                 giveBNB(args[0]["playerAddress"], winTT)
-                winTT = winTT*2
+                winTT = winTT * 2
 
         else:
             winTS = float(playerAmount) * 0.004
@@ -142,8 +144,7 @@ def setReward_bsc():
     try:
         dividend = getTodayDividend(web3_bsc, threeStarContractAddress_bsc)
         withdrawThreeStar_bsc({"privateKey": os.getenv("privateKey"),
-                               "amount": float(blockchain.getOwnerRemain(web3_bsc, threeStarContract_bsc)) - float(
-                                   dividend)})
+                               "amount": float(blockchain.getOwnerRemain(web3_bsc, threeStarContract_bsc))})
         try:
             tx = {
                 'nonce': web3_bsc.eth.get_transaction_count(owner['address']),
