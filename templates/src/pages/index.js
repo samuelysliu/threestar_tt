@@ -93,41 +93,40 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
   let web3 = new Web3(window.ethereum);
 
   const loadWeb3 = () => {
-    metaConnect
-      .getChainId()
-      .then((value) => {
-        const pathController = new PathController(value);
-        setApiPath(pathController.getApiPath());
-        const threeStarcontractABI = ThreeStarABI.abi;
-        const threeStarcontractAddress =
-          pathController.getThreeStarContractAddress();
-        const TSTokenContractABI = ThreeStarTokenABI.abi;
-        const TSTokenContractAddress =
-          pathController.getTSTokenContractAddress();
+    metaConnect.getChainId().then((value) => {
 
-        setTSTokenContract(
-          new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress)
-        );
-        setThreeStarContract(
-          new web3.eth.Contract(threeStarcontractABI, threeStarcontractAddress)
-        );
+      const pathController = new PathController(value);
+      setApiPath(pathController.getApiPath());
 
-        setStatusMessage('YOU WILL WIN ' + token);
-        if (token === 'TT') {
-          setBetNumberDefault(['20', '80', '100', '1K', '10K']);
-          setUserBet(100);
-        } else {
-          setBetNumberDefault(['0.01', '0.1', '1', '10', '100']);
-          setUserBet(1);
-        }
-        setBetNumberCircle({
-          one: '1',
-          two: '1',
-          three: '2',
-          four: '1',
-          five: '1',
-        });
-      })
+      const threeStarcontractABI = ThreeStarABI.abi;
+      const threeStarcontractAddress = pathController.getThreeStarContractAddress();
+
+      const TSTokenContractABI = ThreeStarTokenABI.abi;
+      const TSTokenContractAddress = pathController.getTSTokenContractAddress();
+
+      setTSTokenContract(
+        new web3.eth.Contract(TSTokenContractABI, TSTokenContractAddress)
+      );
+      setThreeStarContract(
+        new web3.eth.Contract(threeStarcontractABI, threeStarcontractAddress)
+      );
+
+      setStatusMessage('YOU WILL WIN ' + token);
+      if (token === 'TT') {
+        setBetNumberDefault(['20', '80', '100', '1K', '10K']);
+        setUserBet(100);
+      } else {
+        setBetNumberDefault(['0.01', '0.1', '1', '10', '100']);
+        setUserBet(1);
+      }
+      setBetNumberCircle({
+        one: '1',
+        two: '1',
+        three: '2',
+        four: '1',
+        five: '1',
+      });
+    })
       .catch((error) => {
         console.log(error);
       });
@@ -153,67 +152,47 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
       } else {
         setBetting(true);
         let point = 0;
+
         // assign task to backend to create random number and match
-        threeStarcontract.methods
-          .game()
-          .send({
-            from: userInfo.account,
-            value: web3.utils.toWei(String(userBet), 'ether'),
-          })
-          .then(function (receipt) {
-            axios
-              .post(apiPath + '/startGame', {
-                userLuckyNum: userLuckyNumber,
-                playerAddress: userInfo.account,
-                betNum: userBet,
-                hash: receipt['transactionHash'],
-              })
-              .then((res) => {
-                point = res['data']['point'];
-                setStarNumber(res['data']['starNumber']);
-                checkUserNumberMatch(res['data']['starNumber']);
+        threeStarcontract.methods.game().send({ from: userInfo.account, value: web3.utils.toWei(String(userBet), 'ether') }).then(function (receipt) {
+          axios.post(apiPath + '/startGame', { userLuckyNum: userLuckyNumber, playerAddress: userInfo.account, betNum: userBet, hash: receipt['transactionHash'] }).then((res) => {
+            point = res['data']['point'];
+            setStarNumber(res['data']['starNumber']);
+            checkUserNumberMatch(res['data']['starNumber']);
 
-                setBetting(false);
+            setBetting(false);
 
-                if (point > 2) {
-                  setStatusMessage('YOU WON!!');
-                  setWinTT(res['data']['winTT']);
-                  setTToken(
-                    (
-                      Number(TTToken) -
-                      Number(userBet) +
-                      Number(res['data']['winTT'])
-                    ).toFixed(2)
-                  );
-                } else {
-                  setStatusMessage('YOU GOT 3Star!');
-                  setWinTS(res['data']['winTS']);
-                  setTToken((Number(TTToken) - Number(userBet)).toFixed(2));
-                  setTSToken(
-                    (Number(TSToken) + Number(res['data']['winTS'])).toFixed(2)
-                  );
-                }
+            if (point > 2) {
+              setStatusMessage('YOU WON!!');
+              setWinTT(res['data']['winTT']);
+              setTToken(
+                (
+                  Number(TTToken) -
+                  Number(userBet) +
+                  Number(res['data']['winTT'])
+                ).toFixed(2)
+              );
+            } else {
+              setStatusMessage('YOU GOT 3Star!');
+              setWinTS(res['data']['winTS']);
+              setTToken((Number(TTToken) - Number(userBet)).toFixed(2));
+              setTSToken(
+                (Number(TSToken) + Number(res['data']['winTS'])).toFixed(2)
+              );
+            }
 
-                setTimeout(() => {
-                  setStatusMessage('YOU WILL WIN ' + token);
-                  setUserNumberColor({
-                    one: '1',
-                    two: '1',
-                    three: '1',
-                    four: '1',
-                    five: '1',
-                  });
-                }, '6000');
+            setTimeout(() => {
+              setStatusMessage('YOU WILL WIN ' + token);
+              setUserNumberColor({ one: '1', two: '1', three: '1', four: '1', five: '1' });
+            }, '6000');
 
-                checkPrizeList();
-              })
-              .catch((error) => {
-                setBetting(false);
-              });
-          })
-          .catch((error) => {
+            checkPrizeList();
+          }).catch((error) => {
             setBetting(false);
           });
+        }).catch((error) => {
+          setBetting(false);
+        });
       }
     }
   };
@@ -243,13 +222,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
   };
 
   const checkUserNumberMatch = (_starNumber) => {
-    setUserNumberColor({
-      one: '1',
-      two: '1',
-      three: '1',
-      four: '1',
-      five: '1',
-    });
+    setUserNumberColor({ one: '1', two: '1', three: '1', four: '1', five: '1', });
     for (let i = 0; i < _starNumber.length; i++) {
       for (let j = 0; j < userLuckyNumber.length; j++) {
         if (_starNumber[i] === userLuckyNumber[j]) {
@@ -288,13 +261,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
           setUserBet(0.01);
         }
 
-        setBetNumberCircle({
-          one: '2',
-          two: '1',
-          three: '1',
-          four: '1',
-          five: '1',
-        });
+        setBetNumberCircle({ one: '2', two: '1', three: '1', four: '1', five: '1', });
         break;
 
       case 'two':
@@ -303,13 +270,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         } else {
           setUserBet(0.1);
         }
-        setBetNumberCircle({
-          one: '1',
-          two: '2',
-          three: '1',
-          four: '1',
-          five: '1',
-        });
+        setBetNumberCircle({ one: '1', two: '2', three: '1', four: '1', five: '1', });
         break;
 
       case 'three':
@@ -318,13 +279,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         } else {
           setUserBet(1);
         }
-        setBetNumberCircle({
-          one: '1',
-          two: '1',
-          three: '2',
-          four: '1',
-          five: '1',
-        });
+        setBetNumberCircle({ one: '1', two: '1', three: '2', four: '1', five: '1', });
         break;
 
       case 'four':
@@ -333,13 +288,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         } else {
           setUserBet(10);
         }
-        setBetNumberCircle({
-          one: '1',
-          two: '1',
-          three: '1',
-          four: '2',
-          five: '1',
-        });
+        setBetNumberCircle({ one: '1', two: '1', three: '1', four: '2', five: '1', });
         break;
 
       case 'five':
@@ -348,67 +297,40 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
         } else {
           setUserBet(100);
         }
-        setBetNumberCircle({
-          one: '1',
-          two: '1',
-          three: '1',
-          four: '1',
-          five: '2',
-        });
+        setBetNumberCircle({ one: '1', two: '1', three: '1', four: '1', five: '2', });
         break;
     }
   };
 
   const checkBalance = () => {
-    TSTokenContract.methods
-      .balanceOf(userInfo.account)
-      .call()
-      .then(function (receipt) {
-        setTToken(Number(userInfo.balance).toFixed(2));
-        setTSToken(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(2));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    TSTokenContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+      setTToken(Number(userInfo.balance).toFixed(2));
+      setTSToken(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(2));
+    }).catch((error) => {
+      console.log(error);
+    });
 
     checkPrizeList();
 
-    metaConnect
-      .getChainId()
-      .then((value) => {
-        const pathController = new PathController(value);
-        axios
-          .get(
-            pathController.getApiPath() +
-              '/claimPrize?prizeType=double bonus&address=' +
-              userInfo.account
-          )
-          .then((res) => {
-            setPrizePopUpShow(res['data']['result']);
-            setTodayNotClaim(res['data']['result']);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      })
-      .catch((error) => {
+    metaConnect.getChainId().then((value) => {
+      const pathController = new PathController(value);
+      axios.get(pathController.getApiPath() + '/claimPrize?prizeType=double bonus&address=' + userInfo.account).then((res) => {
+        setPrizePopUpShow(res['data']['result']);
+        setTodayNotClaim(res['data']['result']);
+      }).catch((error) => {
         console.log(error);
       });
+    }).catch((error) => {
+      console.log(error);
+    });
   };
 
   const checkIfHaveCoupon = (userPrizeList) => {
     for (let i = 0; i < userPrizeList.length; i++) {
-      if (
-        token === 'TT' &&
-        userPrizeList[i]['chainName'] === 'thunderCore' &&
-        Number(userPrizeList[i]['number']) > 0
-      ) {
+      if (token === 'TT' && userPrizeList[i]['chainName'] === 'thunderCore' && Number(userPrizeList[i]['number']) > 0) {
         setIsHaveCoupon(true);
         break;
-      } else if (
-        token === 'BNB' &&
-        userPrizeList[i]['chainName'] === 'bsc' &&
-        Number(userPrizeList[i]['number']) > 0
+      } else if (token === 'BNB' && userPrizeList[i]['chainName'] === 'bsc' && Number(userPrizeList[i]['number']) > 0
       ) {
         setIsHaveCoupon(true);
         break;
@@ -427,17 +349,11 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
       }, 6000);
     } else {
       setIsClaiming(true);
-      axios
-        .post(apiPath + '/claimPrize', {
-          prizeType: 'double bonus',
-          address: userInfo.account,
-        })
-        .then((res) => {
-          setIsClaimDone(true);
-          setTodayNotClaim(false);
-          checkPrizeList();
-        })
-        .catch((error) => console.log(error));
+      axios.post(apiPath + '/claimPrize', { prizeType: 'double bonus', address: userInfo.account, }).then((res) => {
+        setIsClaimDone(true);
+        setTodayNotClaim(false);
+        checkPrizeList();
+      }).catch((error) => console.log(error));
     }
   };
 

@@ -11,9 +11,11 @@ from module.prizeClaimInfo import prizeClaimInfo
 from module.userPrizeInfo import userPrizeInfo
 from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
-from module.dividendRoundInfo_bsc import dividendRoundInfo
+from module.dividendRoundInfo_bsc import dividendRoundInfo_bsc
 
 load_dotenv()
+
+dividendRoundInfo = dividendRoundInfo_bsc()
 
 owner = blockchain.getOwner()
 web3_bsc, chainID_bsc = blockchain.bsc()
@@ -22,50 +24,6 @@ threeStarContractAddress_bsc, threeStarContract_bsc = blockchain.getThreeStarCon
 stakeContractAddress_bsc, stakeContract_bsc = blockchain.getStakeContract_bsc(
     web3_bsc)
 TSContractAddress_bsc, TSContract_bsc = blockchain.getTSToken_bsc(web3_bsc)
-
-
-def cannotLose(point, contractRemain, playerAmount, userHaveBonus):
-    if userHaveBonus:
-        playerAmount = playerAmount * 2
-    point -= 2
-    if (point > 0):
-        if (point == 1):
-            if (contractRemain <= playerAmount * 2):
-                return False
-        elif (point == 2):
-            if (contractRemain <= playerAmount * 20):
-                return False
-        elif (point == 3):
-            if (contractRemain <= playerAmount * 100):
-                return False
-    elif (point > 3):
-        return False
-
-    return True
-
-
-def createRandom():
-    randomNumber = [random.randint(1, 80)]
-    while len(randomNumber) < 20:
-        temp = random.randint(1, 80)
-        for i in randomNumber:
-            if i == temp:
-                break
-            elif i == randomNumber[-1]:
-                randomNumber.append(temp)
-
-    randomNumber = sorted(randomNumber)
-    return randomNumber
-
-
-def countPoint(starNumber, userNumber):
-    point = 0
-    for i in starNumber:
-        for j in userNumber:
-            if j == i:
-                point += 1
-    return point
-
 
 def getTodayDividend(web3, threeStarContractAddress):
     ownerRemain = blockchain.getOwnerRemain(web3, threeStarContractAddress)

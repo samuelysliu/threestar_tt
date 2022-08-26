@@ -1,5 +1,4 @@
 from web3 import Web3
-import random
 import os
 from dotenv import load_dotenv
 from control import blockchain
@@ -11,6 +10,7 @@ from module.userPrizeInfo import userPrizeInfo
 from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
 from module.dividendRoundInfo import dividendRoundInfo
+import random
 
 load_dotenv()
 
@@ -22,8 +22,7 @@ stakeContractAddress, stakeContract = blockchain.getStakeContract(web3)
 TSContractAddress, TSContract = blockchain.getTSToken(web3)
 
 
-# to detect if this random lucky number we can't afford
-def cannotLose(point, contractRemain, playerAmount, userHaveBonus):
+def cannotLose(self, point, contractRemain, playerAmount, userHaveBonus):
     if userHaveBonus:
         playerAmount = playerAmount * 2
     point -= 2
@@ -44,7 +43,7 @@ def cannotLose(point, contractRemain, playerAmount, userHaveBonus):
 
 
 # create random lucky number
-def createRandom():
+def createRandom(self):
     randomNumber = [random.randint(1, 80)]
     while len(randomNumber) < 20:
         temp = random.randint(1, 80)
@@ -59,14 +58,13 @@ def createRandom():
 
 
 # count point number
-def countPoint(starNumber, userNumber):
+def countPoint(self, starNumber, userNumber):
     point = 0
     for i in starNumber:
         for j in userNumber:
             if j == i:
                 point += 1
     return point
-
 
 # start game
 def game(*args):
@@ -88,7 +86,7 @@ def game(*args):
         playerAmount = args[0]["betNum"]
 
         while (cannotLose(point, contractRemain, playerAmount, isUserHaveBonus(args[0]["playerAddress"])) == False):
-            starNumber = createRandom()
+            starNumber = sharedFunction.createRandom()
             point = countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
 
         if point > 2:

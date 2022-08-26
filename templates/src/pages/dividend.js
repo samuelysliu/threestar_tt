@@ -84,10 +84,9 @@ function Dividend({ userInfo, connectWallet, token }) {
                 )
             );
             //setStakeContract(new web3.eth.Contract(stakeContractABI, "0xa931A981edfCd9cA80A0Be1653CE3b1C4ceb757e"));
-        })
-            .catch((error) => {
-                console.log(error);
-            });
+        }).catch((error) => {
+            console.log(error);
+        });
     };
 
     const checkContractInfo = () => {
@@ -181,8 +180,10 @@ function Dividend({ userInfo, connectWallet, token }) {
     useEffect(() => {
         loadWeb3();
 
-        if (apiPath !== '') {
-            axios.get(apiPath + '/getDividendInfo').then((res) => {
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value);
+
+            axios.get(pathController.getApiPath() + '/getDividendInfo').then((res) => {
                 setDividends(res['data']['dividends']);
                 setAPR(res['data']['APR']);
                 setPayout(res['data']['payout']);
@@ -191,7 +192,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                 console.log(error);
             });
 
-            axios.get(apiPath + '/lastRound').then((res) => {
+            axios.get(pathController.getApiPath() + '/lastRound').then((res) => {
                 setLastPayout(res['data']['payout']);
                 setLastTotalStake(res['data']['totalStake']);
                 setLastAPR(res['data']['APR']);
@@ -201,7 +202,11 @@ function Dividend({ userInfo, connectWallet, token }) {
             if (userInfo.account.length !== 0) {
                 checkContractInfo();
             }
-        }
+
+        }).catch((error) => {
+            console.log(error);
+        });
+
     }, [token]);
 
     useEffect(() => {
@@ -213,9 +218,14 @@ function Dividend({ userInfo, connectWallet, token }) {
 
     useEffect(() => {
         if (ttEarnRoundTitle === 'Next') {
-            setTodayClaimNum(
-                ((Number(dividends) * Number(unstakeMax)) / Number(totalStakeNow)).toFixed(5)
-            );
+            if (Number(totalStakeNow) === 0) {
+                setTodayClaimNum(0);
+            } else {
+                setTodayClaimNum(
+                    ((Number(dividends) * Number(unstakeMax)) / Number(totalStakeNow)).toFixed(5)
+                );
+            }
+
         }
     }, [dividends, isStaking, totalStakeNow, ttEarnRoundTitle]);
 

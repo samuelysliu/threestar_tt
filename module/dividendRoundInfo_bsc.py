@@ -4,7 +4,7 @@ import tools
 col = dbInfo.dividendRound_bsc(self='')
 
 
-class dividendRoundInfo:
+class dividendRoundInfo_bsc:
     def saveDividendRound(self):
         try:
             result = col.insert_one(
