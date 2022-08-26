@@ -440,7 +440,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                                 </Button>
                             ) : (
                                 <Button
-                                    disabled={stakeAmount > stakeMax || stakeAmount < 1}
+                                    disabled={stakeAmount > stakeMax || stakeAmount <= 0}
                                     style={{
                                         backgroundColor: '#669BFD',
                                         borderColor: '#669BFD',
