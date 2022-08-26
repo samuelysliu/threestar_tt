@@ -10,10 +10,10 @@ from module.userPrizeInfo import userPrizeInfo
 from bson.objectid import ObjectId
 from module.transactionInfo import transactionInfo
 from module.dividendRoundInfo import dividendRoundInfo
-from module.dividendRoundInfo_bsc import dividendRoundInfo_bsc
 import random
 
 load_dotenv()
+
 
 class threeStar:
     def __init__(self, chain):
@@ -23,13 +23,13 @@ class threeStar:
             self.threeStarContractAddress, self.threeStarContract = blockchain.getThreeStarContract(self.web3)
             self.stakeContractAddress, self.stakeContract = blockchain.getStakeContract(self.web3)
             self.TSContractAddress, self.TSContract = blockchain.getTSToken(self.web3)
-            self.dividendRoundInfo = dividendRoundInfo()
+            self.dividendRoundInfo = dividendRoundInfo("thunderCore")
         elif chain == "bsc":
             self.web3, self.chainID = blockchain.bsc()
             self.threeStarContractAddress, self.threeStarContract = blockchain.getThreeStarContract(self.web3)
             self.stakeContractAddress, self.stakeContract = blockchain.getStakeContract(self.web3)
             self.TSContractAddress, self.TSContract = blockchain.getTSToken(self.web3)
-            self.dividendRoundInfo = dividendRoundInfo_bsc()
+            self.dividendRoundInfo = dividendRoundInfo("bsc")
 
     def cannotLose(self, point, contractRemain, playerAmount, userHaveBonus):
         if userHaveBonus:
@@ -93,7 +93,7 @@ class threeStar:
             playerAmount = args[0]["betNum"]
 
             while (self.cannotLose(point, contractRemain, playerAmount,
-                                             self.isUserHaveBonus(args[0]["playerAddress"])) == False):
+                                   self.isUserHaveBonus(args[0]["playerAddress"])) == False):
                 starNumber = self.createRandom()
                 point = self.countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
 
@@ -108,7 +108,7 @@ class threeStar:
 
                 if self.userUseBonus(args[0]["playerAddress"]):
                     self.withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                                       "amount": winTT})
+                                            "amount": winTT})
                     self.giveTT(args[0]["playerAddress"], winTT)
                     winTT = winTT * 2
 
@@ -144,7 +144,8 @@ class threeStar:
         try:
             dividend = self.getTodayDividend()
             self.withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                               "amount": float(blockchain.getOwnerRemain(self.web3, self.threeStarContractAddress))})
+                                    "amount": float(
+                                        blockchain.getOwnerRemain(self.web3, self.threeStarContractAddress))})
             try:
                 tx = {
                     'nonce': self.web3.eth.get_transaction_count(self.owner['address']),
@@ -155,7 +156,8 @@ class threeStar:
                 }
                 blockchain.sendTransaction(self.web3, tx)
 
-                setTodayReward = self.stakeContract.functions.setReward(self.web3.toWei(dividend, 'ether')).buildTransaction(
+                setTodayReward = self.stakeContract.functions.setReward(
+                    self.web3.toWei(dividend, 'ether')).buildTransaction(
                     {
                         'from': self.owner['address'],
                         'gasPrice': self.web3.toWei('50', 'gwei'),
@@ -208,7 +210,8 @@ class threeStar:
     def giveTSToken(self, receipient, amount):
         try:
             receipient = self.web3.toChecksumAddress(receipient)
-            transferTSToken = self.TSContract.functions.transfer(receipient, self.web3.toWei(amount, "ether")).buildTransaction({
+            transferTSToken = self.TSContract.functions.transfer(receipient,
+                                                                 self.web3.toWei(amount, "ether")).buildTransaction({
                 'from': self.owner['address'],
                 'gasPrice': self.web3.toWei('50', 'gwei'),
                 'nonce': self.web3.eth.get_transaction_count(self.owner['address']),

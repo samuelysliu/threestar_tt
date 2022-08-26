@@ -6,9 +6,15 @@ col = dbInfo.dividendRound_bsc(self='')
 
 class dividendRoundInfo_bsc:
     def saveDividendRound(self):
+        result = col.insert_one(
+            {"roundNumber": self["roundNumber"], "payout": self["payout"], "totalStake": float(self["totalStake"]),
+             "APR": self["APR"], "dividend": self["dividend"], "createdTime": tools.getTimeNow()})
+        print(result)
+        return result.inserted_id
         try:
             result = col.insert_one(
-                {"roundNumber": self["roundNumber"], "payout": self["payout"], "totalStake": float(self["totalStake"]), "APR": self["APR"], "dividend": self["dividend"], "createdTime": tools.getTimeNow()})
+                {"roundNumber": self["roundNumber"], "payout": self["payout"], "totalStake": float(self["totalStake"]),
+                 "APR": self["APR"], "dividend": self["dividend"], "createdTime": tools.getTimeNow()})
             return result.inserted_id
         except:
             return "failed"

@@ -1,21 +1,27 @@
 from module.dbInfo import dbInfo
 import tools
 
-col = dbInfo.dividendRound(self='')
-
 
 class dividendRoundInfo:
-    def saveDividendRound(self):
+    def __init__(self, chain):
+        if chain == "thunderCore":
+            self.col = dbInfo.dividendRound(self='')
+        elif chain == "bsc":
+            self.col = dbInfo.dividendRound_bsc(self='')
+
+    def saveDividendRound(self, roundInfo):
         try:
-            result = col.insert_one(
-                {"roundNumber": self["roundNumber"], "payout": self["payout"], "totalStake": float(self["totalStake"]), "APR": self["APR"], "dividend": self["dividend"], "createdTime": tools.getTimeNow()})
+            result = self.col.insert_one(
+                {"roundNumber": roundInfo["roundNumber"], "payout": roundInfo["payout"],
+                 "totalStake": float(roundInfo["totalStake"]), "APR": roundInfo["APR"],
+                 "dividend": roundInfo["dividend"], "createdTime": tools.getTimeNow()})
             return result.inserted_id
         except:
             return "failed"
 
     def getAllRound(self):
         try:
-            result = col.find()
+            result = self.col.find()
             prizeArray = []
             for i in result:
                 prizeArray.append(
@@ -30,9 +36,9 @@ class dividendRoundInfo:
 
     def getLastRound(self):
         try:
-            cursorLen = col.count_documents({})
+            cursorLen = self.col.count_documents({})
             if cursorLen > 0:
-                result = col.find().sort("_id", -1).limit(1)
+                result = self.col.find().sort("_id", -1).limit(1)
                 i = result[0]
                 return {"id": str(i["_id"]), "roundNumber": i["roundNumber"], "payout": i["payout"],
                         "totalStake": round(i["totalStake"], 5), "APR": i["APR"],
@@ -48,7 +54,7 @@ class dividendRoundInfo:
 
     def getRoundByNumber(self):
         try:
-            result = col.find({"roundNumber": self["roundNumber"]})
+            result = self.col.find({"roundNumber": self["roundNumber"]})
             i = result[0]
             return {"id": str(i["_id"]), "roundNumber": i["roundNumber"], "payout": i["payout"],
                     "totalStake": i["totalStake"], "APR": i["APR"],
