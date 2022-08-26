@@ -61,150 +61,116 @@ function Dividend({ userInfo, connectWallet, token }) {
     const [todayClaimNum, setTodayClaimNum] = useState(0);
 
     const loadWeb3 = () => {
-        metaConnect
-            .getChainId()
-            .then((value) => {
-                const pathController = new PathController(value);
-                setApiPath(pathController.getApiPath());
+        metaConnect.getChainId().then((value) => {
+            const pathController = new PathController(value);
+            setApiPath(pathController.getApiPath());
 
-                const stakeContractABI = StakingRewardABI.abi;
-                setStakeContractAddress(pathController.getStakeContractAddress());
+            const stakeContractABI = StakingRewardABI.abi;
+            setStakeContractAddress(pathController.getStakeContractAddress());
 
-                const TSTokenContractABI = ThreeStarTokenABI.abi;
-                setTSTokenContractAddress(pathController.getTSTokenContractAddress());
+            const TSTokenContractABI = ThreeStarTokenABI.abi;
+            setTSTokenContractAddress(pathController.getTSTokenContractAddress());
 
-                setTSTokenContract(
-                    new web3.eth.Contract(
-                        TSTokenContractABI,
-                        pathController.getTSTokenContractAddress()
-                    )
-                );
-                setStakeContract(
-                    new web3.eth.Contract(
-                        stakeContractABI,
-                        pathController.getStakeContractAddress()
-                    )
-                );
-                //setStakeContract(new web3.eth.Contract(stakeContractABI, "0xa931A981edfCd9cA80A0Be1653CE3b1C4ceb757e"));
-            })
+            setTSTokenContract(
+                new web3.eth.Contract(
+                    TSTokenContractABI,
+                    pathController.getTSTokenContractAddress()
+                )
+            );
+            setStakeContract(
+                new web3.eth.Contract(
+                    stakeContractABI,
+                    pathController.getStakeContractAddress()
+                )
+            );
+            //setStakeContract(new web3.eth.Contract(stakeContractABI, "0xa931A981edfCd9cA80A0Be1653CE3b1C4ceb757e"));
+        })
             .catch((error) => {
                 console.log(error);
             });
     };
 
     const checkContractInfo = () => {
-        TSTokenContract.methods
-            .allowance(userInfo.account, stakeContractAddress)
-            .call()
-            .then(function (receipt) {
-                if (receipt >= 100000000000000000000000) {
-                    setUnlockBool(false);
-                    TSTokenContract.methods
-                        .balanceOf(userInfo.account)
-                        .call()
-                        .then(function (receipt) {
-                            setStakeMax(
-                                Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5)
-                            );
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                        });
+        TSTokenContract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
+            if (receipt >= 100000000000000000000000) {
+                setUnlockBool(false);
+                TSTokenContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+                    setStakeMax(
+                        Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5)
+                    );
+                }).catch((error) => {
+                    console.log(error);
+                });
 
-                    stakeContract.methods
-                        .balanceOf(userInfo.account)
-                        .call()
-                        .then(function (receipt) {
-                            setUnstakeMax(
-                                Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5)
-                            );
-                        })
-                        .catch((error) => { });
+                stakeContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
+                    setUnstakeMax(
+                        Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5)
+                    );
+                }).catch((error) => { });
 
-                    stakeContract.methods
-                        .rewards(userInfo.account)
-                        .call()
-                        .then(function (receipt) {
-                            if (receipt > 0) {
-                                setTTEarnRoundTitle('Last');
-                                console.log(web3.utils.fromWei(receipt, 'ether'));
-                                setTodayClaimNum(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
-                                setDisableDividends(false);
-                            } else {
-                                setTTEarnRoundTitle('Next');
-                            }
-                        })
-                        .catch((error) => { });
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+                stakeContract.methods.rewards(userInfo.account).call().then(function (receipt) {
+                    if (receipt > 0) {
+                        setTTEarnRoundTitle('Last');
+                        setTodayClaimNum(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
+                        setDisableDividends(false);
+                    } else {
+                        setTTEarnRoundTitle('Next');
+                    }
+                }).catch((error) => { });
+            }
+        }).catch((error) => {
+            console.log(error);
+        });
     };
 
     const unlock = () => {
         setIsUnlocking(true);
-        TSTokenContract.methods
-            .approve(stakeContractAddress, totalAllowance)
-            .send({ from: userInfo.account })
-            .then(function (receipt) {
-                checkContractInfo();
-                setIsUnlocking(false);
-            })
-            .catch((error) => {
-                setIsUnlocking(false);
-            });
+        TSTokenContract.methods.approve(stakeContractAddress, totalAllowance).send({ from: userInfo.account }).then(function (receipt) {
+            checkContractInfo();
+            setIsUnlocking(false);
+        }).catch((error) => {
+            setIsUnlocking(false);
+        });
     };
 
     const stake = () => {
         setIsStaking(true);
         if (stakeAmount > 0 && stakeAmount <= stakeMax) {
-            stakeContract.methods
-                .stake(web3.utils.toWei(stakeAmount, 'ether'))
-                .send({ from: userInfo.account })
-                .then(function (receipt) {
-                    setUnstakeMax((Number(unstakeMax) + Number(stakeAmount)).toFixed(5));
-                    setStakeMax((Number(stakeMax) - Number(stakeAmount)).toFixed(5));
-                    setIsStaking(false);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    setIsStaking(false);
-                });
+            stakeContract.methods.stake(web3.utils.toWei(stakeAmount, 'ether')).send({ from: userInfo.account }).then(function (receipt) {
+                setUnstakeMax((Number(unstakeMax) + Number(stakeAmount)).toFixed(5));
+                setStakeMax((Number(stakeMax) - Number(stakeAmount)).toFixed(5));
+                setIsStaking(false);
+            }).catch((error) => {
+                console.log(error);
+                setIsStaking(false);
+            });
         }
     };
 
     const unstake = () => {
         if (unstakeAmount > 0 && unstakeAmount <= unstakeMax) {
             setIsUnStaking(true);
-            stakeContract.methods
-                .withdraw(web3.utils.toWei(unstakeAmount, 'ether'))
-                .send({ from: userInfo.account, value: web3.utils.toWei('1', 'ether') })
-                .then(function (receipt) {
-                    setUnstakeMax(
-                        (Number(unstakeMax) - Number(unstakeAmount)).toFixed(5)
-                    );
-                    setStakeMax((Number(stakeMax) + Number(unstakeAmount)).toFixed(5));
-                    setIsUnStaking(false);
-                })
-                .catch((error) => {
-                    setIsUnStaking(false);
-                });
+            stakeContract.methods.withdraw(web3.utils.toWei(unstakeAmount, 'ether')).send({ from: userInfo.account, value: web3.utils.toWei('1', 'ether') }).then(function (receipt) {
+                setUnstakeMax(
+                    (Number(unstakeMax) - Number(unstakeAmount)).toFixed(5)
+                );
+                setStakeMax((Number(stakeMax) + Number(unstakeAmount)).toFixed(5));
+                setIsUnStaking(false);
+            }).catch((error) => {
+                setIsUnStaking(false);
+            });
         }
     };
 
     const claimDevidends = () => {
         setIsClaiming(true);
-        stakeContract.methods
-            .getReward()
-            .send({ from: userInfo.account })
-            .then(function (receipt) {
-                setDisableDividends(true);
-                setIsClaiming(false);
-            })
-            .catch((error) => {
-                setIsClaiming(false);
-            });
+        stakeContract.methods.getReward().send({ from: userInfo.account }).then(function (receipt) {
+            setDisableDividends(true);
+            setIsClaiming(false);
+            checkContractInfo()
+        }).catch((error) => {
+            setIsClaiming(false);
+        });
     };
 
     useEffect(() => {
@@ -251,7 +217,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                 ((Number(dividends) * Number(unstakeMax)) / Number(totalStakeNow)).toFixed(5)
             );
         }
-    }, [dividends, isStaking, totalStakeNow]);
+    }, [dividends, isStaking, totalStakeNow, ttEarnRoundTitle]);
 
     const blockOneStyle = {
         border: '1px',
@@ -589,21 +555,8 @@ function Dividend({ userInfo, connectWallet, token }) {
                                 {lastPayout}
                             </Col>
                         </Row>
+
                         <Row>
-                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>
-                                Total Staked
-                            </Col>
-                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
-                                {lastTotalStake}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>APR</Col>
-                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
-                                {lastAPR}
-                            </Col>
-                        </Row>
-                        <Row style={{ marginBottom: '10px' }}>
                             <Col style={{ fontSize: '15px', textAlign: 'left' }}>
                                 Dividends
                             </Col>
@@ -611,6 +564,23 @@ function Dividend({ userInfo, connectWallet, token }) {
                                 {lastDividend}
                             </Col>
                         </Row>
+
+                        <Row>
+                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>APR</Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
+                                {lastAPR}
+                            </Col>
+                        </Row>
+
+                        <Row style={{ marginBottom: '10px' }}>
+                            <Col style={{ fontSize: '15px', textAlign: 'left' }}>
+                                Total Staked
+                            </Col>
+                            <Col style={{ fontSize: '15px', textAlign: 'right' }}>
+                                {lastTotalStake}
+                            </Col>
+                        </Row>
+
                     </div>
                 </Container>
 

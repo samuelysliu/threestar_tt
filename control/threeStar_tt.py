@@ -157,7 +157,6 @@ def setReward():
             setTodayReward = stakeContract.functions.setReward(web3.toWei(dividend, 'ether')).buildTransaction(
                 {
                     'from': owner['address'],
-                    'gas': 9999999,
                     'nonce': web3.eth.get_transaction_count(owner['address']),
                 }
             )
