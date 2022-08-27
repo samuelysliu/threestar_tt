@@ -32,11 +32,12 @@ def serve(path):
 
 
 
+"""
 @app.before_request
 def before_request():
     if not request.is_secure:
         return redirect(request.url.replace('http://', 'https://'))
-
+"""
 
 
 class startGame(Resource):

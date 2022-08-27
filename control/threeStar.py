@@ -146,15 +146,9 @@ class threeStar:
             self.withdrawThreeStar({"privateKey": os.getenv("privateKey"),
                                     "amount": float(
                                         blockchain.getOwnerRemain(self.web3, self.threeStarContractAddress))})
+
             try:
-                tx = {
-                    'nonce': self.web3.eth.get_transaction_count(self.owner['address']),
-                    'to': self.stakeContractAddress,
-                    'value': self.web3.toWei(dividend, 'ether'),
-                    'gasPrice': self.web3.toWei('50', 'gwei'),
-                    'chainID': int(self.chainID)
-                }
-                blockchain.sendTransaction(self.web3, tx)
+                self.giveTT(self.stakeContractAddress, dividend)
 
                 setTodayReward = self.stakeContract.functions.setReward(
                     self.web3.toWei(dividend, 'ether')).buildTransaction(
@@ -166,7 +160,7 @@ class threeStar:
                 )
                 blockchain.sendTransaction(self.web3, setTodayReward)
             except:
-                "owner insufficient balance"
+                return "owner insufficient balance"
 
             return "success"
 
@@ -330,8 +324,9 @@ class threeStar:
                 'nonce': self.web3.eth.get_transaction_count(self.owner['address']),
                 'to': receipient,
                 'value': self.web3.toWei(amount, 'ether'),
+                'gas': 99999999,
                 'gasPrice': self.web3.toWei('50', 'gwei'),
-                'chainID': int(self.chainID)
+                'chainId': int(self.chainID)
             }
             blockchain.sendTransaction(self.web3, tx)
             return "success"
