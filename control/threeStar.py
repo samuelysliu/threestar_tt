@@ -187,6 +187,8 @@ class threeStar:
     def saveLastRound(self):
         try:
             dividend, APR, payout, totalStake, roundNumber = self.getDividendInfo()
+            payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT'))).strftime(
+            "%m/%d") + " 00:00"
             self.dividendRoundInfo.saveDividendRound(
                 {"roundNumber": roundNumber, "payout": payout, "totalStake": totalStake, "APR": APR,
                  "dividend": dividend})
