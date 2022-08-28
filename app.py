@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, redirect
 from flask_restful import Api, Resource
 from flask_cors import CORS
 from control.threeStar import threeStar
@@ -10,10 +10,10 @@ load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
 
-#CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-#CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
-CORS(app)
+#CORS(app)
 
 
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -32,12 +32,10 @@ def serve(path):
 
 
 
-"""
 @app.before_request
 def before_request():
     if not request.is_secure:
         return redirect(request.url.replace('http://', 'https://'))
-"""
 
 
 class startGame(Resource):
