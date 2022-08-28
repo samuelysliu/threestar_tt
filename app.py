@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request, send_from_directory, Response, redirect
+from flask import Flask, request, send_from_directory
 from flask_restful import Api, Resource
 from flask_cors import CORS
 from control.threeStar import threeStar
