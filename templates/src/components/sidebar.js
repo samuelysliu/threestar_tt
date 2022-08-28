@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa'
 import NewIcon from '../images/newIcon.png'
 
-function Sidebar() {
+function Sidebar({headerColor}) {
     const [isOpen, setIsopen] = useState(false);
 
     const ToggleSidebar = () => {
@@ -15,7 +15,7 @@ function Sidebar() {
     }
 
     return (
-        <div className="container-fluid" style={{ backgroundColor: "#01AFFB", position:"sticky", top: "0px", zIndex: "99" }}>
+        <div className="container-fluid" style={{ backgroundColor: headerColor, position:"sticky", top: "0px", zIndex: "99" }}>
             <nav className="navbar navbar-expand-lg navbar-light shadow-md">
                 <font style={{ fontSize: "28px", color: "white", position: "absolute", left: "50%", marginLeft: "-60px", cursor: "pointer" }} onClick={backHome}><strong>TT 3Star</strong></font>
                 <div className="form-inline ml-auto">
@@ -35,7 +35,8 @@ function Sidebar() {
                     <ul>
                         <li><a className="sd-link" href='/'>Home</a></li>
                         <li><a className="sd-link" href='/dividend'>Dividend</a></li>
-                        <li><a className="sd-link" href='/bonus'>Bonus<img src={NewIcon} style={{paddingLeft: "5px", width: "35px"}}></img></a></li>
+                        <li><a className="sd-link" href='/lpDividend'>Hyper Dividend<img src={NewIcon} style={{paddingLeft: "5px", width: "35px"}}></img></a></li>
+                        <li><a className="sd-link" href='/bonus'>Bonus</a></li>
                         <li><a className="sd-link" href='https://twitter.com/3star_tt'>Twitter</a></li>
                         <li><a className="sd-link" href='https://t.me/ThreeStarDapp'>Telegram</a></li>
                     </ul>

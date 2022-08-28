@@ -7,6 +7,7 @@ import { ConnectWallet } from './components/connectWallet';
 import Web3 from 'web3'
 import BNBTokenImage from './images/BNB.png'
 import Bonus from './pages/bonus';
+import LpDividend from './pages/lpDividend';
 
 function App() {
   const metaConnect = new ConnectWallet()
@@ -74,6 +75,7 @@ function App() {
         <Route path="/" element={<Index connectWallet={connectWallet} userInfo={userInfo} token={token} originTokenUrl={originTokenUrl} />}></Route>
         <Route path='/dividend' element={<Dividend connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>
         <Route path="/bonus" element={<Bonus connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>
+        <Route path="/lpDividend" element={<LpDividend connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>
       </Routes>
     </Router>
   );

@@ -103,7 +103,7 @@ function Bonus({ userInfo, connectWallet, token }) {
 
   return (
     <>
-      <Sidebar />
+      <Sidebar headerColor={"#01AFFB"} />
       <PrizePopUp
         show={prizePopUpShow}
         setShow={setPrizePopUpShow}

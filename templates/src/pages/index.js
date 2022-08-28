@@ -453,7 +453,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
 
   return (
     <>
-      <Sidebar />
+      <Sidebar headerColor={"#01AFFB"} />
       <PrizePopUp
         show={prizePopUpShow}
         setShow={setPrizePopUpShow}

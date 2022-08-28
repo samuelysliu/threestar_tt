@@ -15,7 +15,7 @@ import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import useCollapse from 'react-collapsed';
 import TTSwapIcon from '../images/TTSwapIcon.png';
 
-function Dividend({ userInfo, connectWallet, token }) {
+function LpDividend({ userInfo, connectWallet, token }) {
     const metaConnect = new ConnectWallet();
     const web3 = new Web3(window.ethereum);
 
@@ -256,7 +256,7 @@ function Dividend({ userInfo, connectWallet, token }) {
 
     return (
         <div style={{ backgroundColor: '#FAF9FA', minHeight: '100vh' }}>
-            <Sidebar headerColor={"#01AFFB"} />
+            <Sidebar headerColor={"#5E75E0"} />
             <Container style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }} >
                 <font style={{ fontSize: '26px' }}>
                     <font style={{ color: '#669BFD' }}>3Star </font>
@@ -639,4 +639,4 @@ function Dividend({ userInfo, connectWallet, token }) {
     );
 }
 
-export default Dividend;
+export default LpDividend;
