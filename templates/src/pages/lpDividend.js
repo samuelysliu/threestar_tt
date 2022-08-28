@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Form, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Container, Row, Col, Button, Form, Spinner, Overlay } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Web3 from 'web3';
 import axios from 'axios';
-import ThreeStarToken from '../images/threeStarToken.png';
+import LpToken from '../images/lpToken.png';
 import Sidebar from '../components/sidebar';
 import ThreeStarTokenABI from '../abi/threeStarTokenABI.json';
 import StakingRewardABI from '../abi/stakingRewardABI.json';
 import { PathController } from '../components/pathController';
 import { ConnectWallet } from '../components/connectWallet';
-import { FiExternalLink } from 'react-icons/fi';
-import '../styles/dividend.css';
 import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import useCollapse from 'react-collapsed';
 import TTSwapIcon from '../images/TTSwapIcon.png';
+import { BsInfoCircleFill } from 'react-icons/bs';
+import { css } from '@emotion/css'
+import ClaimAnimation from '../components/claimAnimation';
 
 function LpDividend({ userInfo, connectWallet, token }) {
     const metaConnect = new ConnectWallet();
@@ -59,6 +60,12 @@ function LpDividend({ userInfo, connectWallet, token }) {
     const [ttEarnRoundTitle, setTTEarnRoundTitle] = useState('');
 
     const [todayClaimNum, setTodayClaimNum] = useState(0);
+
+    const [infoShow, setInfoShow] = useState(false);
+    const [infoTarget, setInfoTarget] = useState(null);
+    const infoRef = useRef(null);
+
+    const [claimAnimation, setClaimAnimation] = useState(false)
 
     const loadWeb3 = () => {
         metaConnect.getChainId().then((value) => {
@@ -108,7 +115,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
                         setTodayClaimNum(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
                         setDisableDividends(false);
                     } else {
-                        setTTEarnRoundTitle('Next');
+                        setTTEarnRoundTitle("");
                     }
                 }).catch((error) => { });
             }
@@ -144,7 +151,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
     const unstake = () => {
         if (unstakeAmount > 0 && unstakeAmount <= unstakeMax) {
             setIsUnStaking(true);
-            stakeContract.methods.withdraw(web3.utils.toWei(unstakeAmount, 'ether')).send({ from: userInfo.account, value: web3.utils.toWei('1', 'ether') }).then(function (receipt) {
+            stakeContract.methods.withdraw(web3.utils.toWei(unstakeAmount, 'ether')).send({ from: userInfo.account, value: web3.utils.toWei('10', 'ether') }).then(function (receipt) {
                 setUnstakeMax(
                     (Number(unstakeMax) - Number(unstakeAmount)).toFixed(5)
                 );
@@ -157,11 +164,21 @@ function LpDividend({ userInfo, connectWallet, token }) {
     };
 
     const claimDevidends = () => {
+        setClaimAnimation(true)
+        setTimeout(() => {
+            setClaimAnimation(false)
+          }, 6000);
         setIsClaiming(true);
         stakeContract.methods.getReward().send({ from: userInfo.account }).then(function (receipt) {
             setDisableDividends(true);
             setIsClaiming(false);
             checkContractInfo()
+
+            setClaimAnimation(true)
+            setTimeout(() => {
+                setClaimAnimation(false)
+              }, 6000);
+
         }).catch((error) => {
             setIsClaiming(false);
         });
@@ -212,7 +229,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
     }, [userInfo]);
 
     useEffect(() => {
-        if (ttEarnRoundTitle === 'Next') {
+        if (ttEarnRoundTitle === "") {
             if (Number(totalStakeNow) === 0) {
                 setTodayClaimNum(0);
             } else {
@@ -223,17 +240,6 @@ function LpDividend({ userInfo, connectWallet, token }) {
 
         }
     }, [dividends, isStaking, totalStakeNow, ttEarnRoundTitle]);
-
-    const blockOneStyle = {
-        border: '1px',
-        borderStyle: 'solid',
-        borderColor: '#669BFD',
-        borderLeft: 'none',
-        borderRight: 'none',
-        borderTop: 'none',
-        marginTop: '10px',
-        paddingBottom: '10px',
-    };
 
     const blockThreeStyle = {
         border: '1px',
@@ -255,24 +261,45 @@ function LpDividend({ userInfo, connectWallet, token }) {
     };
 
     return (
-        <div style={{ backgroundColor: '#FAF9FA', minHeight: '100vh' }}>
+        <div style={{ backgroundColor: '#F1F2FF', minHeight: '100vh' }} className={style}>
             <Sidebar headerColor={"#5E75E0"} />
-            <Container style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }} >
-                <font style={{ fontSize: '26px' }}>
-                    <font style={{ color: '#669BFD' }}>3Star </font>
-                    <font>Dividend</font>
-                </font>
-                <br></br>
-                <font style={{ fontSize: '15px' }}>Stake 3Star to earn {token}</font>
+
+            {claimAnimation ? <ClaimAnimation claimNumber={todayClaimNum} /> : ""}
+
+            <Container style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }}>
+                <Row>
+                    <Col xs={2}></Col>
+                    <Col xs={8}>
+                        <font style={{ fontSize: '26px' }}>
+                            <font style={{ color: '#5E75E0' }}>Hyper </font>
+                            <font>Dividend</font>
+                        </font>
+                        <br></br>
+                        <font style={{ fontSize: '15px' }}>Stake 3Star-{token} LP to earn {token}</font>
+                    </Col>
+                    <Col xs={2} style={{ textAlign: 'right', paddingRight: "10px" }}>
+                        <BsInfoCircleFill ref={infoRef} style={{ color: '#5E75E0', backgroundColor: 'white', borderRadius: '50%' }}
+                            onClick={(event) => { setInfoShow(!infoShow); setInfoTarget(event.target); }} />
+                    </Col>
+                </Row>
+                <Row ref={infoRef}>
+                    <Overlay show={infoShow} target={infoTarget} placement='bottom' container={infoRef} rootClose onHide={() => setInfoShow(false)}>
+                        <div className='info'>
+                            <font>
+                                if stake at 8/27, you can start to claim Dividends at 8/29
+                            </font>
+                        </div>
+                    </Overlay>
+                </Row>
                 <Container className='card'>
-                    <Row style={blockOneStyle}>
+                    <Row className="blockOne">
                         <Col xs={2} sm={2}>
-                            <img src={ThreeStarToken} width='50px'></img>
+                            <img src={LpToken} width='50px'></img>
                         </Col>
                         <Col xs={4} sm={4} style={{ textAlign: 'left' }}>
                             <font style={{ fontSize: '13px' }}>Stake</font>
                             <br></br>
-                            <font style={{ fontSize: '17px' }}>3Star</font>
+                            <font style={{ fontSize: '17px' }}>3Star-{token}</font>
                         </Col>
                         <Col xs={6} sm={6} style={{ textAlign: 'right' }}>
                             <font style={{ fontSize: '13px' }}>Coming Dividend</font>
@@ -361,7 +388,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
 
                     <Row style={blockThreeStyle}>
                         <Col xs={5} sm={5} style={{ textAlign: 'left' }}>
-                            <font style={{ fontSize: '13px', color: '#669BFD' }}>
+                            <font style={{ fontSize: '13px', color: '#5E75E0' }}>
                                 Aviailable 3Star
                             </font>
                             <br></br>
@@ -376,11 +403,11 @@ function LpDividend({ userInfo, connectWallet, token }) {
                                 />
                             </font>
                         </Col>
-                        <Col style={{ textAlign: 'right' }}>
+                        <Col style={{ textAlign: 'right' }} className="stakeBlock">
                             <font
                                 style={{
                                     fontSize: '10px',
-                                    color: '#669BFD',
+                                    color: '#5E75E0',
                                     textDecoration: 'underline',
                                 }}
                                 onClick={() => {
@@ -393,8 +420,6 @@ function LpDividend({ userInfo, connectWallet, token }) {
                             {isStaking ? (
                                 <Button
                                     style={{
-                                        backgroundColor: '#669BFD',
-                                        borderColor: '#669BFD',
                                         width: '70%',
                                         lineHeight: '1.1',
                                     }}
@@ -413,8 +438,6 @@ function LpDividend({ userInfo, connectWallet, token }) {
                                 <Button
                                     disabled={stakeAmount > stakeMax || stakeAmount <= 0}
                                     style={{
-                                        backgroundColor: '#669BFD',
-                                        borderColor: '#669BFD',
                                         width: '70%',
                                         lineHeight: '1.1',
                                     }}
@@ -433,7 +456,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
 
                     <Row style={{ marginTop: '10px' }} className='claimBlock'>
                         <Col style={{ textAlign: 'left' }}>
-                            <font style={{ color: '#00B3F7' }}>
+                            <font style={{ color: '#5E75E0' }}>
                                 {ttEarnRoundTitle} TT Earn
                             </font>
                             <br></br>
@@ -442,13 +465,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
                         <Col className='claimBtDiv'>
                             {isClaiming ? (
                                 <Button disabled={true}>
-                                    <Spinner
-                                        as='span'
-                                        animation='grow'
-                                        size='sm'
-                                        role='status'
-                                        aria-hidden='true'
-                                    />
+                                    <Spinner as='span' animation='grow' size='sm' role='status' aria-hidden='true' />
                                     Loading...
                                 </Button>
                             ) : (
@@ -480,7 +497,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
                     <div {...getCollapseProps()}>
                         <Row style={blockThreeStyle}>
                             <Col xs={5} sm={5} style={{ textAlign: 'left' }}>
-                                <font style={{ fontSize: '13px', color: '#669BFD' }}>
+                                <font style={{ fontSize: '13px', color: '#5E75E0' }}>
                                     Staked 3Star
                                 </font>
                                 <br></br>
@@ -499,7 +516,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
                                 <font
                                     style={{
                                         fontSize: '10px',
-                                        color: '#669BFD',
+                                        color: '#5E75E0',
                                         textDecoration: 'underline',
                                     }}
                                     onClick={() => {
@@ -530,7 +547,7 @@ function LpDividend({ userInfo, connectWallet, token }) {
                                     </Button>
                                 ) : (
                                     <Button
-                                        disabled={unstakeAmount > unstakeMax}
+                                        disabled={unstakeAmount > unstakeMax || unstakeAmount <= 0}
                                         variant='outline-primary'
                                         style={{
                                             color: '#669BFD',
@@ -590,47 +607,32 @@ function LpDividend({ userInfo, connectWallet, token }) {
                 </Container>
 
                 <Container className='card'>
-                    <Row style={blockOneStyle}>
+                    <Row className="blockOne">
                         <Col>
                             <font style={{ fontSize: '26px' }}>
-                                Get <font style={{ color: '#669BFD' }}>3Star</font>
+                                Get <font style={{ color: '#5E75E0' }}>3Star-{token} </font>LP
                             </font>
                         </Col>
                     </Row>
                     <Row style={blockFiveStyle}>
                         <Col>
-                            <font>
-                                To get <font style={{ color: '#669BFD' }}>3Star</font> you just
-                                need to play the games!
-                            </font>
+                            <a href='https://ttswap.space/#/add-liquidity/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186'>
+                                <Button className='longButton'>Get 3Star-TT LP</Button>
+                            </a>
                         </Col>
+
                     </Row>
                     <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
                         <Col>
-                            <a href='/'>
-                                <Button className='longButton'>Go to play</Button>
-                            </a>
-                        </Col>
-                    </Row>
-
-                    <Row style={blockFiveStyle}>
-                        <Col>
                             <font>
-                                You can also buy <font style={{ color: '#669BFD' }}>3Star</font>{' '}
-                                on TTSwap
+                                Add <font style={{ color: '#5E75E0' }}>3Star</font> and <font style={{ color: '#5E75E0' }}>{token}</font> on TTSwap
+                                to get <font style={{ color: '#5E75E0' }}>3Star-{token}</font> LP tokens. Then stake LP  here to get Dividends!
                             </font>
                         </Col>
                     </Row>
                     <Row>
                         <Col>
                             <img src={TTSwapIcon} alt='ttswapicon' width='45px'></img>
-                        </Col>
-                    </Row>
-                    <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
-                        <Col>
-                            <a href='https://ttswap.space/#/swap/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186'>
-                                <Button className='longButton'>Buy on TTSwap</Button>
-                            </a>
                         </Col>
                     </Row>
                 </Container>
@@ -640,3 +642,82 @@ function LpDividend({ userInfo, connectWallet, token }) {
 }
 
 export default LpDividend;
+
+const style = css`
+svg {
+    cursor: pointer;
+}
+
+.blockFour {
+    margin-top: 10px;
+}
+
+.card {
+    border: 1px;
+    border-style: solid;
+    border-color: #B7C4FF;
+    border-radius: 10px;
+    background-color: white;
+    margin-top: 10px;
+}
+
+.longButton {
+    background-color: #5E75E0;
+    border-color: #5E75E0;
+    width: 98%;
+    border-radius: 10px;
+}
+
+.claimBlock {
+    font-weight: 500;
+}
+
+.claimBlock button {
+    width: 100%;
+    line-height: 1.1;
+}
+
+.stakeBlock button{
+    background-color: #5E75E0;
+    border-color: #5E75E0;
+}
+
+.claimBtDiv {
+    text-align: right;
+    margin-right: 4px;
+}
+
+.claimBtDiv button{
+    background-color: #5E75E0;
+    border-color: #5E75E0;
+}
+
+.detailBlock {
+    cursor: pointer;
+    color: #5E75E0;
+}
+
+.info {
+    background-color: white;
+    color: black;
+    width: 210px;
+    font-size: 12px;
+    border-radius: 5px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+    text-align: left;
+}
+
+.blockOne {
+    border: 1px;
+    border-style: solid;
+    border-color: #B7C4FF;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+`

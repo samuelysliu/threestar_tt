@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Container,
-  Row,
-  Col,
-  Spinner,
-  Overlay,
-  Dropdown,
-} from 'react-bootstrap';
+import { Container, Row, Col, Spinner, Overlay, Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Web3 from 'web3';
 import Sidebar from '../components/sidebar';
@@ -418,7 +411,6 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
     boxShadow: '0px 5px 0px 0px #00AFF3',
     padding: '6px',
     fontSize: '16px',
-    color: 'white',
   };
 
   const connectBtStyle = {

@@ -19,7 +19,7 @@ function Sidebar({headerColor}) {
             <nav className="navbar navbar-expand-lg navbar-light shadow-md">
                 <font style={{ fontSize: "28px", color: "white", position: "absolute", left: "50%", marginLeft: "-60px", cursor: "pointer" }} onClick={backHome}><strong>TT 3Star</strong></font>
                 <div className="form-inline ml-auto">
-                    <div className="btn btn-primary" onClick={ToggleSidebar} >
+                    <div className="btn btn-primary" style={{borderColor: headerColor, backgroundColor: headerColor}} onClick={ToggleSidebar} >
                         <FaBars />
                     </div>
                 </div>

@@ -10,10 +10,10 @@ import StakingRewardABI from '../abi/stakingRewardABI.json';
 import { PathController } from '../components/pathController';
 import { ConnectWallet } from '../components/connectWallet';
 import { FiExternalLink } from 'react-icons/fi';
-import '../styles/dividend.css';
 import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import useCollapse from 'react-collapsed';
 import TTSwapIcon from '../images/TTSwapIcon.png';
+import { css } from '@emotion/css'
 
 function Dividend({ userInfo, connectWallet, token }) {
     const metaConnect = new ConnectWallet();
@@ -255,7 +255,7 @@ function Dividend({ userInfo, connectWallet, token }) {
     };
 
     return (
-        <div style={{ backgroundColor: '#FAF9FA', minHeight: '100vh' }}>
+        <div style={{ backgroundColor: '#FAF9FA', minHeight: '100vh' }} className={style}>
             <Sidebar headerColor={"#01AFFB"} />
             <Container style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }} >
                 <font style={{ fontSize: '26px' }}>
@@ -640,3 +640,49 @@ function Dividend({ userInfo, connectWallet, token }) {
 }
 
 export default Dividend;
+
+const style = css`
+svg {
+  cursor: pointer;
+}
+
+.blockFour {
+  margin-top: 10px;
+}
+
+.card {
+  border: 1px;
+  border-style: solid;
+  border-color: #669bfd;
+  border-radius: 10px;
+  background-color: white;
+  margin-top: 10px;
+}
+
+.longButton {
+  background-color: #669BFD;
+  border-color: #669BFD;
+  width: 98%;
+  border-radius: 10px;
+}
+
+.claimBlock {
+  font-weight: 500;
+}
+
+.claimBlock button {
+  width: 100%;
+  line-height: 1.1;
+}
+
+.claimBtDiv {
+  text-align: right;
+  margin-right: 4px;
+}
+
+.detailBlock {
+  cursor: pointer;
+  color: #00b3f7;
+}
+
+`
