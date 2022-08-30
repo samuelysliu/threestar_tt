@@ -85,7 +85,9 @@ function Dividend({ userInfo, connectWallet, token }) {
     };
 
     const checkContractInfo = () => {
+        console.log("hi")
         TSTokenContract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
+            console.log(receipt)
             if (receipt >= 100000000000000000000000) {
                 setUnlockBool(false);
                 TSTokenContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
@@ -103,6 +105,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                 }).catch((error) => { });
 
                 stakeContract.methods.rewards(userInfo.account).call().then(function (receipt) {
+                    console.log(receipt)
                     if (receipt > 0) {
                         setTTEarnRoundTitle('Last');
                         setTodayClaimNum(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
@@ -678,6 +681,11 @@ svg {
 .claimBtDiv {
   text-align: right;
   margin-right: 4px;
+}
+
+.btn-primary:disabled{
+    background-color: #669BFD;
+    border-color: #669BFD;
 }
 
 .detailBlock {
