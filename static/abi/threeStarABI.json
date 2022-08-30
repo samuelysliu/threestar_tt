@@ -2,101 +2,46 @@
   "contractName": "ThreeStar",
   "abi": [
     {
-      "constant": false,
       "inputs": [
         {
-          "name": "withdrawAmount",
+          "internalType": "uint256",
+          "name": "_gasFee",
           "type": "uint256"
         }
       ],
-      "name": "withdraw",
+      "name": "changeGasFee",
       "outputs": [],
-      "payable": true,
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "constant": true,
-      "inputs": [],
-      "name": "ownerRemain",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
       "inputs": [
         {
-          "name": "_winner",
-          "type": "address"
-        },
-        {
-          "name": "_point",
-          "type": "uint256"
-        }
-      ],
-      "name": "sendPrize",
-      "outputs": [],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
+          "internalType": "address",
+          "name": "_newOurToken",
           "type": "address"
         }
       ],
-      "name": "playerInfo",
-      "outputs": [
-        {
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "player",
-          "type": "address"
-        }
-      ],
-      "name": "balanceOf",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "game",
+      "name": "changeTokenAddress",
       "outputs": [],
-      "payable": true,
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "payable": true,
+      "name": "game",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_ourToken",
+          "type": "address"
+        }
+      ],
       "stateMutability": "payable",
       "type": "constructor"
     },
@@ -105,16 +50,18 @@
       "inputs": [
         {
           "indexed": false,
-          "name": "player",
+          "internalType": "address",
+          "name": "",
           "type": "address"
         },
         {
           "indexed": false,
-          "name": "betAmount",
+          "internalType": "uint256",
+          "name": "",
           "type": "uint256"
         }
       ],
-      "name": "playGame",
+      "name": "Received",
       "type": "event"
     },
     {
@@ -122,16 +69,19 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "address",
           "name": "player",
           "type": "address"
         },
         {
           "indexed": false,
+          "internalType": "uint256",
           "name": "prize",
           "type": "uint256"
         },
         {
           "indexed": false,
+          "internalType": "bool",
           "name": "result",
           "type": "bool"
         }
@@ -144,17 +94,129 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "betAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "playGame",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "_winner",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_point",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "double",
+          "type": "uint256"
+        }
+      ],
+      "name": "sendPrize",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "withdrawAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
           "name": "betAmount",
           "type": "uint256"
         },
         {
           "indexed": false,
+          "internalType": "bool",
           "name": "success",
           "type": "bool"
         }
       ],
       "name": "withdrawOrder",
       "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ourToken",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "playerInfo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
 }

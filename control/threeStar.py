@@ -83,6 +83,7 @@ class threeStar:
                     if i["chainName"] == "thunderCore":
                         return {"point": 0, "starNumber": [0], "winTS": 0, "winTT": 0}
 
+
             starNumber = self.createRandom()
             point = self.countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
             winTS = 0
@@ -97,39 +98,35 @@ class threeStar:
                 starNumber = self.createRandom()
                 point = self.countPoint(starNumber, sorted(args[0]["userLuckyNum"]))
 
-            if point > 2:
-                self.sendPrize(args[0]["playerAddress"], point)
-                if point == 3:
-                    winTT = playerAmount * 99 / 100 * 2
-                elif point == 4:
-                    winTT = playerAmount * 99 / 100 * 20
-                elif point == 5:
-                    winTT = playerAmount * 99 / 100 * 100
+            if point == 3:
+                winTT = playerAmount * 99 / 100 * 2
+            elif point == 4:
+                winTT = playerAmount * 99 / 100 * 20
+            elif point == 5:
+                winTT = playerAmount * 99 / 100 * 100
+            elif point < 3:
+                winTS = float(playerAmount) / 250
 
-                if self.userUseBonus(args[0]["playerAddress"]):
-                    self.withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                                            "amount": winTT})
-                    self.giveTT(args[0]["playerAddress"], winTT)
-                    winTT = winTT * 2
-
+            if self.userUseBonus(args[0]["playerAddress"]):
+                self.sendPrize(args[0]["playerAddress"], point, 2)
+                winTT = winTT * 2
+                winTS = winTS * 2
             else:
-                winTS = float(playerAmount) * 0.004
-                self.giveTSToken(args[0]["playerAddress"], winTS)
-                if self.userUseBonus(args[0]["playerAddress"]):
-                    self.giveTSToken(args[0]["playerAddress"], winTS)
-                    winTS = winTS * 2
+                self.sendPrize(args[0]["playerAddress"], point, 1)
 
-            transactionInfo.saveTransaction({"address": args[0]["playerAddress"], "hash": args[0]["hash"],
-                                             "chainName": "thunderCore", "betAmount": playerAmount, "winTT": winTT})
+            transactionInfo.saveTransaction(
+                {"address": Web3.toChecksumAddress(args[0]["playerAddress"]), "hash": args[0]["hash"],
+                 "chainName": "thunderCore", "betAmount": playerAmount, "winTT": winTT})
 
             return {"point": point, "starNumber": starNumber, "winTS": winTS, "winTT": winTT}
+
         else:
             return {"point": 0, "starNumber": [0], "winTS": 0, "winTT": 0}
 
-    def sendPrize(self, winner, point):
-        winner = self.web3.toChecksumAddress(winner)
 
-        contractSendPrize = self.threeStarContract.functions.sendPrize(winner, point).buildTransaction(
+    def sendPrize(self, winner, point, bonus):
+        winner = Web3.toChecksumAddress(winner)
+        contractSendPrize = self.threeStarContract.functions.sendPrize(winner, point, bonus).buildTransaction(
             {
                 'from': self.owner['address'],
                 'gasPrice': self.web3.toWei('50', 'gwei'),
@@ -139,6 +136,7 @@ class threeStar:
 
         result = blockchain.sendTransaction(self.web3, contractSendPrize)
         return result
+
 
     def setReward(self):
         try:
@@ -167,10 +165,12 @@ class threeStar:
         except:
             return "contract insufficient balance"
 
+
     # get today dividend
     def getTodayDividend(self):
         ownerRemain = blockchain.getOwnerRemain(self.web3, self.threeStarContractAddress)
         return round(ownerRemain * 20 / 100, 5)
+
 
     # get this round dividend info
     def getDividendInfo(self):
@@ -183,12 +183,13 @@ class threeStar:
 
         return str(dividend), APR, payout, float(totalStake), roundNumber
 
+
     # scheduler will auto save lastRound
     def saveLastRound(self):
         try:
             dividend, APR, payout, totalStake, roundNumber = self.getDividendInfo()
             payout = "GMT " + (datetime.datetime.now(pytz.timezone('GMT'))).strftime(
-            "%m/%d") + " 00:00"
+                "%m/%d") + " 00:00"
             self.dividendRoundInfo.saveDividendRound(
                 {"roundNumber": roundNumber, "payout": payout, "totalStake": totalStake, "APR": APR,
                  "dividend": dividend})
@@ -196,12 +197,15 @@ class threeStar:
         except:
             return "failed"
 
+
     def getLastRound(self):
         lastRound = self.dividendRoundInfo.getLastRound()
         return {"roundNumber": lastRound["roundNumber"], "payout": lastRound["payout"],
                 "totalStake": lastRound["totalStake"],
                 "APR": lastRound["APR"], "dividend": lastRound["dividend"]}
 
+
+    """
     # function let owner transfer 3star token
     def giveTSToken(self, receipient, amount):
         try:
@@ -212,11 +216,14 @@ class threeStar:
                 'gasPrice': self.web3.toWei('50', 'gwei'),
                 'nonce': self.web3.eth.get_transaction_count(self.owner['address']),
             })
-
+    
             blockchain.sendTransaction(self.web3, transferTSToken)
             return "success"
         except:
             return "failed"
+    
+    """
+
 
     # master withdraw the tt in threestar main contract
     def withdrawThreeStar(self, *args):
@@ -236,6 +243,7 @@ class threeStar:
         else:
             return {"result": "failed"}
 
+
     # if user can get daily check prize
     def canClaimBool(self, prizeType, address):
         prizeType = prizeType
@@ -251,6 +259,7 @@ class threeStar:
                 return True
             else:
                 return False
+
 
     # usear request get daily prize
     def claimPrize(self, *args):
@@ -285,6 +294,7 @@ class threeStar:
         except:
             return "failed"
 
+
     # get user all prize
     def getUserPrizeList(self, playerAddress):
         playerAddress = playerAddress.lower()
@@ -292,6 +302,7 @@ class threeStar:
         userPrizeArray = userPrizeInfo.getUserPrizeByAddress(
             {"address": playerAddress})
         return userPrizeArray
+
 
     # check user have bonus but not use it only for check
     def isUserHaveBonus(self, playerAddress):
@@ -302,6 +313,7 @@ class threeStar:
             if i["chainName"] == "thunderCore" and int(i["number"]) > 0:
                 return True
         return False
+
 
     # user using prize coupon
     def userUseBonus(self, playerAddress):
@@ -318,10 +330,11 @@ class threeStar:
 
         return False
 
+
     # function let master transfer tt from owner wallet
     def giveTT(self, receipient, amount):
         try:
-            receipient = self.web3.toChecksumAddress(receipient)
+            receipient = Web3.toChecksumAddress(receipient)
             tx = {
                 'nonce': self.web3.eth.get_transaction_count(self.owner['address']),
                 'to': receipient,
@@ -334,3 +347,14 @@ class threeStar:
             return "success"
         except:
             return "failed"
+
+
+    def changeGasFee(self):
+        threeStarWithdraw = self.threeStarContract.functions.changeGasFee(250).buildTransaction({
+            'from': self.owner['address'],
+            'gasPrice': self.web3.toWei('50', 'gwei'),
+            'nonce': self.web3.eth.get_transaction_count(self.owner['address']),
+        })
+        blockchain.sendTransaction(self.web3, threeStarWithdraw)
+
+        return "success"

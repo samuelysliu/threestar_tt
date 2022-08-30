@@ -10,16 +10,15 @@ load_dotenv()
 
 app = Flask(__name__, static_folder='templates/build')
 
-#CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
-#CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={r"/api/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
+CORS(app, resources={r"/bsc/.*": {"origins": [os.getenv("REACT_APP_APIPATH")]}})
 CORS(app, resources={r"/master/.*": {"origins": ["192.168.100.10"]}})
-CORS(app)
+#CORS(app)
 
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['PROPAGATE_EXCEPTIONS'] = True
 api = Api(app)
-
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -31,12 +30,10 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 
-"""
 @app.before_request
 def before_request():
     if not request.is_secure:
         return redirect(request.url.replace('http://', 'https://'))
-"""
 
 class startGame(Resource):
     def __init__(self):
