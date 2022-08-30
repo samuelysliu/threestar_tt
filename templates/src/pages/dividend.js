@@ -628,7 +628,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                     </Row>
                     <Row style={{ marginTop: '10px', marginBottom: '10px' }}>
                         <Col>
-                            <a href='https://ttswap.space/#/swap/0xF0F35015Fd4879Ef73Dfc1abbB29226AfBF53186'>
+                            <a href='https://ttswap.space/#/swap/0xa8Dc2bE06c36AdAA4A4E1B22cC92b6dE64f49f72'>
                                 <Button className='longButton'>Buy on TTSwap</Button>
                             </a>
                         </Col>
