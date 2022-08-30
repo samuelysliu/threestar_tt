@@ -75,7 +75,7 @@ function App() {
         <Route path="/" element={<Index connectWallet={connectWallet} userInfo={userInfo} token={token} originTokenUrl={originTokenUrl} />}></Route>
         <Route path='/dividend' element={<Dividend connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>
         <Route path="/bonus" element={<Bonus connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>
-        <Route path="/lpDividend" element={<LpDividend connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>
+        {/*<Route path="/lpDividend" element={<LpDividend connectWallet={connectWallet} userInfo={userInfo} token={token} />}></Route>*/}
       </Routes>
     </Router>
   );

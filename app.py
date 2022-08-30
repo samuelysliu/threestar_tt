@@ -35,6 +35,7 @@ def before_request():
     if not request.is_secure:
         return redirect(request.url.replace('http://', 'https://'))
 
+
 class startGame(Resource):
     def __init__(self):
         self.threeStar = threeStar("thunderCore")
