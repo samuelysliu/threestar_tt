@@ -103,7 +103,6 @@ function Dividend({ userInfo, connectWallet, token }) {
                 }).catch((error) => { });
 
                 stakeContract.methods.rewards(userInfo.account).call().then(function (receipt) {
-                    console.log(receipt)
                     if (receipt > 0) {
                         setTTEarnRoundTitle('Last');
                         setTodayClaimNum(Number(web3.utils.fromWei(receipt, 'ether')).toFixed(5));
