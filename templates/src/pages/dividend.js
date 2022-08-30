@@ -259,11 +259,11 @@ function Dividend({ userInfo, connectWallet, token }) {
             <Sidebar headerColor={"#01AFFB"} />
             <Container style={{ textAlign: 'center', marginTop: '20px', maxWidth: '720px' }} >
                 <font style={{ fontSize: '26px' }}>
-                    <font style={{ color: '#669BFD' }}>3Star </font>
+                    <font style={{ color: '#669BFD' }}>Star </font>
                     <font>Dividend</font>
                 </font>
                 <br></br>
-                <font style={{ fontSize: '15px' }}>Stake 3Star to earn {token}</font>
+                <font style={{ fontSize: '15px' }}>Stake Star to earn {token}</font>
                 <Container className='card'>
                     <Row style={blockOneStyle}>
                         <Col xs={2} sm={2}>
@@ -272,7 +272,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                         <Col xs={4} sm={4} style={{ textAlign: 'left' }}>
                             <font style={{ fontSize: '13px' }}>Stake</font>
                             <br></br>
-                            <font style={{ fontSize: '17px' }}>3Star</font>
+                            <font style={{ fontSize: '17px' }}>Star</font>
                         </Col>
                         <Col xs={6} sm={6} style={{ textAlign: 'right' }}>
                             <font style={{ fontSize: '13px' }}>Coming Dividend</font>
@@ -362,7 +362,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                     <Row style={blockThreeStyle}>
                         <Col xs={5} sm={5} style={{ textAlign: 'left' }}>
                             <font style={{ fontSize: '13px', color: '#669BFD' }}>
-                                Aviailable 3Star
+                                Aviailable Star
                             </font>
                             <br></br>
                             <font style={{ fontSize: '15px' }}>
@@ -481,7 +481,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                         <Row style={blockThreeStyle}>
                             <Col xs={5} sm={5} style={{ textAlign: 'left' }}>
                                 <font style={{ fontSize: '13px', color: '#669BFD' }}>
-                                    Staked 3Star
+                                    Staked Star
                                 </font>
                                 <br></br>
                                 <font style={{ fontSize: '15px' }}>
@@ -593,14 +593,14 @@ function Dividend({ userInfo, connectWallet, token }) {
                     <Row style={blockOneStyle}>
                         <Col>
                             <font style={{ fontSize: '26px' }}>
-                                Get <font style={{ color: '#669BFD' }}>3Star</font>
+                                Get <font style={{ color: '#669BFD' }}>Star</font>
                             </font>
                         </Col>
                     </Row>
                     <Row style={blockFiveStyle}>
                         <Col>
                             <font>
-                                To get <font style={{ color: '#669BFD' }}>3Star</font> you just
+                                To get <font style={{ color: '#669BFD' }}>Star</font> you just
                                 need to play the games!
                             </font>
                         </Col>
@@ -616,7 +616,7 @@ function Dividend({ userInfo, connectWallet, token }) {
                     <Row style={blockFiveStyle}>
                         <Col>
                             <font>
-                                You can also buy <font style={{ color: '#669BFD' }}>3Star</font>{' '}
+                                You can also buy <font style={{ color: '#669BFD' }}>Star</font>{' '}
                                 on TTSwap
                             </font>
                         </Col>

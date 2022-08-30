@@ -166,7 +166,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                 ).toFixed(2)
               );
             } else {
-              setStatusMessage('YOU GOT 3Star!');
+              setStatusMessage('YOU GOT Star!');
               setWinTS(res['data']['winTS']);
               setTToken((Number(TTToken) - Number(userBet)).toFixed(2));
               setTSToken(
@@ -507,7 +507,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
               >
                 <div className='info'>
                   <font>
-                    winning {token} will be charged 1% fee, lose can get 3Star
+                    winning {token} will be charged 1% fee, lose can get Star
                     tokens{' '}
                   </font>
                 </div>
@@ -578,7 +578,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                   </font>
                 </Col>
               </Row>
-            ) : statusMessage === 'YOU GOT 3Star!' ? (
+            ) : statusMessage === 'YOU GOT Star!' ? (
               <Row>
                 <Col className='winTokenRowStyle'>
                   <img src={ThreeStarToken} style={{ width: '30px' }}></img>
@@ -667,7 +667,7 @@ function Index({ userInfo, connectWallet, token, originTokenUrl }) {
                   </Col>
                   <Col className='tokenNumBc' style={{ marginRight: '20px' }}>
                     <img className='tokenStyle' src={ThreeStarToken}></img>
-                    <font>{TSToken} 3Star</font>
+                    <font>{TSToken} Star</font>
                   </Col>
                 </>
               )}
