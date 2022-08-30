@@ -85,9 +85,7 @@ function Dividend({ userInfo, connectWallet, token }) {
     };
 
     const checkContractInfo = () => {
-        console.log("hi")
         TSTokenContract.methods.allowance(userInfo.account, stakeContractAddress).call().then(function (receipt) {
-            console.log(receipt)
             if (receipt >= 100000000000000000000000) {
                 setUnlockBool(false);
                 TSTokenContract.methods.balanceOf(userInfo.account).call().then(function (receipt) {
