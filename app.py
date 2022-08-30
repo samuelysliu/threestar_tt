@@ -29,7 +29,6 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
-
 @app.before_request
 def before_request():
     if not request.is_secure:

@@ -26,9 +26,9 @@ class threeStar:
             self.dividendRoundInfo = dividendRoundInfo("thunderCore")
         elif chain == "bsc":
             self.web3, self.chainID = blockchain.bsc()
-            self.threeStarContractAddress, self.threeStarContract = blockchain.getThreeStarContract(self.web3)
-            self.stakeContractAddress, self.stakeContract = blockchain.getStakeContract(self.web3)
-            self.TSContractAddress, self.TSContract = blockchain.getTSToken(self.web3)
+            self.threeStarContractAddress, self.threeStarContract = blockchain.getThreeStarContract_bsc(self.web3)
+            self.stakeContractAddress, self.stakeContract = blockchain.getStakeContract_bsc(self.web3)
+            self.TSContractAddress, self.TSContract = blockchain.getTSToken_bsc(self.web3)
             self.dividendRoundInfo = dividendRoundInfo("bsc")
 
     def cannotLose(self, point, contractRemain, playerAmount, userHaveBonus):
