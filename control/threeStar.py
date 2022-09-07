@@ -142,12 +142,10 @@ class threeStar:
         try:
             dividend = self.getTodayDividend()
             self.withdrawThreeStar({"privateKey": os.getenv("privateKey"),
-                                    "amount": float(
-                                        blockchain.getOwnerRemain(self.web3, self.threeStarContractAddress))})
-
+                                    "amount": round(float(
+                                        blockchain.getOwnerRemain(self.web3, self.threeStarContractAddress)), 3)})
             try:
                 self.giveTT(self.stakeContractAddress, dividend)
-                """
                 setTodayReward = self.stakeContract.functions.setReward(
                     self.web3.toWei(dividend, 'ether')).buildTransaction(
                     {
@@ -157,7 +155,6 @@ class threeStar:
                     }
                 )
                 blockchain.sendTransaction(self.web3, setTodayReward)
-                """
             except:
                 return "owner insufficient balance"
 
@@ -244,6 +241,7 @@ class threeStar:
             return {"result": "success"}
         else:
             return {"result": "failed"}
+
 
 
     # if user can get daily check prize
