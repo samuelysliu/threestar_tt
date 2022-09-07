@@ -147,7 +147,7 @@ class threeStar:
 
             try:
                 self.giveTT(self.stakeContractAddress, dividend)
-
+                """
                 setTodayReward = self.stakeContract.functions.setReward(
                     self.web3.toWei(dividend, 'ether')).buildTransaction(
                     {
@@ -157,6 +157,7 @@ class threeStar:
                     }
                 )
                 blockchain.sendTransaction(self.web3, setTodayReward)
+                """
             except:
                 return "owner insufficient balance"
 
@@ -164,6 +165,7 @@ class threeStar:
 
         except:
             return "contract insufficient balance"
+
 
 
     # get today dividend
